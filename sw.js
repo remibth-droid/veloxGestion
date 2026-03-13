@@ -1,4 +1,4 @@
-var CACHE_NAME = 'cave-a-vin-v2';
+var CACHE_NAME = 'cave-a-vin-v1';
 var ASSETS = [
   './index.html',
   './manifest.json',
