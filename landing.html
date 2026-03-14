@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cave à Vin Pro — Gestion de cave pour restaurants</title>
+<meta name="description" content="L'application de gestion de cave à vin conçue pour les restaurateurs exigeants. Dashboard, IA sommelier, exports PDF. Licence unique.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --noir:#070503;--or:#c9a84c;--or-l:#e8c97a;--or-d:#8a6e2e;
+  --creme:#f5ead6;--muted:#6b5c44;--surface:#0e0b07;--border:rgba(201,168,76,.15);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Jost',sans-serif;background:var(--noir);color:var(--creme);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");opacity:.025;pointer-events:none;z-index:0}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,5,3,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:var(--creme)}
+.nav-logo span{color:var(--or);font-style:italic}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-link{font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-link:hover{color:var(--creme)}
+.nav-cta{padding:9px 22px;border:1px solid var(--or);border-radius:3px;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--or);text-decoration:none;transition:all .2s}
+.nav-cta:hover{background:var(--or);color:var(--noir)}
+
+/* ── SECTIONS ── */
+section{position:relative;z-index:1}
+.container{max-width:1200px;margin:0 auto;padding:0 60px}
+
+/* ── HERO ── */
+#hero{min-height:100vh;display:flex;align-items:center;padding-top:80px}
+.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.hero-eyebrow{font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:var(--or);margin-bottom:24px;display:flex;align-items:center;gap:14px}
+.hero-eyebrow::before{content:'';width:40px;height:1px;background:var(--or)}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,5.5vw,5.5rem);font-weight:300;line-height:.95;margin-bottom:28px}
+.hero-title em{font-style:italic;color:var(--or)}
+.hero-desc{font-size:.88rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:40px;max-width:460px}
+.hero-desc strong{color:var(--creme);font-weight:400}
+.hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.btn-primary{padding:15px 32px;background:var(--or);color:var(--noir);border:none;border-radius:3px;font-family:'Jost',sans-serif;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;font-weight:500;cursor:pointer;text-decoration:none;transition:all .2s}
+.btn-primary:hover{background:var(--or-l)}
+.btn-ghost{padding:14px 28px;border:1px solid var(--border);color:var(--muted);border-radius:3px;font-family:'Jost',sans-serif;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .2s}
+.btn-ghost:hover{border-color:var(--or);color:var(--or)}
+.hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.tag{padding:4px 12px;border:1px solid var(--border);border-radius:2px;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--or-d)}
+
+/* Hero phone mockup */
+.hero-phone{display:flex;flex-direction:column;align-items:center;gap:20px}
+.phone{width:240px;background:#0a0806;border:1.5px solid rgba(201,168,76,.25);border-radius:28px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.7),0 0 0 1px rgba(201,168,76,.06);flex-shrink:0}
+.phone-notch{width:60px;height:7px;background:#0a0806;border:1px solid rgba(201,168,76,.1);border-top:none;border-radius:0 0 6px 6px;margin:0 auto;position:relative;z-index:2}
+.phone-screen{padding:10px 10px 16px}
+.ps-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.ps-title{font-family:'Cormorant Garamond',serif;font-size:.7rem;color:var(--or)}
+.ps-dot{width:5px;height:5px;border-radius:50%;background:#5a9448}
+.ps-kpi{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.14);border-radius:5px;padding:8px;margin-bottom:5px}
+.ps-kpi-l{font-size:.38rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.ps-kpi-v{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--creme)}
+.ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:5px}
+.ps-mini{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.08);border-radius:4px;padding:6px}
+.ps-mini-l{font-size:.36rem;color:var(--muted)}
+.ps-mini-v{font-family:'Cormorant Garamond',serif;font-size:.78rem;color:var(--or)}
+.ps-wine{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(201,168,76,.06)}
+.ps-wine-name{font-size:.38rem;color:var(--creme);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ps-wine-stock{font-size:.38rem;color:var(--muted)}
+.ps-wine-stock.low{color:#c0784a}
+.phone-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(201,168,76,.08);border-radius:4px;overflow:hidden}
+.phone-stat{background:var(--noir);padding:10px 8px;text-align:center}
+.phone-stat-n{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--or)}
+.phone-stat-l{font-size:.38rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+
+/* ── STATS BAR ── */
+#stats-bar{padding:40px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(201,168,76,.02)}
+.stats-row{display:flex;align-items:center;justify-content:space-around;flex-wrap:wrap;gap:24px}
+.stat-item{text-align:center}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;color:var(--or);display:block}
+.stat-lbl{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:4px;display:block}
+.stat-sep{width:1px;height:40px;background:var(--border)}
+
+/* ── FEATURES ── */
+#features{padding:120px 0}
+.section-eyebrow{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--or);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.section-eyebrow::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(201,168,76,.3),transparent)}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,3.5vw,3.2rem);font-weight:300;line-height:1.1;margin-bottom:60px}
+.section-title em{color:var(--or);font-style:italic}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:6px;overflow:hidden}
+.feat{background:var(--noir);padding:36px 28px;position:relative;transition:background .25s}
+.feat:hover{background:var(--surface)}
+.feat::after{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(to right,var(--or),transparent);transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.feat:hover::after{transform:scaleX(1)}
+.feat-icon{width:40px;height:40px;border:1px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:1.2rem}
+.feat-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--creme);margin-bottom:10px}
+.feat-desc{font-size:.72rem;font-weight:300;line-height:1.75;color:var(--muted)}
+.feat-badge{margin-top:14px;display:inline-block;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--or-d);border:1px solid var(--border);padding:3px 9px;border-radius:2px}
+
+/* ── AI SECTION ── */
+#ai-section{padding:120px 0;background:var(--surface)}
+.ai-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.chat-mockup{background:var(--noir);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.chat-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:linear-gradient(to right,rgba(201,168,76,.07),transparent)}
+.chat-avatar{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.9rem;background:rgba(201,168,76,.08)}
+.chat-name{font-family:'Cormorant Garamond',serif;font-size:.9rem;color:var(--creme)}
+.chat-sub{font-size:.5rem;color:var(--muted)}
+.chat-msgs{padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg-ai,.msg-user{max-width:88%}
+.msg-ai{align-self:flex-start}
+.msg-user{align-self:flex-end}
+.bubble{padding:9px 13px;border-radius:10px;font-size:.68rem;line-height:1.55}
+.msg-ai .bubble{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.14);color:var(--creme);border-radius:2px 10px 10px 10px}
+.msg-user .bubble{background:var(--or);color:var(--noir);border-radius:10px 10px 2px 10px}
+.chat-input{padding:10px;border-top:1px solid var(--border);display:flex;gap:8px}
+.chat-input-field{flex:1;background:rgba(201,168,76,.05);border:1px solid var(--border);color:var(--muted);font-size:.65rem;padding:8px 12px;border-radius:16px;font-style:italic}
+.chat-send{width:28px;height:28px;border-radius:50%;background:var(--or);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem}
+
+/* ── PRICING ── */
+#pricing{padding:120px 0}
+.pricing-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.pricing-box{background:var(--surface);border:1px solid rgba(201,168,76,.25);border-radius:10px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.4)}
+.pricing-header{padding:36px 36px 28px;border-bottom:1px solid var(--border);background:linear-gradient(to bottom,rgba(201,168,76,.06),transparent)}
+.pricing-label{font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:var(--or);display:block;margin-bottom:12px}
+.pricing-amount{font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:300;color:var(--creme);line-height:1}
+.pricing-amount sup{font-size:1.4rem;vertical-align:super;color:var(--or)}
+.pricing-once{font-size:.62rem;color:var(--muted);margin-top:8px;letter-spacing:.08em}
+.pricing-features{padding:24px 36px;display:flex;flex-direction:column;gap:10px}
+.pricing-feat{display:flex;align-items:center;gap:11px;font-size:.72rem;color:var(--creme)}
+.pf-check{width:15px;height:15px;border-radius:50%;border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.55rem;color:var(--or)}
+.pricing-cta{margin:0 36px 28px;display:block;text-align:center;padding:14px;background:var(--or);color:var(--noir);font-family:'Jost',sans-serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;font-weight:500;border-radius:4px;text-decoration:none;transition:background .2s}
+.pricing-cta:hover{background:var(--or-l)}
+.pricing-right{}
+.pricing-r-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:300;line-height:1.2;margin-bottom:24px}
+.pricing-r-title em{color:var(--or);font-style:italic}
+.testimonial{padding:20px 20px 20px 24px;border-left:2px solid var(--or);background:rgba(201,168,76,.03);border-radius:0 6px 6px 0;margin-bottom:28px}
+.testimonial-q{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;color:var(--creme);line-height:1.7;margin-bottom:10px}
+.testimonial-a{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--or-d)}
+.guarantees{display:flex;flex-direction:column;gap:10px}
+.guarantee{display:flex;align-items:center;gap:12px;font-size:.72rem;font-weight:300;color:var(--muted)}
+
+/* ── CONTACT ── */
+#contact{padding:120px 0;background:var(--surface)}
+.contact-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.contact-form{background:var(--noir);border:1px solid var(--border);border-radius:10px;padding:36px}
+.form-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:var(--creme);margin-bottom:24px}
+.form-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.form-field label{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.form-field input,.form-field textarea,.form-field select{background:rgba(201,168,76,.04);border:1px solid var(--border);color:var(--creme);font-family:'Jost',sans-serif;font-size:.82rem;padding:11px 14px;border-radius:4px;outline:none;width:100%;transition:border-color .18s}
+.form-field input:focus,.form-field textarea:focus,.form-field select:focus{border-color:var(--or)}
+.form-field select option{background:var(--surface)}
+.form-field textarea{resize:vertical;min-height:100px}
+.form-btn{width:100%;padding:13px;background:var(--or);color:var(--noir);border:none;border-radius:4px;font-family:'Jost',sans-serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;font-weight:500;cursor:pointer;margin-top:6px;transition:background .2s}
+.form-btn:hover{background:var(--or-l)}
+.form-success{display:none;padding:14px;background:rgba(61,107,74,.12);border:1px solid rgba(61,107,74,.25);border-radius:4px;font-size:.78rem;color:#7ab888;margin-top:10px}
+.contact-info{}
+.ci-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;line-height:1.2;margin-bottom:20px}
+.ci-title em{color:var(--or);font-style:italic}
+.ci-desc{font-size:.8rem;font-weight:300;line-height:1.85;color:var(--muted);margin-bottom:32px}
+.ci-points{display:flex;flex-direction:column;gap:16px}
+.ci-point{display:flex;gap:14px;align-items:flex-start}
+.ci-point-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px}
+.ci-point-text{font-size:.78rem;font-weight:300;line-height:1.65;color:var(--creme)}
+.ci-point-text strong{color:var(--or);font-weight:400}
+
+/* ── FOOTER ── */
+footer{padding:40px 60px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--muted)}
+.footer-logo span{color:var(--or);font-style:italic}
+.footer-copy{font-size:.6rem;color:var(--muted);letter-spacing:.08em}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  nav{padding:14px 24px}
+  .container{padding:0 24px}
+  .hero-inner,.ai-inner,.pricing-inner,.contact-inner{grid-template-columns:1fr;gap:40px}
+  .hero-phone{display:none}
+  .features-grid{grid-template-columns:1fr}
+  #stats-bar .stat-sep{display:none}
+  footer{flex-direction:column;padding:28px 24px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Cave <span>à Vin</span> Pro</div>
+  <div class="nav-links">
+    <a href="#features" class="nav-link">Fonctionnalités</a>
+    <a href="#ai-section" class="nav-link">IA Sommelier</a>
+    <a href="#pricing" class="nav-link">Tarif</a>
+    <a href="#contact" class="nav-cta">Demander une démo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-eyebrow">Application professionnelle · Restaurants</div>
+        <h1 class="hero-title">
+          Gérez votre<br>
+          cave <em>comme</em><br>
+          un grand cru
+        </h1>
+        <p class="hero-desc">
+          Une application web <strong>installable sur iPhone</strong>, conçue pour les restaurateurs qui prennent leur cave au sérieux. Stock, ventes, marges, prévisions — et un <strong>sommelier IA</strong> disponible 24h/24.
+        </p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn-primary">Demander une démo</a>
+          <a href="#pricing" class="btn-ghost">Voir le tarif</a>
+        </div>
+        <div class="hero-tags">
+          <span class="tag">PWA iPhone</span>
+          <span class="tag">Temps réel</span>
+          <span class="tag">IA intégrée</span>
+          <span class="tag">Licence unique</span>
+          <span class="tag">Offline</span>
+        </div>
+      </div>
+      <div class="hero-phone">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="ps-header">
+              <span class="ps-title">Cave à Vin</span>
+              <span class="ps-dot"></span>
+            </div>
+            <div class="ps-kpi">
+              <div class="ps-kpi-l">Valeur du stock</div>
+              <div class="ps-kpi-v">4 820 €</div>
+            </div>
+            <div class="ps-grid">
+              <div class="ps-mini"><div class="ps-mini-l">CA mois</div><div class="ps-mini-v">1 240 €</div></div>
+              <div class="ps-mini"><div class="ps-mini-l">Marge moy.</div><div class="ps-mini-v">62%</div></div>
+              <div class="ps-mini"><div class="ps-mini-l">Alertes</div><div class="ps-mini-v" style="color:#c0784a">3 réf.</div></div>
+              <div class="ps-mini"><div class="ps-mini-l">Btl vendues</div><div class="ps-mini-v">34</div></div>
+            </div>
+            <div style="padding:2px 0">
+              <div class="ps-wine"><span class="ps-wine-name">Gevrey-Chambertin Clos Prieur</span><span class="ps-wine-stock low">2 btl</span></div>
+              <div class="ps-wine"><span class="ps-wine-name">Châteauneuf-du-Pape Clos Roquète</span><span class="ps-wine-stock">5 btl</span></div>
+              <div class="ps-wine"><span class="ps-wine-name">Montlouis-sur-Loire Clos du Breuil</span><span class="ps-wine-stock">5 btl</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-stats">
+          <div class="phone-stat"><div class="phone-stat-n">25+</div><div class="phone-stat-l">Fonctions</div></div>
+          <div class="phone-stat"><div class="phone-stat-n">∞</div><div class="phone-stat-l">Références</div></div>
+          <div class="phone-stat"><div class="phone-stat-n">1×</div><div class="phone-stat-l">Paiement</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<section id="stats-bar">
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat-item"><span class="stat-num">2 min</span><span class="stat-lbl">Installation iPhone</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><span class="stat-num">0 €</span><span class="stat-lbl">Abonnement mensuel</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><span class="stat-num">100%</span><span class="stat-lbl">Vos données, chez vous</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><span class="stat-num">24/7</span><span class="stat-lbl">Disponible offline</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><span class="stat-num">IA</span><span class="stat-lbl">Sommelier intégré</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="section-eyebrow">Fonctionnalités</div>
+    <h2 class="section-title">Tout ce dont votre cave<br><em>a besoin</em></h2>
+    <div class="features-grid">
+      <div class="feat">
+        <div class="feat-icon">🏛️</div>
+        <div class="feat-title">Gestion multi-caves</div>
+        <p class="feat-desc">Organisez vos bouteilles par cave, par type, par région. Badges d'alerte stock bas, tableau de bord avec recherche et filtres avancés.</p>
+        <span class="feat-badge">Stock · Inventaire</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">Dashboard analytique</div>
+        <p class="feat-desc">4 blocs en temps réel : financier, inventaire, ventes, prévisions. Valeur du stock, CA, marges, taux de rotation, top vins.</p>
+        <span class="feat-badge">Analytics · KPIs</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🤖</div>
+        <div class="feat-title">Sommelier IA</div>
+        <p class="feat-desc">Posez n'importe quelle question sur votre cave. Accords mets, disponibilités, analyse de portefeuille — réponse en 3 secondes.</p>
+        <span class="feat-badge">Claude AI · Chat</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📷</div>
+        <div class="feat-title">Photo → fiche vin</div>
+        <p class="feat-desc">Photographiez une étiquette : l'IA reconnaît automatiquement le vin, le producteur, la région, le cépage, le millésime.</p>
+        <span class="feat-badge">Vision IA · Auto</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🗺️</div>
+        <div class="feat-title">Carte des vignobles</div>
+        <p class="feat-desc">Tous vos vins géolocalisés sur une carte interactive. France et monde, bulles proportionnelles, alertes stock visibles.</p>
+        <span class="feat-badge">Leaflet · Géo</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📄</div>
+        <div class="feat-title">Export & bons de commande</div>
+        <p class="feat-desc">Rapport PDF complet avec marges et valeur. Bon de commande automatique avec quantités suggérées selon la vélocité.</p>
+        <span class="feat-badge">PDF · Export</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">💰</div>
+        <div class="feat-title">Marges calculées</div>
+        <p class="feat-desc">Saisissez prix d'achat et de vente : la marge % et le coefficient multiplicateur se calculent en direct. Valeur totale du stock.</p>
+        <span class="feat-badge">Finance · Marge</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📱</div>
+        <div class="feat-title">PWA iPhone native</div>
+        <p class="feat-desc">Installable depuis Safari en 30 secondes. Icône sur l'écran d'accueil, plein écran, fonctionne sans internet.</p>
+        <span class="feat-badge">PWA · Offline</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🔄</div>
+        <div class="feat-title">Sync temps réel</div>
+        <p class="feat-desc">Firebase Realtime Database. Chaque modification s'affiche instantanément sur tous vos appareils. Mises à jour automatiques.</p>
+        <span class="feat-badge">Firebase · Sync</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI SECTION -->
+<section id="ai-section">
+  <div class="container">
+    <div class="ai-inner">
+      <div class="chat-mockup">
+        <div class="chat-header">
+          <div class="chat-avatar">🍷</div>
+          <div>
+            <div class="chat-name">Sommelier IA</div>
+            <div class="chat-sub">Connaît votre cave en temps réel · 25 références</div>
+          </div>
+        </div>
+        <div class="chat-msgs">
+          <div class="msg-ai"><div class="bubble">Bonjour ! Je connais votre cave — <strong>25 références</strong>, 112 bouteilles. Comment puis-je vous aider ?</div></div>
+          <div class="msg-user"><div class="bubble">Quel vin avec un magret ce soir ?</div></div>
+          <div class="msg-ai"><div class="bubble">Pour un magret, je recommande le <strong>Saint-Joseph Sous l'Amandier</strong> de Curtat (stock : 5 btl) — fruits rouges et poivre, accord parfait. En puissance : <strong>Châteauneuf-du-Pape Clos Roquète</strong> (5 btl).</div></div>
+          <div class="msg-user"><div class="bubble">Mes vins bio disponibles ?</div></div>
+          <div class="msg-ai"><div class="bubble">6 références certifiées avec stock : Brouilly Alex Foillard 🌿, Ribeiro Os Pasás 🌿, Montlouis Chidaine 🌱…</div></div>
+        </div>
+        <div class="chat-input">
+          <div class="chat-input-field">Posez une question sur votre cave…</div>
+          <div class="chat-send">➤</div>
+        </div>
+      </div>
+      <div>
+        <div class="section-eyebrow">Intelligence artificielle</div>
+        <h2 class="section-title" style="margin-bottom:20px">Un sommelier<br><em>toujours disponible</em></h2>
+        <p style="font-size:.82rem;font-weight:300;line-height:1.85;color:var(--muted);margin-bottom:32px">L'assistant IA connaît chaque bouteille de votre cave en temps réel. Répondez à vos clients en 3 secondes, même en plein service.</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:rgba(201,168,76,.04);border:1px solid var(--border);border-radius:5px">
+            <span style="font-size:1.2rem;flex-shrink:0">🍽️</span>
+            <div style="font-size:.75rem;font-weight:300;line-height:1.65;color:var(--creme)"><strong style="color:var(--or);font-weight:400">Accords mets & vins</strong> — recommandations basées sur votre stock disponible ce soir</div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:rgba(201,168,76,.04);border:1px solid var(--border);border-radius:5px">
+            <span style="font-size:1.2rem;flex-shrink:0">📊</span>
+            <div style="font-size:.75rem;font-weight:300;line-height:1.65;color:var(--creme)"><strong style="color:var(--or);font-weight:400">Analyse de portefeuille</strong> — lacunes, opportunités de marge, équilibre régions</div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:rgba(201,168,76,.04);border:1px solid var(--border);border-radius:5px">
+            <span style="font-size:1.2rem;flex-shrink:0">🌿</span>
+            <div style="font-size:.75rem;font-weight:300;line-height:1.65;color:var(--creme)"><strong style="color:var(--or);font-weight:400">Certifications instantanées</strong> — naturel, bio, biodynamique en un instant</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="pricing-inner">
+      <div class="pricing-box">
+        <div class="pricing-header">
+          <span class="pricing-label">Licence unique · Restaurant</span>
+          <div class="pricing-amount"><sup>€</sup>— <span style="font-size:1rem;color:var(--muted)">une fois</span></div>
+          <p class="pricing-once">Aucun abonnement · Mises à jour incluses · Support inclus</p>
+        </div>
+        <div class="pricing-features">
+          <div class="pricing-feat"><div class="pf-check">✓</div>Inventaire illimité</div>
+          <div class="pricing-feat"><div class="pf-check">✓</div>Sommelier IA intégré</div>
+          <div class="pricing-feat"><div class="pf-check">✓</div>Dashboard analytique complet</div>
+          <div class="pricing-feat"><div class="pf-check">✓</div>Photo étiquette → fiche auto</div>
+          <div class="pricing-feat"><div class="pf-check">✓</div>Export PDF · Bons de commande</div>
+          <div class="pricing-feat"><div class="pf-check">✓</div>Carte des vignobles interactive</div>
+          <div class="pricing-feat"><div class="pf-check">✓</div>PWA iPhone · Mode offline</div>
+          <div class="pricing-feat"><div class="pf-check">✓</div>Sync temps réel Firebase</div>
+          <div class="pricing-feat"><div class="pf-check">✓</div>Multi-utilisateurs (patron + serveurs)</div>
+          <div class="pricing-feat"><div class="pf-check">✓</div>Mises à jour automatiques à vie</div>
+        </div>
+        <a href="#contact" class="pricing-cta">Demander une démo gratuite</a>
+      </div>
+      <div class="pricing-right">
+        <div class="section-eyebrow">Investissement unique</div>
+        <h2 class="pricing-r-title">Rentable dès<br>le <em>premier mois</em></h2>
+        <div class="testimonial">
+          <p class="testimonial-q">« Une cave bien pilotée c'est 15 à 20% de marge supplémentaire sur les boissons. Cet outil se rembourse en quelques services. »</p>
+          <p class="testimonial-a">— Restaurateur, Paris 6e</p>
+        </div>
+        <div class="guarantees">
+          <div class="guarantee"><span>🔒</span>Vos données hébergées sur votre Firebase — vous en êtes propriétaire</div>
+          <div class="guarantee"><span>📱</span>iPhone, iPad, Mac, Android — un seul achat, tous vos appareils</div>
+          <div class="guarantee"><span>🚀</span>Déploiement le jour même — opérationnel en moins d'une heure</div>
+          <div class="guarantee"><span>🔧</span>Personnalisation incluse selon votre carte des vins</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-inner">
+      <div class="contact-form">
+        <div class="form-title">Demander une démo</div>
+        <div class="form-field">
+          <label>Nom du restaurant</label>
+          <input type="text" id="c-resto" placeholder="Le Comptoir du Vin">
+        </div>
+        <div class="form-field">
+          <label>Votre nom</label>
+          <input type="text" id="c-name" placeholder="Jean Dupont">
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" id="c-email" placeholder="contact@restaurant.fr">
+        </div>
+        <div class="form-field">
+          <label>Taille de la cave</label>
+          <select id="c-size">
+            <option value="">Sélectionner…</option>
+            <option>Moins de 50 références</option>
+            <option>50 à 150 références</option>
+            <option>Plus de 150 références</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Message (optionnel)</label>
+          <textarea id="c-msg" placeholder="Questions, besoins spécifiques…"></textarea>
+        </div>
+        <button class="form-btn" id="btn-send-contact">Envoyer la demande</button>
+        <div class="form-success" id="form-success">✅ Votre demande a été envoyée ! Je vous recontacte dans les 24h.</div>
+      </div>
+      <div class="contact-info">
+        <h2 class="ci-title">On installe <em>ensemble</em><br>en moins d'une heure</h2>
+        <p class="ci-desc">Pas besoin de compétences techniques. Je m'occupe de tout — configuration Firebase, déploiement, import de votre cave existante, formation.</p>
+        <div class="ci-points">
+          <div class="ci-point">
+            <span class="ci-point-icon">📞</span>
+            <div class="ci-point-text"><strong>Démo gratuite</strong> — je vous montre l'app en live sur votre téléphone avant tout achat</div>
+          </div>
+          <div class="ci-point">
+            <span class="ci-point-icon">⚡</span>
+            <div class="ci-point-text"><strong>Installation le jour même</strong> — vous êtes opérationnel avant le service du soir</div>
+          </div>
+          <div class="ci-point">
+            <span class="ci-point-icon">📦</span>
+            <div class="ci-point-text"><strong>Import de votre cave</strong> — je rentre vos vins existants dans le système</div>
+          </div>
+          <div class="ci-point">
+            <span class="ci-point-icon">🔑</span>
+            <div class="ci-point-text"><strong>Vos données vous appartiennent</strong> — hébergées sur votre propre compte Firebase</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Cave <span>à Vin</span> Pro</div>
+  <div class="footer-copy">Application professionnelle pour restaurateurs · Licence unique · Données privées</div>
+</footer>
+
+<script>
+// Smooth scroll for nav links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// Contact form — simple mailto fallback
+document.getElementById('btn-send-contact').addEventListener('click', () => {
+  const resto = document.getElementById('c-resto').value.trim();
+  const name  = document.getElementById('c-name').value.trim();
+  const email = document.getElementById('c-email').value.trim();
+  const size  = document.getElementById('c-size').value;
+  const msg   = document.getElementById('c-msg').value.trim();
+
+  if (!name || !email) {
+    alert('Merci de renseigner votre nom et email.');
+    return;
+  }
+
+  // Build mailto
+  const subject = encodeURIComponent('Demande de démo Cave à Vin Pro — ' + (resto || name));
+  const body = encodeURIComponent(
+    'Restaurant : ' + (resto || '—') + '\n' +
+    'Nom : ' + name + '\n' +
+    'Email : ' + email + '\n' +
+    'Taille cave : ' + (size || '—') + '\n\n' +
+    'Message :\n' + (msg || '—')
+  );
+
+  // Replace with your email
+  window.location.href = `mailto:VOTRE_EMAIL_ICI?subject=${subject}&body=${body}`;
+
+  document.getElementById('form-success').style.display = 'block';
+});
+
+// Nav active on scroll
+const sections = ['hero','features','ai-section','pricing','contact'];
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY;
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (scrollY >= el.offsetTop - 100 && scrollY < el.offsetTop + el.offsetHeight - 100) {
+      document.querySelectorAll('.nav-link').forEach(l => l.style.color = '');
+    }
+  });
+});
+</script>
+</body>
+</html>
