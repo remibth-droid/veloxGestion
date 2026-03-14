@@ -285,7 +285,7 @@ document.getElementById('a-pass').addEventListener('keydown', e => {
 document.getElementById('btn-admin-logout').addEventListener('click', () => signOut(auth));
 
 onAuthStateChanged(auth, user => {
-  if (user && (ADMIN_UID === 'METS_TON_UID_ICI' || user.uid === ADMIN_UID)) {
+  if (user && (ADMIN_UID === 'Ygt3atkCV3NjMQTz8CzABIpYEY03' || user.uid === ADMIN_UID)) {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('admin-app').style.display = 'block';
     document.getElementById('admin-uid').textContent = user.email;
