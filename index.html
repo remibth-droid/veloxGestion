@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#06060a">
+<meta name="description" content="Velox Gestion — Suite complete d outils pour restaurateurs et independants.">
+<title>Velox Gestion — La suite pour restaurateurs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06060a;--surface:#0e0e14;--surface2:#16161f;--surface3:#1e1e2a;
+  --border:#22222e;--border2:#2d2d3d;
+  --white:#f4f0ff;--muted:#6e6b80;--dim:#3d3a4d;
+  --purple:#a855f7;--purple-dim:#7c3aed;--pink:#ec4899;--blue:#3b82f6;
+  --green:#10b981;--amber:#f59e0b;--rose:#f43f5e;--cyan:#06b6d4;--orange:#f97316;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--white);font-weight:400;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Syne',sans-serif}
+#stars-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.z1{position:relative;z-index:1}
+.hidden{display:none!important}
+
+/* ─── NAV ─── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;transition:all .35s}
+.nav.scrolled{background:rgba(6,6,10,.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.nav-brand{font-family:'Space Mono',monospace;font-size:.85rem;font-weight:700;color:var(--white);letter-spacing:-.01em}
+.nav-brand span{background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-items{display:flex;gap:20px;align-items:center}
+.nav-items a{color:var(--muted);text-decoration:none;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;transition:color .2s}
+.nav-items a:hover{color:var(--white)}
+.nav-cta{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;padding:9px 18px;border-radius:6px;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;text-decoration:none;transition:all .25s;border:none;cursor:pointer}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(168,85,247,.3)}
+
+/* ─── HERO ─── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px}
+.hero-chip{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--purple);background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.18);padding:7px 18px;border-radius:30px;margin-bottom:28px;display:inline-block}
+.hero h1{font-size:clamp(2.4rem,6.5vw,5rem);font-weight:800;line-height:1.05;margin-bottom:20px;max-width:800px;letter-spacing:-.03em}
+.hero h1 .gr{background:linear-gradient(135deg,var(--purple),var(--pink),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:clamp(.85rem,1.4vw,1.05rem);color:var(--muted);max-width:520px;line-height:1.75;margin-bottom:36px;font-weight:400}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn-main{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;padding:15px 32px;border:none;border-radius:8px;font-family:'Manrope';font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;cursor:pointer;text-decoration:none;transition:all .25s;display:inline-flex;align-items:center;gap:8px}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(168,85,247,.25)}
+.btn-sec{background:var(--surface2);border:1px solid var(--border);color:var(--white);padding:15px 32px;border-radius:8px;font-family:'Manrope';font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;cursor:pointer;text-decoration:none;transition:all .25s}
+.btn-sec:hover{border-color:var(--purple);color:var(--purple)}
+.hero-scroll{position:absolute;bottom:28px;font-family:'Space Mono';font-size:.55rem;color:var(--dim);letter-spacing:.15em;text-transform:uppercase;animation:bob 2.5s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+
+/* ─── SECTION ─── */
+.section{padding:80px 24px;max-width:1100px;margin:0 auto}
+.section-chip{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;color:var(--purple);margin-bottom:10px;display:block}
+.section-title{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:800;margin-bottom:14px;letter-spacing:-.02em;line-height:1.15}
+.section-sub{font-size:.88rem;color:var(--muted);max-width:500px;line-height:1.7;margin-bottom:44px}
+
+/* ─── TOOL GRID ─── */
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px 24px;transition:all .35s;text-decoration:none;color:var(--white);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;transition:opacity .3s;opacity:0}
+.tool-card:hover{transform:translateY(-6px);border-color:var(--border2);box-shadow:0 16px 50px rgba(0,0,0,.4)}
+.tool-card:hover::before{opacity:1}
+.tool-card[data-color="purple"]::before{background:linear-gradient(90deg,var(--purple),var(--pink))}
+.tool-card[data-color="blue"]::before{background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.tool-card[data-color="green"]::before{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.tool-card[data-color="amber"]::before{background:linear-gradient(90deg,var(--amber),var(--orange))}
+.tool-card[data-color="rose"]::before{background:linear-gradient(90deg,var(--rose),var(--pink))}
+.tool-card[data-color="cyan"]::before{background:linear-gradient(90deg,var(--cyan),var(--blue))}
+.tool-icon{font-size:2.2rem;margin-bottom:14px;display:block}
+.tool-name{font-family:'Syne';font-size:1.15rem;font-weight:700;margin-bottom:6px;letter-spacing:-.01em}
+.tool-desc{font-size:.78rem;color:var(--muted);line-height:1.65;flex:1}
+.tool-features{margin-top:14px;display:flex;flex-direction:column;gap:4px}
+.tool-feat{font-size:.68rem;color:var(--dim);display:flex;align-items:center;gap:6px}
+.tool-feat::before{content:'';width:4px;height:4px;border-radius:50%;flex-shrink:0}
+.tool-card[data-color="purple"] .tool-feat::before{background:var(--purple)}
+.tool-card[data-color="blue"] .tool-feat::before{background:var(--blue)}
+.tool-card[data-color="green"] .tool-feat::before{background:var(--green)}
+.tool-card[data-color="amber"] .tool-feat::before{background:var(--amber)}
+.tool-card[data-color="rose"] .tool-feat::before{background:var(--rose)}
+.tool-card[data-color="cyan"] .tool-feat::before{background:var(--cyan)}
+.tool-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.tool-status{font-family:'Space Mono';font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;padding:4px 10px;border-radius:20px}
+.tool-status.live{background:rgba(16,185,129,.1);color:var(--green)}
+.tool-status.soon{background:rgba(110,107,128,.1);color:var(--muted)}
+.tool-arrow{font-size:.75rem;color:var(--dim);transition:all .2s}
+.tool-card:hover .tool-arrow{color:var(--white);transform:translateX(4px)}
+
+/* ─── NUMBERS ─── */
+.numbers{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:60px 0}
+.num-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 20px;text-align:center}
+.num-val{font-family:'Syne';font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.num-label{font-size:.72rem;color:var(--muted);margin-top:4px;font-weight:500}
+
+/* ─── PRICING ─── */
+.pricing{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:660px;margin:0 auto}
+.price-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px 24px;text-align:center;position:relative;transition:all .3s}
+.price-card.pop{border-color:rgba(168,85,247,.3);box-shadow:0 0 60px rgba(168,85,247,.06)}
+.price-card.pop::before{content:'POPULAIRE';position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-family:'Space Mono';font-size:.5rem;letter-spacing:.18em;background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;padding:3px 14px;border-radius:20px;font-weight:700}
+.price-label{font-family:'Space Mono';font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.price-val{font-family:'Syne';font-size:2.8rem;font-weight:800;color:var(--white)}
+.price-val span{font-size:.85rem;font-weight:400;color:var(--muted)}
+.price-per{font-size:.72rem;color:var(--muted);margin-bottom:20px}
+.price-list{text-align:left;margin-bottom:24px}
+.price-li{font-size:.75rem;color:var(--white);padding:5px 0;display:flex;align-items:center;gap:7px;font-weight:400}
+.price-li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--purple);flex-shrink:0}
+.price-btn{width:100%;padding:13px;border:none;border-radius:8px;font-family:'Manrope';font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;cursor:pointer;transition:all .2s}
+.price-btn.main{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff}
+.price-btn.main:hover{box-shadow:0 6px 24px rgba(168,85,247,.25)}
+.price-btn.sec{background:var(--surface2);border:1px solid var(--border);color:var(--white)}
+.price-btn.sec:hover{border-color:var(--purple)}
+
+/* ─── CTA ─── */
+.cta-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:50px 32px;text-align:center;max-width:640px;margin:0 auto;position:relative;overflow:hidden}
+.cta-box::before{content:'';position:absolute;top:-1px;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--purple),var(--pink),transparent)}
+.cta-box h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;margin-bottom:12px;letter-spacing:-.02em}
+.cta-box p{color:var(--muted);font-size:.85rem;margin-bottom:28px}
+.cta-contact{margin-top:20px;font-size:.72rem;color:var(--dim)}
+.cta-contact a{color:var(--purple);text-decoration:none}
+
+/* ─── FOOTER ─── */
+.footer{border-top:1px solid var(--border);padding:36px 24px;text-align:center;margin-top:40px}
+.footer-brand{font-family:'Space Mono',monospace;font-size:.8rem;font-weight:700;color:var(--white);margin-bottom:10px}
+.footer-brand span{background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.footer-links{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;transition:color .2s}
+.footer-links a:hover{color:var(--purple)}
+.footer-copy{font-size:.58rem;color:var(--dim);letter-spacing:.06em}
+
+/* ─── DIVIDER ─── */
+.sep{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);max-width:400px;margin:0 auto}
+
+/* ─── REVEAL ─── */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .65s cubic-bezier(.4,0,.2,1),transform .65s cubic-bezier(.4,0,.2,1)}
+.rv.vis{opacity:1;transform:none}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){.tools-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){
+  .nav-items{display:none}
+  .tools-grid{grid-template-columns:1fr}
+  .numbers{grid-template-columns:1fr 1fr}
+  .pricing{grid-template-columns:1fr}
+  .hero-btns{flex-direction:column;align-items:stretch}
+  .btn-main,.btn-sec{text-align:center;justify-content:center}
+  .hero{padding:100px 20px 60px}
+  .section{padding:50px 20px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="stars-bg"></canvas>
+
+<!-- NAV -->
+<nav class="nav z1" id="nav">
+  <div class="nav-brand">VELOX<span>GESTION</span></div>
+  <div class="nav-items">
+    <a href="#outils">Outils</a>
+    <a href="#tarifs">Tarifs</a>
+    <a href="#contact">Contact</a>
+    <a href="./cave/" class="nav-cta">Mon espace</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero z1">
+  <div class="hero-chip rv">6 outils — 1 plateforme</div>
+  <h1 class="rv">Tout pour gerer<br>votre restaurant. <span class="gr">Simplement.</span></h1>
+  <p class="hero-sub rv">Cave a vin, stocks, reservations, fiches techniques, planning equipe, facturation. Une suite complete pensee pour les restaurateurs.</p>
+  <div class="hero-btns rv">
+    <a href="./cave/" class="btn-main">Commencer gratuitement</a>
+    <a href="#outils" class="btn-sec">Voir les outils</a>
+  </div>
+  <div class="hero-scroll">Defiler ↓</div>
+</section>
+
+<!-- NUMBERS -->
+<section class="section z1">
+  <div class="numbers">
+    <div class="num-card rv"><div class="num-val">6</div><div class="num-label">Outils integres</div></div>
+    <div class="num-card rv"><div class="num-val">100%</div><div class="num-label">Mobile</div></div>
+    <div class="num-card rv"><div class="num-val">30s</div><div class="num-label">Pour demarrer</div></div>
+    <div class="num-card rv"><div class="num-val">0</div><div class="num-label">Installation</div></div>
+  </div>
+</section>
+
+<!-- OUTILS -->
+<section class="section z1" id="outils">
+  <span class="section-chip rv">La suite complete</span>
+  <h2 class="section-title rv">Chaque outil dont vous avez besoin</h2>
+  <p class="section-sub rv">Plus besoin de jongler entre 5 logiciels. Tout est reuni dans Velox.</p>
+
+  <div class="tools-grid">
+
+    <a href="./cave/" class="tool-card rv" data-color="purple">
+      <span class="tool-icon">🍷</span>
+      <div class="tool-name">Velox Cave</div>
+      <div class="tool-desc">Gerez votre cave a vin. Ajoutez vos bouteilles, suivez les stocks, enregistrez les ventes, visualisez vos appellations sur la carte de France. Intelligence artificielle integree pour analyser les etiquettes.</div>
+      <div class="tool-features">
+        <div class="tool-feat">Scan d etiquettes par IA</div>
+        <div class="tool-feat">Carte de France des appellations</div>
+        <div class="tool-feat">Suivi des ventes et statistiques</div>
+        <div class="tool-feat">Multi-employes avec codes d acces</div>
+      </div>
+      <div class="tool-bottom">
+        <span class="tool-status live">Disponible</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="./stock/" class="tool-card rv" data-color="blue">
+      <span class="tool-icon">📦</span>
+      <div class="tool-name">Velox Stock</div>
+      <div class="tool-desc">Suivi de stock en temps reel pour tout votre inventaire. Entrees, sorties, alertes de seuil, historique des mouvements. Tout ce qu il faut pour ne jamais etre en rupture.</div>
+      <div class="tool-features">
+        <div class="tool-feat">Mouvements d entree et sortie</div>
+        <div class="tool-feat">Alertes de seuil bas</div>
+        <div class="tool-feat">Dashboard avec les best-sellers</div>
+        <div class="tool-feat">Codes employes pour votre equipe</div>
+      </div>
+      <div class="tool-bottom">
+        <span class="tool-status live">Disponible</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="./cout/" class="tool-card rv" data-color="green">
+      <span class="tool-icon">📊</span>
+      <div class="tool-name">Velox Cout</div>
+      <div class="tool-desc">Fiches techniques et cout matiere. Creez vos recettes ingredient par ingredient, l outil calcule automatiquement vos marges. Sachez exactement ce que chaque plat vous coute.</div>
+      <div class="tool-features">
+        <div class="tool-feat">Base de prix fournisseurs</div>
+        <div class="tool-feat">Calcul de marge en temps reel</div>
+        <div class="tool-feat">Alerte quand la marge baisse</div>
+        <div class="tool-feat">Cout par portion automatique</div>
+      </div>
+      <div class="tool-bottom">
+        <span class="tool-status live">Disponible</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="./reservation/" class="tool-card rv" data-color="amber">
+      <span class="tool-icon">📅</span>
+      <div class="tool-name">Velox Reservation</div>
+      <div class="tool-desc">Vos clients reservent en ligne via un calendrier interactif. Vous gerez sur un dashboard avec vue jour, plan de salle, avis clients et statistiques de remplissage.</div>
+      <div class="tool-features">
+        <div class="tool-feat">Calendrier public pour les clients</div>
+        <div class="tool-feat">Plan de salle interactif</div>
+        <div class="tool-feat">Avis clients avec reponses</div>
+        <div class="tool-feat">Stats de remplissage et no-show</div>
+      </div>
+      <div class="tool-bottom">
+        <span class="tool-status live">Disponible</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="./planning/" class="tool-card rv" data-color="cyan">
+      <span class="tool-icon">👥</span>
+      <div class="tool-name">Velox Planning</div>
+      <div class="tool-desc">Planning equipe visuel. Posez les shifts sur une grille semaine. Chaque employe voit son planning sur son telephone. Compteur d heures automatique.</div>
+      <div class="tool-features">
+        <div class="tool-feat">Grille semaine visuelle</div>
+        <div class="tool-feat">Acces employe par code</div>
+        <div class="tool-feat">Compteur d heures hebdo</div>
+        <div class="tool-feat">Couleur par employe</div>
+      </div>
+      <div class="tool-bottom">
+        <span class="tool-status soon">Bientot</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </a>
+
+    <div class="tool-card rv" data-color="rose" style="cursor:default">
+      <span class="tool-icon">🧾</span>
+      <div class="tool-name">Velox Factures</div>
+      <div class="tool-desc">Devis et factures en 2 minutes. Creez, envoyez, suivez. Numerotation conforme, export PDF professionnel, relances automatiques des impayes.</div>
+      <div class="tool-features">
+        <div class="tool-feat">Devis transforme en facture</div>
+        <div class="tool-feat">Numerotation conforme</div>
+        <div class="tool-feat">Export PDF professionnel</div>
+        <div class="tool-feat">Suivi paiements et relances</div>
+      </div>
+      <div class="tool-bottom">
+        <span class="tool-status soon">Bientot</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SEP -->
+<div class="z1" style="padding:0 24px"><div class="sep"></div></div>
+
+<!-- POURQUOI -->
+<section class="section z1">
+  <span class="section-chip rv">Pourquoi Velox</span>
+  <h2 class="section-title rv">Pas un logiciel de plus.<br>Le bon outil, enfin.</h2>
+  <p class="section-sub rv">Construit par des gens du metier. Chaque fonctionnalite repond a un vrai probleme, pas a un brief marketing.</p>
+
+  <div class="numbers rv">
+    <div class="num-card"><div class="num-val" style="font-size:1.6rem;-webkit-text-fill-color:var(--green)">⚡</div><div class="num-label">Rapide</div></div>
+    <div class="num-card"><div class="num-val" style="font-size:1.6rem;-webkit-text-fill-color:var(--purple)">🔒</div><div class="num-label">Securise</div></div>
+    <div class="num-card"><div class="num-val" style="font-size:1.6rem;-webkit-text-fill-color:var(--amber)">👨‍🍳</div><div class="num-label">Multi-employes</div></div>
+    <div class="num-card"><div class="num-val" style="font-size:1.6rem;-webkit-text-fill-color:var(--cyan)">📱</div><div class="num-label">Hors-ligne</div></div>
+  </div>
+</section>
+
+<!-- TARIFS -->
+<section class="section z1" id="tarifs">
+  <span class="section-chip rv">Tarifs</span>
+  <h2 class="section-title rv">Simple. Transparent.</h2>
+  <p class="section-sub rv">Pas de surprise. Essayez gratuitement, passez en Pro quand vous etes pret.</p>
+
+  <div class="pricing rv">
+    <div class="price-card">
+      <div class="price-label">Mensuel</div>
+      <div class="price-val">29<span> EUR</span></div>
+      <div class="price-per">par mois, sans engagement</div>
+      <div class="price-list">
+        <div class="price-li">Tous les outils inclus</div>
+        <div class="price-li">Employes illimites</div>
+        <div class="price-li">Support prioritaire</div>
+        <div class="price-li">Mises a jour</div>
+        <div class="price-li">Annulez quand vous voulez</div>
+      </div>
+      <button class="price-btn sec" onclick="window.location.href='./cave/'">Essayer gratuit</button>
+    </div>
+    <div class="price-card pop">
+      <div class="price-label">A vie</div>
+      <div class="price-val">199<span> EUR</span></div>
+      <div class="price-per">paiement unique</div>
+      <div class="price-list">
+        <div class="price-li">Tout le plan mensuel</div>
+        <div class="price-li">Mises a jour a vie</div>
+        <div class="price-li">Futurs outils inclus</div>
+        <div class="price-li">Acces prioritaire nouveautes</div>
+        <div class="price-li">Support a vie</div>
+      </div>
+      <button class="price-btn main" onclick="window.location.href='./cave/'">Obtenir l acces a vie</button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section z1" id="contact">
+  <div class="cta-box rv">
+    <h2>Pret a simplifier votre quotidien ?</h2>
+    <p>Creez votre compte en 30 secondes. Aucune carte bancaire requise.</p>
+    <a href="./cave/" class="btn-main">Demarrer maintenant</a>
+    <div class="cta-contact">Une question ? <a href="mailto:veloxassistancep@gmail.com">veloxassistancep@gmail.com</a></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer z1">
+  <div class="footer-brand">VELOX<span>GESTION</span></div>
+  <div class="footer-links">
+    <a href="#outils">Outils</a>
+    <a href="#tarifs">Tarifs</a>
+    <a href="mailto:veloxassistancep@gmail.com">Contact</a>
+  </div>
+  <div class="footer-copy">© 2025 Velox Gestion — Clermont-Ferrand, France</div>
+</footer>
+
+<!-- STARS (vraies etoiles colorees) -->
+<script>
+(function(){
+  var cv=document.getElementById("stars-bg"),cx=cv.getContext("2d");
+  var S=[],N=60;
+  var COLORS=["#a855f7","#ec4899","#3b82f6","#10b981","#f59e0b","#f43f5e","#06b6d4","#f97316","#6ee7b7","#93c5fd","#fcd34d","#c084fc"];
+
+  function resize(){cv.width=window.innerWidth;cv.height=Math.max(window.innerHeight,document.documentElement.scrollHeight)}
+  window.addEventListener("resize",resize);
+
+  function star(cx2,x,y,r,pts,innerR,color,alpha){
+    cx2.beginPath();
+    for(var i=0;i<pts*2;i++){
+      var rad=(i*Math.PI/pts)-(Math.PI/2);
+      var dist=i%2===0?r:innerR;
+      var px=x+Math.cos(rad)*dist;
+      var py=y+Math.sin(rad)*dist;
+      if(i===0)cx2.moveTo(px,py);else cx2.lineTo(px,py);
+    }
+    cx2.closePath();
+    cx2.fillStyle=color.replace(")",","+alpha+")");
+    cx2.fill();
+  }
+
+  function hexToRgba(hex){
+    var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+    return "rgba("+r+","+g+","+b;
+  }
+
+  function init(){
+    resize();S=[];
+    for(var i=0;i<N;i++){
+      var sz=Math.random()*3+1.5;
+      S.push({
+        x:Math.random()*cv.width,y:Math.random()*cv.height,
+        r:sz,inner:sz*0.4,pts:5,
+        col:COLORS[Math.floor(Math.random()*COLORS.length)],
+        a:Math.random()*0.5+0.15,
+        dx:(Math.random()-0.5)*0.2,
+        dy:(Math.random()-0.5)*0.15,
+        rot:Math.random()*6.28,
+        rotSpeed:(Math.random()-0.5)*0.008,
+        ph:Math.random()*6.28,
+        ps:Math.random()*0.015+0.005
+      });
+    }
+  }
+
+  function draw(){
+    cx.clearRect(0,0,cv.width,cv.height);
+    var ht=Math.max(window.innerHeight,document.documentElement.scrollHeight);
+    if(cv.height!==ht)cv.height=ht;
+
+    for(var i=0;i<S.length;i++){
+      var s=S[i];
+      s.x+=s.dx;s.y+=s.dy;s.rot+=s.rotSpeed;s.ph+=s.ps;
+      if(s.x<-10)s.x=cv.width+10;if(s.x>cv.width+10)s.x=-10;
+      if(s.y<-10)s.y=cv.height+10;if(s.y>cv.height+10)s.y=-10;
+
+      var glow=s.a*(0.4+0.6*Math.sin(s.ph));
+      var rgba=hexToRgba(s.col);
+
+      // Glow
+      cx.save();
+      cx.translate(s.x,s.y);
+      cx.rotate(s.rot);
+      cx.beginPath();
+      for(var j=0;j<10;j++){
+        var rad=(j*Math.PI/5)-(Math.PI/2);
+        var dist=j%2===0?s.r+2:s.inner+1;
+        var px=Math.cos(rad)*dist;
+        var py=Math.sin(rad)*dist;
+        if(j===0)cx.moveTo(px,py);else cx.lineTo(px,py);
+      }
+      cx.closePath();
+      cx.fillStyle=rgba+","+glow*0.2+")";
+      cx.fill();
+
+      // Star
+      cx.beginPath();
+      for(var j=0;j<10;j++){
+        var rad=(j*Math.PI/5)-(Math.PI/2);
+        var dist=j%2===0?s.r:s.inner;
+        var px=Math.cos(rad)*dist;
+        var py=Math.sin(rad)*dist;
+        if(j===0)cx.moveTo(px,py);else cx.lineTo(px,py);
+      }
+      cx.closePath();
+      cx.fillStyle=rgba+","+glow+")";
+      cx.fill();
+      cx.restore();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  init();draw();
+})();
+
+// Nav scroll
+window.addEventListener("scroll",function(){document.getElementById("nav").classList.toggle("scrolled",window.scrollY>50)});
+
+// Reveal
+var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add("vis");obs.unobserve(e.target)}})},{threshold:.12,rootMargin:"0px 0px -30px 0px"});
+document.querySelectorAll(".rv").forEach(function(el){obs.observe(el)});
+</script>
+
+</body>
+</html>
