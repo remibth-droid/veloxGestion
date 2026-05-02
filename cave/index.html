@@ -2210,9 +2210,17 @@ let currentUser = null;
 let userDbPath = null; // 'users/UID' — all data scoped to this path
 let currentRole = 'patron'; // 'patron' | 'employe'
 
-const functions = getFunctions(app, 'europe-west1');
-const askAIFunction = httpsCallable(functions, 'askAI');
-const checkSubFunction = httpsCallable(functions, 'checkSubscription');
+const FUNCTIONS_URL = 'https://europe-west1-cave-2004.cloudfunctions.net';
+async function callFunction(name, body) {
+  const token = await auth.currentUser.getIdToken();
+  const res = await fetch(FUNCTIONS_URL + '/' + name, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || 'Erreur serveur'); }
+  return res.json();
+}
 
 // ── ÉTAT NOUVELLES FEATURES ──────────────────────────────────────────────
 let userFavorites = [];
@@ -3157,7 +3165,7 @@ Pour le prix_estime : estime le prix de vente au verre ou à la bouteille au res
 
   // Vérifier la clé API avant d'appeler
   try {
-    const aiResult = await askAIFunction({
+      const aiResult = await callFunction('askAI', {
       model: 'claude-haiku-4-5',
       max_tokens: 1000,
       messages: [{
@@ -3171,7 +3179,7 @@ Pour le prix_estime : estime le prix de vente au verre ou à la bouteille au res
         }]
       }]
     });
-    const raw = aiResult.data.content?.[0]?.text || '';
+    const raw = aiResult.content?.[0]?.text || '';
     // Fill form
     fillFormFromAI(data);
 
@@ -4073,13 +4081,13 @@ function startApp() {
     sommelierHistory.push({role:'user', content:question});
     showTyping();
     try {
-      const aiRes = await askAIFunction({
+      const aiRes = await callFunction('askAI', {
         model: 'claude-haiku-4-5',
         max_tokens: 1000,
         system: buildCaveContext(),
         messages: sommelierHistory.slice(-10)
       });
-      const reply = aiRes.data.content?.[0]?.text || 'Désolé, je n\'ai pas pu répondre.';
+      const reply = aiRes.content?.[0]?.text || 'Désolé, je n\'ai pas pu répondre.';
       hideTyping();
       addAIMessage(reply);
       sommelierHistory.push({role:'assistant', content:reply});
