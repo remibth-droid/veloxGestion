@@ -2210,10 +2210,13 @@ let currentUser = null;
 let userDbPath = null; // 'users/UID' — all data scoped to this path
 let currentRole = 'patron'; // 'patron' | 'employe'
 
-const FUNCTIONS_URL = 'https://europe-west1-cave-2004.cloudfunctions.net';
+const FUNCTIONS_URLS = {
+  askAI: 'https://askai-s3abapiqlq-ew.a.run.app',
+  checkSubscription: 'https://checksubscription-s3abapiqlq-ew.a.run.app'
+};
 async function callFunction(name, body) {
   const token = await auth.currentUser.getIdToken();
-  const res = await fetch(FUNCTIONS_URL + '/' + name, {
+  const res = await fetch(FUNCTIONS_URLS[name], {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
     body: JSON.stringify(body)
