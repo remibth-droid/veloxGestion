@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velox Utils — Outils gratuits : facture auto-entrepreneur, QR code personnalisé, compression WebP, conversions cuisine</title>
+<meta name="description" content="6 outils gratuits et sans inscription : générateur de factures pour micro-entrepreneurs (mentions légales incluses), QR codes personnalisés avec logo, compression d'images WebP, conversions de cuisine, palettes de couleurs, mots de passe sécurisés. Tout se passe dans votre navigateur.">
+<meta property="og:title" content="Velox Utils — outils gratuits pour indépendants">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--papier:#FBFAF7;--encre:#1C1B18;--accent:#6E1F2E;--accent-pale:#F3E7E9;
+    --zinc:#6B6E73;--trait:#E4E0D8;--vert:#1E6B45;--vert-fond:#E8F2EC}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--encre);
+    font:400 1rem/1.55 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .appbar{display:flex;align-items:baseline;gap:12px;padding:14px 18px;background:#fff;border-bottom:1px solid var(--trait)}
+  .marque{font:800 1.05rem "Archivo",sans-serif;color:var(--accent);text-decoration:none}
+  .marque span{color:var(--encre)}
+  .appbar .note{margin-left:auto}
+  .page{max-width:860px;margin:0 auto;padding:18px 16px 80px}
+  h1{font:800 clamp(1.4rem,4.5vw,2rem) "Archivo",sans-serif;margin:10px 0 6px}
+  .sous{color:var(--zinc);margin:0 0 18px;max-width:64ch}
+  nav.onglets{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 18px}
+  nav.onglets button{font:600 .85rem "Public Sans",sans-serif;padding:8px 14px;border:1px solid var(--trait);
+    border-radius:99px;background:#fff;color:var(--zinc);cursor:pointer}
+  nav.onglets button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  h2{font:800 1.12rem "Archivo",sans-serif;margin:0 0 12px}
+  h3{font:600 .95rem "Public Sans",sans-serif;margin:14px 0 6px}
+  .carte{background:#fff;border:1px solid var(--trait);border-radius:10px;padding:18px;margin-bottom:16px}
+  label{display:block;font-weight:600;font-size:.83rem;margin:10px 0 4px}
+  input,select,textarea{width:100%;padding:9px 11px;font:inherit;color:var(--encre);
+    background:var(--papier);border:1px solid var(--trait);border-radius:7px}
+  textarea{min-height:70px;resize:vertical}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+  input[type=color]{padding:3px;height:42px}
+  input[type=range]{padding:0}
+  .rang{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .rang3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:640px){.rang,.rang3{grid-template-columns:1fr}}
+  button.action{font:600 .9rem "Public Sans",sans-serif;background:var(--accent);color:#fff;
+    border:0;border-radius:7px;padding:10px 16px;cursor:pointer;margin-top:12px}
+  button.sobre{background:#fff;color:var(--encre);border:1px solid var(--trait)}
+  button.mini{font:600 .75rem "Public Sans",sans-serif;background:#fff;border:1px solid var(--trait);
+    border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--zinc)}
+  button.mini.danger{color:#8f2020}
+  .note{font-size:.8rem;color:var(--zinc)}
+  .puces{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .puces label{display:flex;align-items:center;gap:5px;margin:0;font-weight:400;font-size:.82rem;
+    border:1px solid var(--trait);border-radius:99px;padding:5px 10px;background:var(--papier);cursor:pointer}
+  .puces input{width:auto}
+  .resultat{margin-top:14px;background:var(--accent-pale);border:1px solid #E3CDD2;border-radius:10px;
+    padding:14px 16px;font-variant-numeric:tabular-nums}
+  .resultat .gros{font:800 1.4rem "Archivo",sans-serif;color:var(--accent);word-break:break-all}
+  .ligne-fact{display:grid;grid-template-columns:1fr 80px 100px 90px 34px;gap:8px;align-items:center;margin-bottom:8px}
+  .ligne-fact .tot{font-variant-numeric:tabular-nums;font-size:.85rem;text-align:right}
+  @media(max-width:640px){.ligne-fact{grid-template-columns:1fr 60px 80px 70px 30px}}
+  .totaux{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-top:10px;font-variant-numeric:tabular-nums}
+  .totaux .ttc{font:800 1.2rem "Archivo",sans-serif;color:var(--accent)}
+  .swatchs{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-top:12px}
+  .swatch{border-radius:10px;border:1px solid var(--trait);overflow:hidden;cursor:pointer;background:#fff}
+  .swatch .bloc{height:56px}
+  .swatch .hex{font:600 .74rem "Public Sans",sans-serif;text-align:center;padding:5px;font-variant-numeric:tabular-nums}
+  #qr-rendu,#qr-source{display:flex;justify-content:center;padding:10px}
+  #qr-source{position:absolute;left:-9999px;top:-9999px}
+  canvas.apercu{max-width:100%;border:1px solid var(--trait);border-radius:8px;background:#fff}
+  img.apercu{max-width:100%;border:1px solid var(--trait);border-radius:8px}
+  #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--encre);
+    color:#fff;padding:10px 18px;border-radius:8px;font-size:.88rem;opacity:0;pointer-events:none;transition:opacity .25s}
+  #toast.visible{opacity:1}
+  section[hidden]{display:none}
+  .cta-velox{margin-top:26px;background:var(--encre);color:var(--papier);border-radius:10px;padding:20px}
+  .cta-velox a{color:#fff}
+  #facture-print{display:none}
+  @media print{
+    body.impression > *{display:none !important}
+    body.impression #facture-print{display:block !important;font-family:"Public Sans",sans-serif;color:#000;padding:6mm 2mm}
+    #facture-print h1{font:800 20pt "Archivo",sans-serif;margin:0 0 8mm}
+    #facture-print .deux-col{display:flex;justify-content:space-between;gap:10mm;margin-bottom:8mm;font-size:10pt}
+    #facture-print .deux-col .bloc-adr{max-width:48%;white-space:pre-line}
+    #facture-print .bloc-adr b{display:block;font-size:11pt;margin-bottom:1mm}
+    #facture-print .infos{font-size:10pt;margin-bottom:6mm}
+    #facture-print table{width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:5mm}
+    #facture-print th,#facture-print td{border:1px solid #777;padding:2mm 3mm;text-align:left}
+    #facture-print td.num,#facture-print th.num{text-align:right}
+    #facture-print .bloc-totaux{width:60mm;margin-left:auto;font-size:10.5pt}
+    #facture-print .bloc-totaux div{display:flex;justify-content:space-between;padding:1mm 0}
+    #facture-print .bloc-totaux .ttc{font-weight:800;border-top:1px solid #000;padding-top:2mm}
+    #facture-print .mentions{margin-top:10mm;font-size:8pt;color:#333;white-space:pre-line}
+  }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <a class="marque" href="#">VELOX<span> Utils</span></a>
+  <span class="note">Outils gratuits · Aucune donnée envoyée : tout se passe dans votre navigateur</span>
+</header>
+
+<div class="page">
+  <h1>Six outils, zéro inscription</h1>
+  <p class="sous">Facture de micro-entrepreneur, QR code personnalisé, compression d'images,
+  conversions de cuisine, palettes et mots de passe — rien ne quitte votre appareil.</p>
+
+  <nav class="onglets" role="tablist">
+    <button data-onglet="facture" aria-selected="true">Facture</button>
+    <button data-onglet="qr" aria-selected="false">QR code</button>
+    <button data-onglet="webp" aria-selected="false">Images WebP</button>
+    <button data-onglet="cuisine" aria-selected="false">Cuisine</button>
+    <button data-onglet="palette" aria-selected="false">Palette</button>
+    <button data-onglet="mdp" aria-selected="false">Mots de passe</button>
+  </nav>
+
+  <!-- ===== FACTURE ===== -->
+  <section id="onglet-facture">
+    <div class="carte">
+      <h2>Générateur de facture — micro-entrepreneur &amp; TPE</h2>
+      <p class="note">Mentions obligatoires incluses (TVA non applicable art. 293 B, pénalités de retard,
+      indemnité forfaitaire de 40 €). Impression en PDF via votre navigateur.</p>
+      <div class="rang">
+        <div>
+          <h3>Vous (émetteur)</h3>
+          <label for="fa-emetteur-nom">Nom / raison sociale</label><input id="fa-emetteur-nom" placeholder="Rémi Dupont — EI">
+          <label for="fa-emetteur-adr">Adresse</label><textarea id="fa-emetteur-adr" placeholder="12 rue des Lilas&#10;69003 Lyon"></textarea>
+          <label for="fa-siren">SIREN / SIRET</label><input id="fa-siren" placeholder="123 456 789 00012">
+          <label for="fa-emetteur-contact">E-mail / téléphone</label><input id="fa-emetteur-contact">
+        </div>
+        <div>
+          <h3>Client</h3>
+          <label for="fa-client-nom">Nom / raison sociale</label><input id="fa-client-nom">
+          <label for="fa-client-adr">Adresse</label><textarea id="fa-client-adr"></textarea>
+          <div class="rang">
+            <div><label for="fa-numero">N° de facture</label><input id="fa-numero" placeholder="2026-001"></div>
+            <div><label for="fa-date">Date d'émission</label><input id="fa-date" type="date"></div>
+          </div>
+          <label for="fa-echeance">Échéance de paiement</label><input id="fa-echeance" placeholder="À réception / 30 jours">
+        </div>
+      </div>
+
+      <h3>Prestations / produits</h3>
+      <div id="fa-lignes"></div>
+      <button class="mini" id="fa-add-ligne" type="button">+ Ajouter une ligne</button>
+
+      <div class="rang" style="margin-top:12px">
+        <div>
+          <label for="fa-tva">Régime de TVA</label>
+          <select id="fa-tva">
+            <option value="franchise" selected>Franchise en base — TVA non applicable (art. 293 B)</option>
+            <option value="20">TVA 20 %</option>
+            <option value="10">TVA 10 %</option>
+            <option value="5.5">TVA 5,5 %</option>
+          </select>
+        </div>
+        <div>
+          <label for="fa-paiement">Moyen de paiement</label>
+          <input id="fa-paiement" placeholder="Virement — IBAN FR76 …">
+        </div>
+      </div>
+
+      <div class="totaux" id="fa-totaux"></div>
+      <button class="action" id="fa-imprimer">Imprimer / Enregistrer en PDF</button>
+      <p class="note">Astuce : dans la fenêtre d'impression, choisissez « Enregistrer au format PDF ».
+      Rien n'est stocké — pensez à garder vos factures et leur numérotation continue.</p>
+    </div>
+  </section>
+
+  <!-- ===== QR ===== -->
+  <section id="onglet-qr" hidden>
+    <div class="carte">
+      <h2>QR code personnalisé (couleurs + logo)</h2>
+      <label for="qr-texte">Lien ou texte</label>
+      <input id="qr-texte" value="https://veloxgestion.fr">
+      <div class="rang3">
+        <div><label for="qr-avant">Couleur du code</label><input id="qr-avant" type="color" value="#1C1B18"></div>
+        <div><label for="qr-fond">Couleur de fond</label><input id="qr-fond" type="color" value="#FFFFFF"></div>
+        <div><label for="qr-taille">Taille (px)</label>
+          <select id="qr-taille"><option>256</option><option selected>512</option><option>1024</option></select>
+        </div>
+      </div>
+      <label for="qr-logo">Logo au centre (optionnel, PNG/JPG)</label>
+      <input id="qr-logo" type="file" accept="image/*">
+      <div id="qr-source"></div>
+      <div id="qr-rendu"><canvas id="qr-canvas" class="apercu" width="512" height="512"></canvas></div>
+      <button class="action" id="qr-dl">Télécharger le PNG</button>
+      <p class="note">Correction d'erreur maximale (niveau H) : le QR reste lisible avec un logo
+      couvrant le centre. Testez toujours le scan avant impression.</p>
+    </div>
+  </section>
+
+  <!-- ===== WEBP ===== -->
+  <section id="onglet-webp" hidden>
+    <div class="carte">
+      <h2>Compresser une image en WebP</h2>
+      <p class="note">Conversion 100 % locale — vos photos ne quittent jamais votre appareil.</p>
+      <label for="wp-fichier">Image (JPG, PNG…)</label>
+      <input id="wp-fichier" type="file" accept="image/*">
+      <label for="wp-qualite">Qualité : <span id="wp-qualite-val">80</span> %</label>
+      <input id="wp-qualite" type="range" min="10" max="95" value="80">
+      <div class="resultat" id="wp-stats" hidden></div>
+      <div style="margin-top:12px"><img id="wp-apercu" class="apercu" alt="" hidden></div>
+      <button class="action" id="wp-dl" hidden>Télécharger le WebP</button>
+    </div>
+  </section>
+
+  <!-- ===== CUISINE ===== -->
+  <section id="onglet-cuisine" hidden>
+    <div class="carte">
+      <h2>Convertisseur de cuisine</h2>
+      <div class="rang3">
+        <div><label for="cu-valeur">Valeur</label><input id="cu-valeur" type="number" step="any" value="250"></div>
+        <div><label for="cu-de">De</label><select id="cu-de"></select></div>
+        <div><label for="cu-vers">Vers</label><select id="cu-vers"></select></div>
+      </div>
+      <div class="resultat"><span class="gros" id="cu-resultat">—</span></div>
+      <h3>Cups → grammes (selon l'ingrédient)</h3>
+      <div class="rang3">
+        <div><label for="cg-cups">Cups</label><input id="cg-cups" type="number" step="0.25" value="1"></div>
+        <div><label for="cg-ing">Ingrédient</label><select id="cg-ing"></select></div>
+        <div><label>Résultat</label><div class="resultat" style="margin-top:0"><span class="gros" id="cg-resultat">—</span></div></div>
+      </div>
+      <p class="note">1 cup = 240 ml. Les équivalences en grammes varient selon la densité de l'ingrédient ;
+      thermostat = température ÷ 30 (thermostat 6 ≈ 180 °C).</p>
+    </div>
+  </section>
+
+  <!-- ===== PALETTE ===== -->
+  <section id="onglet-palette" hidden>
+    <div class="carte">
+      <h2>Générateur de palettes</h2>
+      <div class="rang">
+        <div><label for="pa-base">Couleur de départ</label><input id="pa-base" type="color" value="#6E1F2E"></div>
+        <div><label for="pa-hex">Ou code hex</label><input id="pa-hex" value="#6E1F2E" maxlength="7"></div>
+      </div>
+      <div id="pa-groupes"></div>
+      <p class="note">Cliquez sur une couleur pour copier son code hex.</p>
+    </div>
+  </section>
+
+  <!-- ===== MOTS DE PASSE ===== -->
+  <section id="onglet-mdp" hidden>
+    <div class="carte">
+      <h2>Générateur de mots de passe</h2>
+      <div class="puces">
+        <label><input type="radio" name="mdp-mode" value="caracteres" checked> Caractères aléatoires</label>
+        <label><input type="radio" name="mdp-mode" value="phrase"> Phrase de passe (mots français)</label>
+      </div>
+      <div id="mdp-opts-car">
+        <label for="mdp-longueur">Longueur : <span id="mdp-longueur-val">16</span></label>
+        <input id="mdp-longueur" type="range" min="8" max="64" value="16">
+        <div class="puces">
+          <label><input type="checkbox" id="mdp-maj" checked> Majuscules</label>
+          <label><input type="checkbox" id="mdp-chiffres" checked> Chiffres</label>
+          <label><input type="checkbox" id="mdp-symboles" checked> Symboles</label>
+        </div>
+      </div>
+      <div id="mdp-opts-phrase" hidden>
+        <label for="mdp-mots">Nombre de mots : <span id="mdp-mots-val">4</span></label>
+        <input id="mdp-mots" type="range" min="3" max="7" value="4">
+      </div>
+      <div class="resultat"><span class="gros" id="mdp-resultat">—</span>
+        <p class="note" id="mdp-entropie" style="margin:6px 0 0"></p></div>
+      <button class="action" id="mdp-generer">Générer</button>
+      <button class="action sobre" id="mdp-copier">Copier</button>
+      <p class="note">Généré via l'aléatoire cryptographique de votre navigateur, jamais transmis.</p>
+    </div>
+  </section>
+
+  <div class="cta-velox">
+    <b>Velox</b>, ce sont aussi des outils pros pour restaurateurs : menus digitaux avec QR code,
+    fiches techniques et coût matière, calculateurs de paie HCR.
+    <a href="https://veloxgestion.fr">Découvrir la suite Velox →</a>
+  </div>
+</div>
+
+<div id="facture-print"></div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script type="module">
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtE = (n) => Number(n || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+let toastTimer;
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('visible'), 2400);
+}
+async function copier(txt) {
+  try { await navigator.clipboard.writeText(txt); toast('Copié !'); }
+  catch { toast('Copie impossible dans ce navigateur.'); }
+}
+
+/* ---------- Onglets ---------- */
+document.querySelectorAll('nav.onglets button').forEach((b) => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('nav.onglets button').forEach((x) => x.setAttribute('aria-selected', 'false'));
+    b.setAttribute('aria-selected', 'true');
+    for (const o of ['facture', 'qr', 'webp', 'cuisine', 'palette', 'mdp']) {
+      $('onglet-' + o).hidden = o !== b.dataset.onglet;
+    }
+    if (b.dataset.onglet === 'qr') rendreQR();
+  });
+});
+
+/* ================= 1. FACTURE ================= */
+let lignesFacture = [{ des: '', qte: 1, pu: '' }];
+$('fa-date').value = new Date().toISOString().slice(0, 10);
+
+function rendreLignesFacture() {
+  $('fa-lignes').innerHTML = lignesFacture.map((l, i) => `
+    <div class="ligne-fact">
+      <input data-fa-des="${i}" placeholder="Désignation" value="${esc(l.des)}">
+      <input data-fa-qte="${i}" type="number" step="0.5" min="0" value="${l.qte}">
+      <input data-fa-pu="${i}" type="number" step="0.01" min="0" placeholder="PU HT €" value="${l.pu}">
+      <span class="tot">${fmtE((Number(l.qte) || 0) * (Number(l.pu) || 0))}</span>
+      <button class="mini danger" data-fa-suppr="${i}" type="button">✕</button>
+    </div>`).join('');
+  majTotauxFacture();
+}
+function totauxFacture() {
+  const ht = lignesFacture.reduce((a, l) => a + (Number(l.qte) || 0) * (Number(l.pu) || 0), 0);
+  const regime = $('fa-tva').value;
+  const taux = regime === 'franchise' ? 0 : Number(regime);
+  const tva = ht * taux / 100;
+  return { ht, taux, tva, ttc: ht + tva, franchise: regime === 'franchise' };
+}
+function majTotauxFacture() {
+  const t = totauxFacture();
+  $('fa-totaux').innerHTML =
+    `<div>Total HT : <b>${fmtE(t.ht)}</b></div>` +
+    (t.franchise ? '<div class="note">TVA non applicable, art. 293 B du CGI</div>'
+      : `<div>TVA ${t.taux.toLocaleString('fr-FR')} % : <b>${fmtE(t.tva)}</b></div>`) +
+    `<div class="ttc">Net à payer : ${fmtE(t.ttc)}</div>`;
+}
+$('fa-lignes').addEventListener('input', (e) => {
+  const d = e.target.dataset;
+  if (d.faDes != null) lignesFacture[d.faDes].des = e.target.value;
+  if (d.faQte != null) lignesFacture[d.faQte].qte = e.target.value;
+  if (d.faPu != null) lignesFacture[d.faPu].pu = e.target.value;
+  const row = e.target.closest('.ligne-fact');
+  const i = d.faDes ?? d.faQte ?? d.faPu;
+  if (row && i != null) {
+    const l = lignesFacture[i];
+    row.querySelector('.tot').textContent = fmtE((Number(l.qte) || 0) * (Number(l.pu) || 0));
+  }
+  majTotauxFacture();
+});
+$('fa-lignes').addEventListener('click', (e) => {
+  const i = e.target.dataset.faSuppr;
+  if (i == null) return;
+  lignesFacture.splice(Number(i), 1);
+  if (!lignesFacture.length) lignesFacture = [{ des: '', qte: 1, pu: '' }];
+  rendreLignesFacture();
+});
+$('fa-add-ligne').addEventListener('click', () => { lignesFacture.push({ des: '', qte: 1, pu: '' }); rendreLignesFacture(); });
+$('fa-tva').addEventListener('input', majTotauxFacture);
+
+$('fa-imprimer').addEventListener('click', () => {
+  const t = totauxFacture();
+  if (!$('fa-emetteur-nom').value.trim() || !$('fa-client-nom').value.trim() || !$('fa-numero').value.trim()) {
+    return toast('Émetteur, client et n° de facture sont obligatoires.');
+  }
+  const dateFr = $('fa-date').value
+    ? new Date($('fa-date').value + 'T00:00:00').toLocaleDateString('fr-FR') : '';
+  const corps = lignesFacture
+    .filter((l) => l.des.trim())
+    .map((l) => `<tr><td>${esc(l.des)}</td><td class="num">${Number(l.qte) || 0}</td>
+      <td class="num">${fmtE(l.pu)}</td><td class="num">${fmtE((Number(l.qte) || 0) * (Number(l.pu) || 0))}</td></tr>`)
+    .join('');
+  const mentions =
+    (t.franchise ? 'TVA non applicable, art. 293 B du CGI.\n' : '') +
+    'En cas de retard de paiement : pénalités au taux légal et indemnité forfaitaire pour frais de recouvrement de 40 € (art. L441-10 du Code de commerce). Pas d’escompte pour paiement anticipé.' +
+    ($('fa-siren').value.trim() ? '\nSIREN/SIRET : ' + esc($('fa-siren').value.trim()) : '');
+  $('facture-print').innerHTML = `
+    <h1>Facture ${esc($('fa-numero').value)}</h1>
+    <div class="deux-col">
+      <div class="bloc-adr"><b>${esc($('fa-emetteur-nom').value)}</b>${esc($('fa-emetteur-adr').value)}
+${esc($('fa-emetteur-contact').value)}</div>
+      <div class="bloc-adr"><b>Facturé à</b>${esc($('fa-client-nom').value)}
+${esc($('fa-client-adr').value)}</div>
+    </div>
+    <div class="infos">Date d'émission : ${esc(dateFr)}${$('fa-echeance').value ? ' — Échéance : ' + esc($('fa-echeance').value) : ''}${$('fa-paiement').value ? ' — Paiement : ' + esc($('fa-paiement').value) : ''}</div>
+    <table><thead><tr><th>Désignation</th><th class="num">Qté</th><th class="num">PU HT</th><th class="num">Total HT</th></tr></thead>
+    <tbody>${corps}</tbody></table>
+    <div class="bloc-totaux">
+      <div><span>Total HT</span><span>${fmtE(t.ht)}</span></div>
+      ${t.franchise ? '' : `<div><span>TVA ${t.taux.toLocaleString('fr-FR')} %</span><span>${fmtE(t.tva)}</span></div>`}
+      <div class="ttc"><span>Net à payer</span><span>${fmtE(t.ttc)}</span></div>
+    </div>
+    <div class="mentions">${esc(mentions)}</div>`;
+  document.body.classList.add('impression');
+  window.print();
+});
+window.addEventListener('afterprint', () => document.body.classList.remove('impression'));
+rendreLignesFacture();
+
+/* ================= 2. QR PERSONNALISÉ ================= */
+let logoImage = null;
+$('qr-logo').addEventListener('change', () => {
+  const f = $('qr-logo').files[0];
+  if (!f) { logoImage = null; rendreQR(); return; }
+  const img = new Image();
+  img.onload = () => { logoImage = img; rendreQR(); };
+  img.src = URL.createObjectURL(f);
+});
+['qr-texte', 'qr-avant', 'qr-fond', 'qr-taille'].forEach((id) => $(id).addEventListener('input', rendreQR));
+
+function rendreQR() {
+  const texte = $('qr-texte').value.trim() || ' ';
+  const taille = parseInt($('qr-taille').value, 10);
+  $('qr-source').innerHTML = '';
+  new QRCode($('qr-source'), {
+    text: texte, width: taille, height: taille,
+    colorDark: $('qr-avant').value, colorLight: $('qr-fond').value,
+    correctLevel: QRCode.CorrectLevel.H
+  });
+  // qrcodejs rend de façon asynchrone : on composite au tick suivant
+  setTimeout(() => {
+    const src = $('qr-source').querySelector('canvas') || $('qr-source').querySelector('img');
+    if (!src) return;
+    const c = $('qr-canvas');
+    c.width = taille; c.height = taille;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = $('qr-fond').value;
+    ctx.fillRect(0, 0, taille, taille);
+    ctx.drawImage(src, 0, 0, taille, taille);
+    if (logoImage) {
+      const l = Math.round(taille * 0.22);
+      const marge = Math.round(l * 0.14);
+      const x = (taille - l) / 2;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(x - marge, x - marge, l + marge * 2, l + marge * 2);
+      ctx.drawImage(logoImage, x, x, l, l);
+    }
+  }, 60);
+}
+$('qr-dl').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = $('qr-canvas').toDataURL('image/png');
+  a.download = 'qr-velox.png';
+  a.click();
+});
+rendreQR();
+
+/* ================= 3. WEBP ================= */
+let imageSource = null;
+let blobWebp = null;
+const octets = (n) => n > 1048576 ? (n / 1048576).toFixed(2) + ' Mo' : Math.round(n / 1024) + ' Ko';
+
+$('wp-fichier').addEventListener('change', () => {
+  const f = $('wp-fichier').files[0];
+  if (!f) return;
+  const img = new Image();
+  img.onload = () => { imageSource = { img, taille: f.size, nom: f.name }; compresserWebp(); };
+  img.src = URL.createObjectURL(f);
+});
+$('wp-qualite').addEventListener('input', () => {
+  $('wp-qualite-val').textContent = $('wp-qualite').value;
+  if (imageSource) compresserWebp();
+});
+function compresserWebp() {
+  const { img, taille } = imageSource;
+  const c = document.createElement('canvas');
+  c.width = img.naturalWidth; c.height = img.naturalHeight;
+  c.getContext('2d').drawImage(img, 0, 0);
+  c.toBlob((blob) => {
+    if (!blob) return toast('Conversion WebP non supportée par ce navigateur.');
+    blobWebp = blob;
+    const gain = Math.round((1 - blob.size / taille) * 100);
+    $('wp-stats').innerHTML = `<span class="gros">${octets(blob.size)}</span>
+      <p class="note" style="margin:6px 0 0">Original : ${octets(taille)} → ${gain >= 0 ? '−' + gain : '+' + (-gain)} % ·
+      ${img.naturalWidth} × ${img.naturalHeight} px</p>`;
+    $('wp-stats').hidden = false;
+    $('wp-apercu').src = URL.createObjectURL(blob);
+    $('wp-apercu').hidden = false;
+    $('wp-dl').hidden = false;
+  }, 'image/webp', Number($('wp-qualite').value) / 100);
+}
+$('wp-dl').addEventListener('click', () => {
+  if (!blobWebp) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blobWebp);
+  a.download = (imageSource.nom || 'image').replace(/\.[^.]+$/, '') + '.webp';
+  a.click();
+});
+
+/* ================= 4. CUISINE ================= */
+const UNITES = {
+  'Poids': { g: 1, kg: 1000, oz: 28.3495, lb: 453.592 },
+  'Volume': { ml: 1, cl: 10, l: 1000, 'c. à café': 5, 'c. à soupe': 15, cup: 240, 'fl oz': 29.5735 },
+  'Température': null
+};
+function remplirUnites() {
+  const opts = [];
+  for (const [dim, table] of Object.entries(UNITES)) {
+    const unites = table ? Object.keys(table) : ['°C', '°F', 'thermostat'];
+    for (const u of unites) opts.push(`<option value="${dim}|${u}">${u} (${dim.toLowerCase()})</option>`);
+  }
+  $('cu-de').innerHTML = opts.join('');
+  $('cu-vers').innerHTML = opts.join('');
+  $('cu-de').value = 'Poids|g';
+  $('cu-vers').value = 'Poids|oz';
+}
+function convertirCuisine() {
+  const v = parseFloat($('cu-valeur').value);
+  const [dimDe, uDe] = $('cu-de').value.split('|');
+  const [dimVers, uVers] = $('cu-vers').value.split('|');
+  if (!Number.isFinite(v)) return void ($('cu-resultat').textContent = '—');
+  if (dimDe !== dimVers) return void ($('cu-resultat').textContent = 'Unités incompatibles');
+  let res;
+  if (dimDe === 'Température') {
+    const enC = uDe === '°C' ? v : uDe === '°F' ? (v - 32) * 5 / 9 : v * 30;
+    res = uVers === '°C' ? enC : uVers === '°F' ? enC * 9 / 5 + 32 : enC / 30;
+  } else {
+    res = v * UNITES[dimDe][uDe] / UNITES[dimDe][uVers];
+  }
+  $('cu-resultat').textContent =
+    res.toLocaleString('fr-FR', { maximumFractionDigits: 2 }) + ' ' + uVers;
+}
+['cu-valeur', 'cu-de', 'cu-vers'].forEach((id) => $(id).addEventListener('input', convertirCuisine));
+
+const CUPS_G = { 'Farine': 120, 'Sucre': 200, 'Sucre glace': 120, 'Beurre': 227, 'Cacao': 100,
+  'Riz cru': 185, 'Flocons d’avoine': 90, 'Eau / lait': 240, 'Miel': 340, 'Parmesan râpé': 100 };
+$('cg-ing').innerHTML = Object.keys(CUPS_G).map((k) => `<option>${k}</option>`).join('');
+function convertirCups() {
+  const c = parseFloat($('cg-cups').value);
+  $('cg-resultat').textContent = Number.isFinite(c)
+    ? Math.round(c * CUPS_G[$('cg-ing').value]).toLocaleString('fr-FR') + ' g' : '—';
+}
+['cg-cups', 'cg-ing'].forEach((id) => $(id).addEventListener('input', convertirCups));
+remplirUnites(); convertirCuisine(); convertirCups();
+
+/* ================= 5. PALETTE ================= */
+function hexVersHsl(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  const r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+    else if (max === g) h = ((b - r) / d + 2) * 60;
+    else h = ((r - g) / d + 4) * 60;
+  }
+  return { h, s, l };
+}
+function hslVersHex({ h, s, l }) {
+  h = ((h % 360) + 360) % 360;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  let [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x]
+    : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  const hx = (v) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+  return '#' + hx(r) + hx(g) + hx(b);
+}
+function rendrePalette() {
+  const base = hexVersHsl($('pa-hex').value) || hexVersHsl($('pa-base').value);
+  if (!base) return;
+  const groupes = [
+    ['Nuances', [-0.28, -0.14, 0, 0.14, 0.28].map((d) => ({ ...base, l: Math.min(0.96, Math.max(0.06, base.l + d)) }))],
+    ['Analogues', [-30, -15, 0, 15, 30].map((d) => ({ ...base, h: base.h + d }))],
+    ['Complémentaire & triadique', [0, 120, 180, 240].map((d) => ({ ...base, h: base.h + d }))]
+  ];
+  $('pa-groupes').innerHTML = groupes.map(([titre, couleurs]) => `
+    <h3>${titre}</h3>
+    <div class="swatchs">${couleurs.map((c) => {
+      const hex = hslVersHex(c);
+      return `<div class="swatch" data-hex="${hex}"><div class="bloc" style="background:${hex}"></div>
+        <div class="hex">${hex.toUpperCase()}</div></div>`;
+    }).join('')}</div>`).join('');
+}
+$('pa-base').addEventListener('input', () => { $('pa-hex').value = $('pa-base').value; rendrePalette(); });
+$('pa-hex').addEventListener('input', () => {
+  if (hexVersHsl($('pa-hex').value)) { $('pa-base').value = $('pa-hex').value; rendrePalette(); }
+});
+$('pa-groupes').addEventListener('click', (e) => {
+  const s = e.target.closest('.swatch');
+  if (s) copier(s.dataset.hex.toUpperCase());
+});
+rendrePalette();
+
+/* ================= 6. MOTS DE PASSE ================= */
+const MOTS_FR = ('avion bateau bureau cactus camion canard carton cerise chaise chameau chanson chapeau cheval ' +
+  'citron clavier cloche cochon colline corde coton crayon cuisine dauphin dessin dragon eclair ecole epice ' +
+  'etoile falaise fenetre ferme feuille ficelle flamme fleuve fourmi fraise fromage fusee galet gateau girafe ' +
+  'glace grange guitare hibou horloge jardin jungle lampe lanterne lezard licorne lievre lumiere marmite melon ' +
+  'meteore miroir montagne moulin muraille navire neige noyau nuage ocean oiseau ombre orage orange panier ' +
+  'papier perle phare piano pierre pigeon plage plume pomme prairie renard riviere rocher ruban sable sapin ' +
+  'sentier serpent sirop soleil sommet source tambour tigre tortue trefle tulipe vague velo verger violon volcan').split(' ');
+
+function alea(max) {
+  const b = new Uint32Array(1);
+  const limite = Math.floor(0xFFFFFFFF / max) * max;
+  do { crypto.getRandomValues(b); } while (b[0] >= limite);
+  return b[0] % max;
+}
+function genererMdp() {
+  const mode = document.querySelector('input[name="mdp-mode"]:checked').value;
+  let resultat, bits;
+  if (mode === 'phrase') {
+    const n = parseInt($('mdp-mots').value, 10);
+    resultat = Array.from({ length: n }, () => MOTS_FR[alea(MOTS_FR.length)]).join('-');
+    bits = Math.round(n * Math.log2(MOTS_FR.length));
+  } else {
+    let alphabet = 'abcdefghijkmnopqrstuvwxyz';
+    if ($('mdp-maj').checked) alphabet += 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    if ($('mdp-chiffres').checked) alphabet += '23456789';
+    if ($('mdp-symboles').checked) alphabet += '!#$%&*+-=?@_';
+    const n = parseInt($('mdp-longueur').value, 10);
+    resultat = Array.from({ length: n }, () => alphabet[alea(alphabet.length)]).join('');
+    bits = Math.round(n * Math.log2(alphabet.length));
+  }
+  $('mdp-resultat').textContent = resultat;
+  $('mdp-entropie').textContent = `≈ ${bits} bits d'entropie ${bits >= 80 ? '— excellent' : bits >= 60 ? '— correct' : '— faible, allongez-le'}`;
+}
+document.querySelectorAll('input[name="mdp-mode"]').forEach((r) => r.addEventListener('change', () => {
+  const phrase = document.querySelector('input[name="mdp-mode"]:checked').value === 'phrase';
+  $('mdp-opts-car').hidden = phrase;
+  $('mdp-opts-phrase').hidden = !phrase;
+  genererMdp();
+}));
+$('mdp-longueur').addEventListener('input', () => { $('mdp-longueur-val').textContent = $('mdp-longueur').value; genererMdp(); });
+$('mdp-mots').addEventListener('input', () => { $('mdp-mots-val').textContent = $('mdp-mots').value; genererMdp(); });
+['mdp-maj', 'mdp-chiffres', 'mdp-symboles'].forEach((id) => $(id).addEventListener('change', genererMdp));
+$('mdp-generer').addEventListener('click', genererMdp);
+$('mdp-copier').addEventListener('click', () => copier($('mdp-resultat').textContent));
+genererMdp();
+</script>
+</body>
+</html>
