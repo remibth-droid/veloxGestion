@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu</title>
+<meta name="description" content="Consultez notre carte et notre menu du jour.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--papier:#FBFAF7;--encre:#1C1B18;--accent:#6E1F2E;--accent-pale:#F3E7E9;
+    --zinc:#6B6E73;--trait:#E4E0D8}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--encre);
+    font:400 1rem/1.55 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .entete{background:var(--accent);color:#fff;padding:26px 18px 22px}
+  .entete .interieur{max-width:640px;margin:0 auto}
+  .entete h1{font:800 clamp(1.5rem,6vw,2.1rem)/1.1 "Archivo",sans-serif;margin:0 0 6px}
+  .entete .infos{font-size:.85rem;opacity:.92;white-space:pre-line}
+  .actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .actions a,.actions button{font:600 .82rem "Public Sans",sans-serif;text-decoration:none;
+    color:#fff;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);
+    border-radius:99px;padding:7px 14px;cursor:pointer}
+  .actions a.resa{background:#fff;color:var(--accent);border-color:#fff;font-weight:700}
+  .page{max-width:640px;margin:0 auto;padding:18px 16px 90px}
+
+  .jour{background:#fff;border:2px solid var(--accent);border-radius:12px;padding:16px 18px;margin-bottom:22px}
+  .jour .etiquette{font:800 .72rem "Archivo",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+  .jour .date{font-size:.8rem;color:var(--zinc);margin-left:6px}
+  .jour ul{list-style:none;margin:10px 0 0;padding:0}
+  .jour li{padding:4px 0;border-bottom:1px dotted var(--trait)}
+  .jour li:last-child{border:0}
+  .jour .prix{font:800 1.1rem "Archivo",sans-serif;color:var(--accent);margin-top:8px;
+    font-variant-numeric:tabular-nums}
+
+  details.filtre{margin-bottom:18px;font-size:.85rem}
+  details.filtre summary{cursor:pointer;color:var(--zinc);font-weight:600}
+  .puces{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .puces label{display:flex;align-items:center;gap:5px;font-size:.78rem;
+    border:1px solid var(--trait);border-radius:99px;padding:4px 10px;background:#fff;cursor:pointer}
+
+  h2.categorie{font:800 .82rem "Archivo",sans-serif;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);border-bottom:1px solid var(--trait);padding-bottom:6px;margin:26px 0 4px}
+  .plat{padding:12px 0;border-bottom:1px dotted var(--trait)}
+  .plat .haut{display:flex;align-items:baseline;gap:8px}
+  .plat .nom{font-weight:600;flex-shrink:0;max-width:75%}
+  .plat .pointille{flex:1;border-bottom:2px dotted var(--trait);transform:translateY(-4px);min-width:14px}
+  .plat .prix{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .plat .desc{font-size:.86rem;color:var(--zinc);margin-top:3px;font-style:italic}
+  .plat .meta{font-size:.72rem;color:var(--zinc);margin-top:4px}
+  .plat .badge{display:inline-block;background:var(--accent-pale);color:var(--accent);
+    border-radius:99px;padding:1px 8px;margin-right:4px;font-weight:600}
+
+  .etat{padding:60px 20px;text-align:center;color:var(--zinc)}
+  footer.velox{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--trait);
+    text-align:center;padding:8px;font-size:.75rem}
+  footer.velox a{color:var(--accent);font-weight:600;text-decoration:none}
+</style>
+</head>
+<body>
+
+<header class="entete">
+  <div class="interieur">
+    <h1 id="nom-resto">…</h1>
+    <div class="infos" id="infos-resto"></div>
+    <div class="actions" id="actions-resto"></div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="etat" id="etat">Chargement du menu…</div>
+  <section id="menu" hidden>
+    <div class="jour" id="bloc-jour" hidden></div>
+    <details class="filtre" id="bloc-filtre" hidden>
+      <summary>Masquer des allergènes</summary>
+      <div class="puces" id="filtre-allergenes"></div>
+    </details>
+    <div id="bloc-carte"></div>
+  </section>
+</main>
+
+<footer class="velox" id="watermark" hidden>
+  Menu créé avec <a href="https://veloxgestion.fr">Velox Menu</a>
+</footer>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, get, set, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { firebaseConfig } from './firebase-config.js';
+
+const THEMES = {
+  bordeaux: '#6E1F2E', ardoise: '#31404C', olive: '#4A5D3A', ocre: '#A8632B', marine: '#1F3A6E'
+};
+const ALLERGENES = ['gluten','crustacés','œufs','poissons','arachides','soja','lait',
+  'fruits à coque','céleri','moutarde','sésame','sulfites','lupin','mollusques'];
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtPrix = (n) => Number(n ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+let R = null;
+let langue = 'fr';
+const masques = new Set();
+
+const params = new URLSearchParams(location.search);
+const slug = params.get('r');
+
+if (!slug) {
+  // Pas de resto demandé : on envoie le visiteur vers la page de vente.
+  location.replace('vente.html');
+} else {
+  demarrer();
+}
+
+async function demarrer() {
+  try {
+    const idSnap = await get(ref(db, `slugs/${slug}`));
+    const ownerUid = idSnap.val();
+    if (!ownerUid) {
+      $('etat').textContent = 'Ce menu n’existe pas (ou plus).';
+      return;
+    }
+    onValue(ref(db, `vitrines/${ownerUid}/public`), (snap) => {
+      R = snap.val();
+      if (!R) { $('etat').textContent = 'Menu indisponible.'; return; }
+      rendre();
+    });
+    compterScan(ownerUid);
+  } catch (e) {
+    $('etat').textContent = 'Impossible de charger le menu. Réessayez.';
+  }
+}
+
+async function compterScan(restoId) {
+  try {
+    const jour = new Date().toISOString().slice(0, 10);
+    const cheminScan = ref(db, `vitrines/${restoId}/stats/scans/${jour}`);
+    const actuel = (await get(cheminScan)).val() || 0;
+    await set(cheminScan, actuel + 1);
+  } catch (e) { /* compteur best effort, jamais bloquant */ }
+}
+
+/* Champ localisé avec repli sur le français */
+const loc = (obj, base) => (langue === 'en' && obj[base + 'En']) ? obj[base + 'En'] : obj[base];
+
+function rendre() {
+  const profil = R.profil || {};
+  document.title = (profil.nom || 'Menu') + ' — Menu';
+  document.documentElement.style.setProperty('--accent', THEMES[profil.theme] || THEMES.bordeaux);
+
+  $('nom-resto').textContent = profil.nom || 'Menu';
+  $('infos-resto').textContent = [profil.adresse, profil.horaires].filter(Boolean).join('\n');
+
+  let actions = '';
+  const resa = R.resa && R.resa.config;
+  if (resa && resa.actif && resa.urlPublique) {
+    actions += `<a class="resa" href="${esc(resa.urlPublique)}">🗓 ${langue === 'fr' ? 'Réserver' : 'Book a table'}</a>`;
+  }
+  if (profil.tel) actions += `<a href="tel:${esc(profil.tel)}">📞 Appeler</a>`;
+  if (profil.adresse) actions += `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(profil.adresse)}" target="_blank" rel="noopener">📍 Itinéraire</a>`;
+  actions += `<button id="btn-langue">${langue === 'fr' ? 'English' : 'Français'}</button>`;
+  $('actions-resto').innerHTML = actions;
+  $('btn-langue').addEventListener('click', () => { langue = langue === 'fr' ? 'en' : 'fr'; rendre(); });
+
+  /* Menu du jour */
+  const j = R.menuDuJour;
+  if (j && j.actif && (j.entree || j.plat || j.dessert)) {
+    const dateTxt = j.date
+      ? new Date(j.date + 'T00:00:00').toLocaleDateString(langue === 'fr' ? 'fr-FR' : 'en-GB',
+          { weekday: 'long', day: 'numeric', month: 'long' })
+      : '';
+    const lignes = [j.entree, j.plat, j.dessert].filter(Boolean)
+      .map((x) => `<li>${esc(x)}</li>`).join('');
+    $('bloc-jour').innerHTML = `
+      <span class="etiquette">${langue === 'fr' ? 'Menu du jour' : 'Today’s menu'}</span>
+      <span class="date">${esc(dateTxt)}</span>
+      <ul>${lignes}</ul>
+      ${j.prixFormule ? `<div class="prix">${langue === 'fr' ? 'Formule' : 'Set menu'} ${fmtPrix(j.prixFormule)}</div>` : ''}`;
+    $('bloc-jour').hidden = false;
+  } else {
+    $('bloc-jour').hidden = true;
+  }
+
+  /* Filtre allergènes */
+  if (!$('filtre-allergenes').childElementCount) {
+    $('filtre-allergenes').innerHTML = ALLERGENES.map((a) =>
+      `<label><input type="checkbox" value="${a}"> ${a}</label>`).join('');
+    $('filtre-allergenes').addEventListener('change', (e) => {
+      if (e.target.checked) masques.add(e.target.value);
+      else masques.delete(e.target.value);
+      rendreCarte();
+    });
+  }
+  $('bloc-filtre').hidden = false;
+
+  rendreCarte();
+  $('watermark').hidden = !!profil.pro;
+  $('etat').hidden = true;
+  $('menu').hidden = false;
+}
+
+function rendreCarte() {
+  const cats = Object.entries((R.carte && R.carte.categories) || {})
+    .sort((a, b) => (a[1].ordre ?? 0) - (b[1].ordre ?? 0));
+  const plats = Object.entries((R.carte && R.carte.plats) || {})
+    .filter(([, p]) => p.visible !== false)
+    .sort((a, b) => (a[1].ordre ?? 0) - (b[1].ordre ?? 0));
+
+  let html = '';
+  for (const [catId, c] of cats) {
+    const liste = plats.filter(([, p]) => p.catId === catId &&
+      !(p.allergenes || []).some((a) => masques.has(a)));
+    if (!liste.length) continue;
+    html += `<h2 class="categorie">${esc(c.nom)}</h2>`;
+    for (const [, p] of liste) {
+      const badges = (p.badges || []).map((b) => `<span class="badge">${esc(b)}</span>`).join('');
+      const allergenes = (p.allergenes || []).length
+        ? `${langue === 'fr' ? 'Allergènes' : 'Allergens'} : ${p.allergenes.map(esc).join(', ')}` : '';
+      html += `
+      <div class="plat">
+        <div class="haut">
+          <span class="nom">${esc(loc(p, 'nom'))}</span>
+          <span class="pointille"></span>
+          <span class="prix">${fmtPrix(p.prix)}</span>
+        </div>
+        ${loc(p, 'desc') ? `<div class="desc">${esc(loc(p, 'desc'))}</div>` : ''}
+        ${(badges || allergenes) ? `<div class="meta">${badges} ${allergenes}</div>` : ''}
+      </div>`;
+    }
+  }
+  $('bloc-carte').innerHTML = html ||
+    `<div class="etat">${langue === 'fr' ? 'La carte arrive bientôt.' : 'Menu coming soon.'}</div>`;
+}
+</script>
+</body>
+</html>

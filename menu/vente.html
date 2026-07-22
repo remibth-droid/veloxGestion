@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velox Menu — Menu digital avec QR code pour restaurant | Menu du jour en 30 secondes</title>
+<meta name="description" content="Créez le menu digital de votre restaurant : QR code à imprimer une seule fois, menu du jour mis à jour depuis votre téléphone, version anglaise, allergènes INCO. Gratuit jusqu'à 15 plats.">
+<meta property="og:title" content="Velox Menu — votre carte à jour en 30 secondes">
+<meta property="og:description" content="Menu digital + QR code pour restaurants indépendants. Gratuit jusqu'à 15 plats.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--papier:#FBFAF7;--encre:#1C1B18;--accent:#6E1F2E;--accent-pale:#F3E7E9;
+    --zinc:#6B6E73;--trait:#E4E0D8;--vert:#1E6B45}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--encre);
+    font:400 1.02rem/1.6 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .conteneur{max-width:980px;margin:0 auto;padding:0 20px}
+  a{color:var(--accent)}
+
+  header.site{padding:18px 0}
+  header.site .conteneur{display:flex;align-items:center;gap:14px}
+  .marque{font:800 1.15rem "Archivo",sans-serif;color:var(--accent);text-decoration:none}
+  .marque span{color:var(--encre)}
+  header.site .cta-entete{margin-left:auto}
+
+  .btn{display:inline-block;font:600 .95rem "Public Sans",sans-serif;text-decoration:none;
+    border-radius:8px;padding:12px 22px;cursor:pointer}
+  .btn.plein{background:var(--accent);color:#fff}
+  .btn.contour{border:1px solid var(--trait);color:var(--encre);background:#fff}
+  .btn.grand{font-size:1.05rem;padding:14px 28px}
+
+  .hero{padding:40px 0 72px}
+  .hero .conteneur{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+  @media(max-width:820px){.hero .conteneur{grid-template-columns:1fr}}
+  .surtitre{font:800 .78rem "Archivo",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+  h1{font:800 clamp(2rem,5.5vw,3rem)/1.08 "Archivo",sans-serif;letter-spacing:-.015em;margin:12px 0 16px}
+  .hero p.accroche{font-size:1.12rem;color:#3c3a35;max-width:52ch;margin:0 0 24px}
+  .hero .boutons{display:flex;gap:12px;flex-wrap:wrap}
+  .hero .rassure{font-size:.85rem;color:var(--zinc);margin-top:14px}
+
+  /* Mockup téléphone : le produit, dessiné en CSS */
+  .telephone{width:min(300px,100%);margin:0 auto;border:10px solid var(--encre);border-radius:38px;
+    overflow:hidden;background:var(--papier);box-shadow:0 24px 48px -20px rgba(28,27,24,.35)}
+  .tel-entete{background:var(--accent);color:#fff;padding:18px 16px 14px}
+  .tel-entete .nom{font:800 1.15rem "Archivo",sans-serif}
+  .tel-entete .infos{font-size:.66rem;opacity:.9}
+  .tel-corps{padding:12px 14px 18px;font-variant-numeric:tabular-nums}
+  .tel-jour{border:2px solid var(--accent);border-radius:10px;padding:10px 12px;margin-bottom:12px}
+  .tel-jour .etiq{font:800 .58rem "Archivo",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+  .tel-jour ul{list-style:none;margin:6px 0 0;padding:0;font-size:.74rem}
+  .tel-jour li{padding:2px 0;border-bottom:1px dotted var(--trait)}
+  .tel-jour li:last-child{border:0}
+  .tel-jour .prix{font:800 .84rem "Archivo",sans-serif;color:var(--accent);margin-top:5px}
+  .tel-cat{font:800 .6rem "Archivo",sans-serif;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);border-bottom:1px solid var(--trait);padding-bottom:3px;margin:10px 0 4px}
+  .tel-plat{display:flex;align-items:baseline;gap:6px;font-size:.76rem;padding:4px 0}
+  .tel-plat .pt{flex:1;border-bottom:2px dotted var(--trait);transform:translateY(-3px)}
+  .tel-plat b{font-weight:600}
+
+  section.bloc{padding:64px 0}
+  section.alt{background:#fff;border-top:1px solid var(--trait);border-bottom:1px solid var(--trait)}
+  h2{font:800 clamp(1.4rem,4vw,1.9rem)/1.15 "Archivo",sans-serif;letter-spacing:-.01em;margin:0 0 10px}
+  .sous-titre{color:var(--zinc);max-width:60ch;margin:0 0 34px}
+
+  .grille3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:760px){.grille3{grid-template-columns:1fr}}
+  .carte{background:#fff;border:1px solid var(--trait);border-radius:12px;padding:22px}
+  section.alt .carte{background:var(--papier)}
+  .carte h3{font:800 1.02rem "Archivo",sans-serif;margin:0 0 8px}
+  .carte p{margin:0;font-size:.93rem;color:#3c3a35}
+
+  .etape .numero{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+    border-radius:50%;background:var(--accent);color:#fff;font:800 1rem "Archivo",sans-serif;margin-bottom:12px}
+
+  .fonctions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 26px;margin-top:8px}
+  @media(max-width:760px){.fonctions{grid-template-columns:1fr}}
+  .fonction{display:flex;gap:10px;align-items:flex-start;font-size:.95rem}
+  .fonction::before{content:"✓";color:var(--vert);font-weight:700}
+
+  .tarifs{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:720px;margin:0 auto}
+  @media(max-width:680px){.tarifs{grid-template-columns:1fr}}
+  .tarif{background:#fff;border:1px solid var(--trait);border-radius:14px;padding:26px;position:relative}
+  .tarif.pro{border:2px solid var(--accent)}
+  .tarif .badge{position:absolute;top:-12px;left:22px;background:var(--accent);color:#fff;
+    font:800 .68rem "Archivo",sans-serif;letter-spacing:.08em;text-transform:uppercase;border-radius:99px;padding:4px 12px}
+  .tarif h3{font:800 1.1rem "Archivo",sans-serif;margin:0}
+  .tarif .prix{font:800 2.2rem "Archivo",sans-serif;margin:8px 0 2px}
+  .tarif .prix small{font:600 .9rem "Public Sans",sans-serif;color:var(--zinc)}
+  .tarif ul{list-style:none;padding:0;margin:16px 0 20px}
+  .tarif li{padding:5px 0;font-size:.92rem;display:flex;gap:8px}
+  .tarif li::before{content:"✓";color:var(--vert);font-weight:700}
+  .tarif li.moins::before{content:"—";color:var(--zinc)}
+
+  details{border-bottom:1px solid var(--trait);padding:14px 0}
+  summary{font-weight:600;cursor:pointer}
+  details p{margin:10px 0 2px;color:#3c3a35}
+
+  .final{text-align:center;padding:80px 20px}
+  .final h2{margin-bottom:14px}
+
+  footer.site{border-top:1px solid var(--trait);padding:28px 0 40px;font-size:.82rem;color:var(--zinc)}
+  footer.site .conteneur{display:flex;flex-wrap:wrap;gap:10px 24px}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="conteneur">
+    <a class="marque" href="vente.html">VELOX<span> Menu</span></a>
+    <a class="btn contour cta-entete" href="admin.html">Se connecter</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="conteneur">
+    <div>
+      <span class="surtitre">Menus digitaux pour restaurants indépendants</span>
+      <h1>Votre carte à jour en 30 secondes, sans jamais réimprimer.</h1>
+      <p class="accroche">Créez votre menu, imprimez votre QR code une seule fois, puis changez
+      vos plats, vos prix ou votre menu du jour depuis votre téléphone — même pendant le coup de feu.</p>
+      <div class="boutons">
+        <a class="btn plein grand" href="admin.html">Créer mon menu gratuit</a>
+        <a class="btn contour grand" href="index.html?r=demo">Voir un menu de démo</a>
+      </div>
+      <p class="rassure">Gratuit jusqu'à 15 plats · Sans carte bancaire · Prêt en 10 minutes</p>
+    </div>
+
+    <div class="telephone" aria-hidden="true">
+      <div class="tel-entete">
+        <div class="nom">Chez Marcel</div>
+        <div class="infos">12 rue des Halles · 12h–14h30 / 19h–22h30</div>
+      </div>
+      <div class="tel-corps">
+        <div class="tel-jour">
+          <span class="etiq">Menu du jour</span>
+          <ul>
+            <li>Velouté de potimarron</li>
+            <li>Blanquette de veau, riz pilaf</li>
+            <li>Crème brûlée à la vanille</li>
+          </ul>
+          <div class="prix">Formule 16,90 €</div>
+        </div>
+        <div class="tel-cat">Entrées</div>
+        <div class="tel-plat"><b>Burrata crémeuse</b><span class="pt"></span><b>9,50 €</b></div>
+        <div class="tel-cat">Plats</div>
+        <div class="tel-plat"><b>Magret de canard</b><span class="pt"></span><b>18,00 €</b></div>
+        <div class="tel-cat">Desserts</div>
+        <div class="tel-plat"><b>Tarte fine aux pommes</b><span class="pt"></span><b>7,50 €</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bloc alt">
+  <div class="conteneur">
+    <h2>La carte plastifiée vous coûte plus cher qu'elle n'en a l'air</h2>
+    <p class="sous-titre">Trois situations que vous vivez toutes les semaines — et ce qu'elles deviennent avec un menu digital.</p>
+    <div class="grille3">
+      <div class="carte">
+        <h3>Un prix change, tout est à refaire</h3>
+        <p>Un fournisseur augmente, un plat s'épuise : chaque modification signifie réimpression,
+        plastification, ou pire — du blanco. En ligne, c'est corrigé en dix secondes, sur toutes les tables à la fois.</p>
+      </div>
+      <div class="carte">
+        <h3>Le menu du jour, chaque matin</h3>
+        <p>L'ardoise photographiée pour les réseaux, personne ne la voit. Avec le bloc « menu du jour »,
+        vous tapez trois lignes au café du matin et vos habitués savent quoi manger avant de s'asseoir.</p>
+      </div>
+      <div class="carte">
+        <h3>Touristes et allergènes</h3>
+        <p>Version anglaise en un bouton, les 14 allergènes officiels affichés proprement avec un filtre
+        pour vos clients : l'obligation INCO devient un argument d'accueil, pas une corvée.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bloc">
+  <div class="conteneur">
+    <h2>Trois étapes, dix minutes</h2>
+    <p class="sous-titre">Aucune compétence technique : si vous savez envoyer un message, vous savez utiliser Velox Menu.</p>
+    <div class="grille3">
+      <div class="carte etape">
+        <span class="numero">1</span>
+        <h3>Créez votre carte</h3>
+        <p>Catégories, plats, prix, descriptions, badges « fait maison » ou « végétarien ».
+        Votre carte existante suffit comme modèle.</p>
+      </div>
+      <div class="carte etape">
+        <span class="numero">2</span>
+        <h3>Imprimez votre QR</h3>
+        <p>Kit de table A6 prêt à poser, généré automatiquement. Le lien ne change jamais :
+        vous n'imprimerez qu'une seule fois.</p>
+      </div>
+      <div class="carte etape">
+        <span class="numero">3</span>
+        <h3>Mettez à jour du pouce</h3>
+        <p>Menu du jour, plat masqué, prix ajusté : tout se fait depuis votre téléphone
+        et s'affiche instantanément chez vos clients.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bloc alt">
+  <div class="conteneur">
+    <h2>Tout ce qu'il faut, rien de plus</h2>
+    <div class="fonctions">
+      <div class="fonction">Menu du jour publié en 30 secondes</div>
+      <div class="fonction">QR code + kit de table imprimable</div>
+      <div class="fonction">Version anglaise pour les touristes</div>
+      <div class="fonction">14 allergènes INCO avec filtre client</div>
+      <div class="fonction">5 thèmes de couleurs assortis à votre salle</div>
+      <div class="fonction">Compteur de scans de votre menu</div>
+    </div>
+  </div>
+</section>
+
+<section class="bloc" id="tarifs">
+  <div class="conteneur">
+    <h2 style="text-align:center">Un tarif simple, sans engagement</h2>
+    <p class="sous-titre" style="text-align:center;margin-left:auto;margin-right:auto">Commencez gratuitement, passez en Pro quand votre carte grandit.</p>
+    <div class="tarifs">
+      <div class="tarif">
+        <h3>Gratuit</h3>
+        <div class="prix">0 €</div>
+        <ul>
+          <li>1 restaurant, 15 plats</li>
+          <li>QR code + kit de table</li>
+          <li>Page menu mobile</li>
+          <li class="moins">Mention « Créé avec Velox Menu »</li>
+        </ul>
+        <a class="btn contour" href="admin.html">Commencer</a>
+      </div>
+      <div class="tarif pro">
+        <span class="badge">Recommandé</span>
+        <h3>Pro</h3>
+        <div class="prix">9 €<small> /mois — ou 90 €/an</small></div>
+        <ul>
+          <li>Plats illimités</li>
+          <li>Menu du jour + version anglaise</li>
+          <li>Thèmes de couleurs</li>
+          <li>Sans mention Velox</li>
+          <li>Support par e-mail</li>
+        </ul>
+        <a class="btn plein" href="admin.html">Passer en Pro</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bloc alt">
+  <div class="conteneur">
+    <h2>Conçu en salle, pas dans un bureau</h2>
+    <p class="sous-titre" style="margin-bottom:0">Velox est développé par un professionnel qui travaille
+    en restauration. Chaque fonction existe parce qu'elle répond à un vrai service du midi — pas à une
+    réunion produit. C'est aussi pour ça qu'il n'y a rien de superflu.</p>
+  </div>
+</section>
+
+<section class="bloc">
+  <div class="conteneur">
+    <h2>Questions fréquentes</h2>
+    <details open>
+      <summary>Mes clients doivent-ils installer une application ?</summary>
+      <p>Non. Le QR code ouvre une simple page web, instantanément, sur n'importe quel téléphone.
+      Rien à télécharger, rien à configurer.</p>
+    </details>
+    <details>
+      <summary>Le QR code change-t-il si je modifie ma carte ?</summary>
+      <p>Jamais. Le lien de votre menu est définitif : vous imprimez vos supports une seule fois,
+      et le contenu derrière évolue autant que vous voulez.</p>
+    </details>
+    <details>
+      <summary>Et si je ne suis pas à l'aise avec l'informatique ?</summary>
+      <p>L'interface se limite à des champs à remplir, comme un SMS un peu long. La plupart des
+      restaurateurs publient leur carte complète en moins de trente minutes.</p>
+    </details>
+    <details>
+      <summary>Que se passe-t-il si j'arrête l'abonnement Pro ?</summary>
+      <p>Votre compte repasse simplement en plan gratuit : votre menu reste en ligne avec 15 plats
+      visibles. Rien n'est supprimé.</p>
+    </details>
+    <details>
+      <summary>Puis-je gérer plusieurs établissements ?</summary>
+      <p>Un restaurant par compte pour l'instant — la gestion multi-établissements arrive dans une
+      prochaine version. Écrivez-nous si c'est votre cas, vous serez prioritaire.</p>
+    </details>
+  </div>
+</section>
+
+<div class="final">
+  <h2>Votre menu en ligne avant le prochain service</h2>
+  <a class="btn plein grand" href="admin.html">Créer mon menu gratuit</a>
+  <p class="rassure" style="color:var(--zinc);font-size:.85rem;margin-top:14px">Gratuit jusqu'à 15 plats · Sans carte bancaire</p>
+</div>
+
+<footer class="site">
+  <div class="conteneur">
+    <span>© Velox — outils pour restaurateurs indépendants</span>
+    <a href="https://veloxgestion.fr">Velox Suite</a>
+    <a href="https://veloxgestion.fr">Velox Food Cost</a>
+    <a href="https://veloxgestion.fr">Calculateurs paie gratuits (heures sup HCR, congés payés)</a>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+ {"@type":"Question","name":"Mes clients doivent-ils installer une application ?","acceptedAnswer":{"@type":"Answer","text":"Non, le QR code ouvre une simple page web sur n'importe quel téléphone, sans téléchargement."}},
+ {"@type":"Question","name":"Le QR code change-t-il si je modifie ma carte ?","acceptedAnswer":{"@type":"Answer","text":"Non, le lien du menu est définitif : les supports sont imprimés une seule fois et le contenu évolue librement."}},
+ {"@type":"Question","name":"Combien coûte Velox Menu ?","acceptedAnswer":{"@type":"Answer","text":"Gratuit jusqu'à 15 plats avec QR code inclus, puis 9 € par mois (ou 90 € par an) pour la version Pro sans limite."}},
+ {"@type":"Question","name":"Que se passe-t-il si j'arrête l'abonnement ?","acceptedAnswer":{"@type":"Answer","text":"Le compte repasse en plan gratuit, le menu reste en ligne avec 15 plats visibles, rien n'est supprimé."}}
+]}
+</script>
+</body>
+</html>

@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velox Menu — Administration</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--papier:#FBFAF7;--encre:#1C1B18;--accent:#6E1F2E;--accent-pale:#F3E7E9;
+    --zinc:#6B6E73;--trait:#E4E0D8;--vert:#1E6B45;--alerte:#9A4A00;--alerte-fond:#FBEFE2}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--encre);
+    font:400 1rem/1.55 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .appbar{display:flex;align-items:center;gap:12px;padding:12px 18px;background:#fff;border-bottom:1px solid var(--trait)}
+  .marque{font:800 1.05rem "Archivo",sans-serif;color:var(--accent)}
+  .marque span{color:var(--encre)}
+  .appbar .droite{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--zinc)}
+  .page{max-width:760px;margin:0 auto;padding:18px 16px 80px}
+  nav.onglets{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 18px}
+  nav.onglets button{font:600 .85rem "Public Sans",sans-serif;padding:8px 14px;border:1px solid var(--trait);
+    border-radius:99px;background:#fff;color:var(--zinc);cursor:pointer}
+  nav.onglets button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  h1{font:800 1.5rem "Archivo",sans-serif;margin:8px 0 14px}
+  h2{font:800 1.12rem "Archivo",sans-serif;margin:0 0 12px}
+  h3{font:600 .95rem "Public Sans",sans-serif;margin:16px 0 8px}
+  .carte{background:#fff;border:1px solid var(--trait);border-radius:10px;padding:18px;margin-bottom:16px}
+  label{display:block;font-weight:600;font-size:.83rem;margin:10px 0 4px}
+  input,select,textarea{width:100%;padding:9px 11px;font:inherit;color:var(--encre);
+    background:var(--papier);border:1px solid var(--trait);border-radius:7px}
+  textarea{min-height:74px;resize:vertical}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+  .rang{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.rang{grid-template-columns:1fr}}
+  button.action{font:600 .9rem "Public Sans",sans-serif;background:var(--accent);color:#fff;
+    border:0;border-radius:7px;padding:10px 16px;cursor:pointer;margin-top:12px}
+  button.sobre{background:#fff;color:var(--encre);border:1px solid var(--trait)}
+  button.mini{font:600 .75rem "Public Sans",sans-serif;background:#fff;border:1px solid var(--trait);
+    border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--zinc)}
+  button.mini.danger{color:#8f2020}
+  .liste{border-top:1px solid var(--trait)}
+  .item{display:flex;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px solid var(--trait);font-size:.92rem}
+  .item .nom{flex:1;min-width:0}
+  .item .prix{font-variant-numeric:tabular-nums;font-weight:600}
+  .item.masque .nom{color:var(--zinc);text-decoration:line-through}
+  .cat-titre{display:flex;align-items:center;gap:8px;margin:18px 0 4px}
+  .cat-titre b{font:800 .8rem "Archivo",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+  .puces{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .puces label{display:flex;align-items:center;gap:5px;margin:0;font-weight:400;font-size:.8rem;
+    border:1px solid var(--trait);border-radius:99px;padding:4px 10px;background:var(--papier);cursor:pointer}
+  .puces input{width:auto}
+  .note{font-size:.8rem;color:var(--zinc)}
+  .bandeau{background:var(--alerte-fond);border:1px solid #EAD3B8;color:var(--alerte);
+    border-radius:8px;padding:10px 14px;font-size:.88rem;margin:10px 0}
+  .ok{background:#E8F2EC;border-color:#BFD9CB;color:var(--vert)}
+  .swatches{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .swatches label{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.75rem;cursor:pointer}
+  .swatches .pastille{width:34px;height:34px;border-radius:50%;border:2px solid transparent}
+  .swatches input{display:none}
+  .swatches input:checked + .pastille{border-color:var(--encre)}
+  #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--encre);
+    color:#fff;padding:10px 18px;border-radius:8px;font-size:.88rem;opacity:0;pointer-events:none;transition:opacity .25s}
+  #toast.visible{opacity:1}
+  #qr-conteneur{display:flex;justify-content:center;padding:14px;background:#fff}
+  .kit{display:none}
+  @media print{
+    body.impression *{display:none !important}
+    body.impression .kit, body.impression .kit *{display:block !important}
+    .kit{width:105mm;margin:20mm auto;text-align:center;font-family:"Public Sans",sans-serif}
+    .kit .kit-nom{font:800 20pt "Archivo",sans-serif;margin-bottom:6mm}
+    .kit #qr-kit{display:flex !important;justify-content:center;margin-bottom:6mm}
+    .kit .kit-phrase{font-size:12pt}
+  }
+  section[hidden]{display:none}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <span class="marque">VELOX<span> Menu</span></span>
+  <div class="droite">
+    <span id="badge-plan"></span>
+    <span id="email-user"></span>
+    <button class="mini" id="btn-logout" hidden>Se déconnecter</button>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- ===== AUTH ===== -->
+  <section id="vue-auth">
+    <h1>Espace restaurateur</h1>
+    <div class="carte">
+      <h2 id="auth-titre">Connexion</h2>
+      <label for="auth-email">E-mail</label>
+      <input id="auth-email" type="email" autocomplete="email">
+      <label for="auth-pass">Mot de passe</label>
+      <input id="auth-pass" type="password" autocomplete="current-password">
+      <button class="action" id="btn-auth">Se connecter</button>
+      <p class="note" style="margin-top:12px">
+        <a href="#" id="lien-bascule-auth">Pas encore de compte ? Créer un compte</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== ONBOARDING ===== -->
+  <section id="vue-onboarding" hidden>
+    <h1>Créons votre menu</h1>
+    <div class="carte">
+      <label for="ob-nom">Nom du restaurant</label>
+      <input id="ob-nom" placeholder="Chez Marcel">
+      <p class="note">Adresse publique du menu : <b id="ob-apercu-slug">…</b></p>
+      <button class="action" id="btn-creer-resto">Créer mon restaurant</button>
+    </div>
+  </section>
+
+  <!-- ===== APP ===== -->
+  <section id="vue-app" hidden>
+    <nav class="onglets" role="tablist">
+      <button data-onglet="carte" aria-selected="true">Ma carte</button>
+      <button data-onglet="jour" aria-selected="false">Menu du jour</button>
+      <button data-onglet="resto" aria-selected="false">Mon resto</button>
+      <button data-onglet="qr" aria-selected="false">QR &amp; impression</button>
+      <button data-onglet="pro" aria-selected="false">Pro</button>
+    </nav>
+
+    <!-- --- Ma carte --- -->
+    <section id="onglet-carte">
+      <div class="carte">
+        <h2>Catégories</h2>
+        <div id="liste-categories" class="liste"></div>
+        <div class="rang" style="margin-top:12px">
+          <input id="nv-categorie" placeholder="Nouvelle catégorie (ex. Entrées)">
+          <button class="action" style="margin-top:0" id="btn-add-categorie">Ajouter</button>
+        </div>
+      </div>
+
+      <div class="carte">
+        <h2>Plats</h2>
+        <div id="liste-plats"></div>
+        <button class="action" id="btn-nouveau-plat">Ajouter un plat</button>
+        <div class="bandeau" id="limite-gratuit" hidden>
+          Plan gratuit : 15 plats maximum. Passez en Pro pour une carte illimitée.
+        </div>
+      </div>
+
+      <div class="carte" id="editeur-plat" hidden>
+        <h2 id="editeur-plat-titre">Nouveau plat</h2>
+        <div class="rang">
+          <div><label for="p-nom">Nom</label><input id="p-nom"></div>
+          <div><label for="p-prix">Prix (€)</label><input id="p-prix" type="number" step="0.1" min="0" inputmode="decimal"></div>
+        </div>
+        <label for="p-desc">Description</label>
+        <textarea id="p-desc"></textarea>
+        <div class="rang">
+          <div><label for="p-nom-en">Nom (anglais, optionnel)</label><input id="p-nom-en"></div>
+          <div><label for="p-cat">Catégorie</label><select id="p-cat"></select></div>
+        </div>
+        <label for="p-desc-en">Description (anglais, optionnel)</label>
+        <textarea id="p-desc-en"></textarea>
+        <h3>Allergènes</h3>
+        <div class="puces" id="p-allergenes"></div>
+        <h3>Badges</h3>
+        <div class="puces" id="p-badges"></div>
+        <label class="puces" style="margin-top:12px"><input type="checkbox" id="p-visible" checked> Visible sur le menu</label>
+        <div>
+          <button class="action" id="btn-save-plat">Enregistrer le plat</button>
+          <button class="action sobre" id="btn-annuler-plat">Annuler</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- --- Menu du jour --- -->
+    <section id="onglet-jour" hidden>
+      <div class="carte">
+        <h2>Menu du jour</h2>
+        <p class="note">Mettez-le à jour chaque matin en 30 secondes : il s'affiche en tête du menu avec la date du jour.</p>
+        <form id="form-jour">
+          <label for="j-entree">Entrée</label><input id="j-entree">
+          <label for="j-plat">Plat</label><input id="j-plat">
+          <label for="j-dessert">Dessert</label><input id="j-dessert">
+          <div class="rang">
+            <div><label for="j-prix">Prix de la formule (€)</label><input id="j-prix" type="number" step="0.5" min="0" inputmode="decimal"></div>
+            <div><label class="puces" style="margin-top:30px"><input type="checkbox" id="j-actif"> Afficher sur le menu</label></div>
+          </div>
+          <button class="action" type="submit">Publier le menu du jour</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- --- Mon resto --- -->
+    <section id="onglet-resto" hidden>
+      <div class="carte">
+        <h2>Informations</h2>
+        <form id="form-resto">
+          <label for="r-nom">Nom</label><input id="r-nom">
+          <label for="r-adresse">Adresse</label><input id="r-adresse">
+          <div class="rang">
+            <div><label for="r-tel">Téléphone</label><input id="r-tel" type="tel"></div>
+            <div><label>Lien public</label><input id="r-lien" readonly></div>
+          </div>
+          <label for="r-horaires">Horaires (une ligne par jour)</label>
+          <textarea id="r-horaires" placeholder="Lun–Ven : 12h–14h30 / 19h–22h30&#10;Sam : 19h–23h"></textarea>
+          <h3>Couleur du menu</h3>
+          <div class="swatches" id="r-themes"></div>
+          <button class="action" type="submit">Enregistrer</button>
+        </form>
+        <p class="note" id="r-scans" style="margin-top:12px"></p>
+      </div>
+    </section>
+
+    <!-- --- QR --- -->
+    <section id="onglet-qr" hidden>
+      <div class="carte">
+        <h2>QR code du menu</h2>
+        <div id="qr-conteneur"></div>
+        <p class="note" style="text-align:center" id="qr-url"></p>
+        <button class="action" id="btn-dl-qr">Télécharger le QR (PNG)</button>
+        <button class="action sobre" id="btn-imprimer-kit">Imprimer le kit de table (A6)</button>
+      </div>
+    </section>
+
+    <!-- --- Pro --- -->
+    <section id="onglet-pro" hidden>
+      <div class="carte">
+        <h2>Votre plan</h2>
+        <div id="pro-statut"></div>
+        <p>Le plan <b>Pro — 9 €/mois</b> débloque : plats illimités, menu du jour, version anglaise,
+        thèmes de couleurs et retire la mention Velox du menu public.</p>
+        <button class="action" id="btn-payer">Passer en Pro</button>
+        <p class="note">Après paiement, votre compte est activé sous 24 h (vous recevez un e-mail de confirmation).</p>
+      </div>
+    </section>
+  </section>
+</div>
+
+<!-- Kit d'impression A6 (visible uniquement à l'impression) -->
+<div class="kit">
+  <div class="kit-nom" id="kit-nom"></div>
+  <div id="qr-kit"></div>
+  <div class="kit-phrase">Scannez pour découvrir notre carte</div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+  createUserWithEmailAndPassword, signOut
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {
+  getDatabase, ref, get, set, update, push, remove, onValue
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { firebaseConfig } from './firebase-config.js';
+
+/* ---------- Constantes produit ---------- */
+const PAYMENT_LINK = 'https://buy.stripe.com/REMPLACER';
+const LIMITE_PLATS_GRATUIT = 15;
+const ALLERGENES = ['gluten','crustacés','œufs','poissons','arachides','soja','lait',
+  'fruits à coque','céleri','moutarde','sésame','sulfites','lupin','mollusques'];
+const BADGES = [
+  { id: 'vege', label: 'Végétarien' },
+  { id: 'vegan', label: 'Vegan' },
+  { id: 'sansgluten', label: 'Sans gluten' },
+  { id: 'maison', label: 'Fait maison' }
+];
+const THEMES = {
+  bordeaux: { nom: 'Bordeaux', accent: '#6E1F2E' },
+  ardoise:  { nom: 'Ardoise',  accent: '#31404C' },
+  olive:    { nom: 'Olive',    accent: '#4A5D3A' },
+  ocre:     { nom: 'Ocre',     accent: '#A8632B' },
+  marine:   { nom: 'Marine',   accent: '#1F3A6E' }
+};
+
+/* ---------- Init ---------- */
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtPrix = (n) => Number(n ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+const slugify = (s) => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+
+let toastTimer;
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('visible'), 2600);
+}
+
+/* Remplit un formulaire seulement si l'utilisateur n'est pas en train d'y taper. */
+function remplirSiInactif(conteneur, valeurs) {
+  if (conteneur.contains(document.activeElement)) return;
+  for (const [id, v] of Object.entries(valeurs)) {
+    const el = $(id);
+    if (!el) continue;
+    if (el.type === 'checkbox') el.checked = !!v;
+    else el.value = v ?? '';
+  }
+}
+
+/* ---------- État ---------- */
+let uid = null;
+let restoId = null;
+let R = {};           // données du resto
+let platEnEdition = null;
+
+const estPro = () => !!(R && R.profil && R.profil.pro);
+const urlPublique = () =>
+  location.origin + location.pathname.replace(/admin\.html.*$/, '') + 'index.html?r=' + ((R.profil && R.profil.slug) || '');
+
+/* ---------- Auth ---------- */
+let modeInscription = false;
+$('lien-bascule-auth').addEventListener('click', (e) => {
+  e.preventDefault();
+  modeInscription = !modeInscription;
+  $('auth-titre').textContent = modeInscription ? 'Créer un compte' : 'Connexion';
+  $('btn-auth').textContent = modeInscription ? 'Créer mon compte' : 'Se connecter';
+  $('lien-bascule-auth').textContent = modeInscription
+    ? 'Déjà un compte ? Se connecter'
+    : 'Pas encore de compte ? Créer un compte';
+});
+
+$('btn-auth').addEventListener('click', async () => {
+  const email = $('auth-email').value.trim();
+  const pass = $('auth-pass').value;
+  if (!email || !pass) return toast('E-mail et mot de passe requis.');
+  try {
+    if (modeInscription) await createUserWithEmailAndPassword(auth, email, pass);
+    else await signInWithEmailAndPassword(auth, email, pass);
+  } catch (e) {
+    toast('Échec : ' + (e.code || e.message).replace('auth/', '').replace(/-/g, ' '));
+  }
+});
+
+$('btn-logout').addEventListener('click', () => signOut(auth));
+
+onAuthStateChanged(auth, async (user) => {
+  uid = user ? user.uid : null;
+  $('email-user').textContent = user ? user.email : '';
+  $('btn-logout').hidden = !user;
+  if (!user) {
+    restoId = null; R = {};
+    montrer('auth');
+    return;
+  }
+  restoId = uid;
+  const profilSnap = await get(ref(db, `users/${uid}/velox_menu_admin/profil`));
+  if (!profilSnap.exists()) montrer('onboarding');
+  else ecouterResto();
+});
+
+function montrer(vue) {
+  $('vue-auth').hidden = vue !== 'auth';
+  $('vue-onboarding').hidden = vue !== 'onboarding';
+  $('vue-app').hidden = vue !== 'app';
+}
+
+/* ---------- Onboarding ---------- */
+$('ob-nom').addEventListener('input', () => {
+  $('ob-apercu-slug').textContent = 'index.html?r=' + (slugify($('ob-nom').value) || '…');
+});
+
+$('btn-creer-resto').addEventListener('click', async () => {
+  const nom = $('ob-nom').value.trim();
+  const slug = slugify(nom);
+  if (!nom || !slug) return toast('Indiquez le nom du restaurant.');
+  const pris = await get(ref(db, `slugs/${slug}`));
+  if (pris.exists()) return toast('Ce nom est déjà utilisé, ajoutez votre ville par exemple.');
+  const profil = { nom, slug, theme: 'bordeaux', pro: false, creeLe: Date.now() };
+  await update(ref(db), {
+    [`users/${uid}/velox_menu_admin/profil`]: profil,
+    [`users/${uid}/restoId`]: uid,
+    [`slugs/${slug}`]: uid,
+    [`vitrines/${uid}/profil`]: { nom, slug, theme: 'bordeaux', pro: false }
+  });
+  restoId = uid;
+  ecouterResto();
+  toast('Restaurant créé !');
+});
+
+/* ---------- Chargement temps réel ---------- */
+function ecouterResto() {
+  montrer('app');
+  onValue(ref(db, `users/${uid}/velox_menu_admin`), (snap) => {
+    R = snap.val() || {};
+    rendreTout();
+  });
+}
+
+/* ---------- Onglets ---------- */
+document.querySelectorAll('nav.onglets button').forEach((b) => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('nav.onglets button').forEach((x) => x.setAttribute('aria-selected', 'false'));
+    b.setAttribute('aria-selected', 'true');
+    for (const o of ['carte', 'jour', 'resto', 'qr', 'pro']) {
+      $('onglet-' + o).hidden = o !== b.dataset.onglet;
+    }
+    if (b.dataset.onglet === 'qr') rendreQR();
+  });
+});
+
+/* ---------- Rendu ---------- */
+async function publierVitrine() {
+  // Recopie la version publique du menu (lecture par tous) à chaque changement.
+  if (!R.profil) return;
+  const pub = {
+    profil: { nom: R.profil.nom, slug: R.profil.slug, theme: R.profil.theme || 'bordeaux',
+              adresse: R.profil.adresse || '', tel: R.profil.tel || '', horaires: R.profil.horaires || '',
+              pro: !!R.profil.pro },
+    carte: R.carte || {},
+    menuDuJour: R.menuDuJour || {}
+  };
+  try { await set(ref(db, `vitrines/${uid}/public`), pub); } catch (e) { /* silencieux */ }
+}
+
+function rendreTout() {
+  $('badge-plan').textContent = estPro() ? 'PRO' : 'Gratuit';
+  publierVitrine();
+  rendreCategories();
+  rendrePlats();
+  rendreJour();
+  rendreResto();
+  rendrePro();
+  if (!$('onglet-qr').hidden) rendreQR();
+}
+
+const categoriesTriees = () =>
+  Object.entries((R.carte && R.carte.categories) || {}).sort((a, b) => (a[1].ordre ?? 0) - (b[1].ordre ?? 0));
+const platsTries = () =>
+  Object.entries((R.carte && R.carte.plats) || {}).sort((a, b) => (a[1].ordre ?? 0) - (b[1].ordre ?? 0));
+
+/* --- Catégories --- */
+function rendreCategories() {
+  const cats = categoriesTriees();
+  $('liste-categories').innerHTML = cats.length
+    ? cats.map(([id, c], i) => `
+      <div class="item">
+        <span class="nom">${esc(c.nom)}</span>
+        <button class="mini" data-act="cat-haut" data-id="${id}" ${i === 0 ? 'disabled' : ''}>↑</button>
+        <button class="mini" data-act="cat-bas" data-id="${id}" ${i === cats.length - 1 ? 'disabled' : ''}>↓</button>
+        <button class="mini" data-act="cat-renommer" data-id="${id}">Renommer</button>
+        <button class="mini danger" data-act="cat-suppr" data-id="${id}">Suppr.</button>
+      </div>`).join('')
+    : '<p class="note" style="padding:10px 2px">Commencez par créer vos catégories : Entrées, Plats, Desserts…</p>';
+  const sel = $('p-cat');
+  sel.innerHTML = cats.map(([id, c]) => `<option value="${id}">${esc(c.nom)}</option>`).join('');
+}
+
+$('btn-add-categorie').addEventListener('click', async () => {
+  const nom = $('nv-categorie').value.trim();
+  if (!nom) return;
+  const ordre = categoriesTriees().length;
+  await push(ref(db, `users/${uid}/velox_menu_admin/carte/categories`), { nom, ordre });
+  $('nv-categorie').value = '';
+});
+
+/* --- Plats --- */
+function rendrePlats() {
+  const plats = platsTries();
+  const parCat = {};
+  for (const [id, p] of plats) (parCat[p.catId] = parCat[p.catId] || []).push([id, p]);
+
+  let html = '';
+  for (const [catId, c] of categoriesTriees()) {
+    const liste = parCat[catId] || [];
+    html += `<div class="cat-titre"><b>${esc(c.nom)}</b><span class="note">${liste.length} plat(s)</span></div><div class="liste">`;
+    liste.forEach(([id, p], i) => {
+      const badges = (p.badges && p.badges.length) ? ` <span class="note">· ${p.badges.map(esc).join(', ')}</span>` : '';
+      html += `
+      <div class="item ${p.visible === false ? 'masque' : ''}">
+        <span class="nom">${esc(p.nom)}${badges}</span>
+        <span class="prix">${fmtPrix(p.prix)}</span>
+        <button class="mini" data-act="plat-haut" data-id="${id}" ${i === 0 ? 'disabled' : ''}>↑</button>
+        <button class="mini" data-act="plat-bas" data-id="${id}" ${i === liste.length - 1 ? 'disabled' : ''}>↓</button>
+        <button class="mini" data-act="plat-editer" data-id="${id}">Modifier</button>
+        <button class="mini danger" data-act="plat-suppr" data-id="${id}">Suppr.</button>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  const orphelins = plats.filter(([, p]) => !((R.carte && R.carte.categories) || {})[p.catId]);
+  if (orphelins.length) {
+    html += `<div class="cat-titre"><b>Sans catégorie</b></div><div class="liste">` +
+      orphelins.map(([id, p]) => `
+        <div class="item"><span class="nom">${esc(p.nom)}</span><span class="prix">${fmtPrix(p.prix)}</span>
+        <button class="mini" data-act="plat-editer" data-id="${id}">Modifier</button>
+        <button class="mini danger" data-act="plat-suppr" data-id="${id}">Suppr.</button></div>`).join('') + '</div>';
+  }
+  $('liste-plats').innerHTML = html || '<p class="note">Aucun plat pour le moment.</p>';
+  $('limite-gratuit').hidden = estPro() || plats.length < LIMITE_PLATS_GRATUIT;
+}
+
+/* Cases à cocher allergènes / badges (générées une fois) */
+$('p-allergenes').innerHTML = ALLERGENES.map((a) =>
+  `<label><input type="checkbox" value="${a}"> ${a}</label>`).join('');
+$('p-badges').innerHTML = BADGES.map((b) =>
+  `<label><input type="checkbox" value="${b.label}"> ${b.label}</label>`).join('');
+
+function ouvrirEditeurPlat(id = null) {
+  platEnEdition = id;
+  const p = id ? R.carte.plats[id] : null;
+  $('editeur-plat-titre').textContent = id ? 'Modifier le plat' : 'Nouveau plat';
+  $('p-nom').value = (p && p.nom) || '';
+  $('p-prix').value = p ? p.prix : '';
+  $('p-desc').value = (p && p.desc) || '';
+  $('p-nom-en').value = (p && p.nomEn) || '';
+  $('p-desc-en').value = (p && p.descEn) || '';
+  $('p-visible').checked = p ? p.visible !== false : true;
+  if (p && p.catId) $('p-cat').value = p.catId;
+  document.querySelectorAll('#p-allergenes input').forEach((c) => c.checked = ((p && p.allergenes) || []).includes(c.value));
+  document.querySelectorAll('#p-badges input').forEach((c) => c.checked = ((p && p.badges) || []).includes(c.value));
+  $('editeur-plat').hidden = false;
+  $('editeur-plat').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+$('btn-nouveau-plat').addEventListener('click', () => {
+  if (!categoriesTriees().length) return toast('Créez d’abord une catégorie.');
+  if (!estPro() && platsTries().length >= LIMITE_PLATS_GRATUIT) {
+    $('limite-gratuit').hidden = false;
+    return toast('Limite du plan gratuit atteinte (15 plats).');
+  }
+  ouvrirEditeurPlat(null);
+});
+$('btn-annuler-plat').addEventListener('click', () => { $('editeur-plat').hidden = true; });
+
+$('btn-save-plat').addEventListener('click', async () => {
+  const nom = $('p-nom').value.trim();
+  const prix = parseFloat($('p-prix').value);
+  if (!nom) return toast('Le nom du plat est requis.');
+  if (!Number.isFinite(prix) || prix < 0) return toast('Prix invalide.');
+  const plat = {
+    nom,
+    prix,
+    desc: $('p-desc').value.trim(),
+    nomEn: $('p-nom-en').value.trim(),
+    descEn: $('p-desc-en').value.trim(),
+    catId: $('p-cat').value,
+    visible: $('p-visible').checked,
+    allergenes: [...document.querySelectorAll('#p-allergenes input:checked')].map((c) => c.value),
+    badges: [...document.querySelectorAll('#p-badges input:checked')].map((c) => c.value),
+    ordre: platEnEdition ? ((R.carte.plats[platEnEdition] && R.carte.plats[platEnEdition].ordre) ?? Date.now()) : Date.now()
+  };
+  if (platEnEdition) await set(ref(db, `users/${uid}/velox_menu_admin/carte/plats/${platEnEdition}`), plat);
+  else await push(ref(db, `users/${uid}/velox_menu_admin/carte/plats`), plat);
+  $('editeur-plat').hidden = true;
+  toast('Plat enregistré.');
+});
+
+/* --- Actions des listes (délégation) --- */
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-act]');
+  if (!btn) return;
+  const act = btn.dataset.act;
+  const id = btn.dataset.id;
+  const base = `users/${uid}/velox_menu_admin/carte`;
+
+  if (act === 'cat-renommer') {
+    const nom = prompt('Nouveau nom de la catégorie :', (R.carte.categories[id] && R.carte.categories[id].nom) || '');
+    if (nom && nom.trim()) await update(ref(db, `${base}/categories/${id}`), { nom: nom.trim() });
+  }
+  if (act === 'cat-suppr') {
+    const aDesPlats = platsTries().some(([, p]) => p.catId === id);
+    if (aDesPlats) return toast('Déplacez ou supprimez d’abord les plats de cette catégorie.');
+    if (confirm('Supprimer cette catégorie ?')) await remove(ref(db, `${base}/categories/${id}`));
+  }
+  if (act === 'cat-haut' || act === 'cat-bas') {
+    const cats = categoriesTriees();
+    const i = cats.findIndex(([cid]) => cid === id);
+    const j = act === 'cat-haut' ? i - 1 : i + 1;
+    if (j < 0 || j >= cats.length) return;
+    await update(ref(db), {
+      [`${base}/categories/${cats[i][0]}/ordre`]: j,
+      [`${base}/categories/${cats[j][0]}/ordre`]: i
+    });
+  }
+  if (act === 'plat-editer') ouvrirEditeurPlat(id);
+  if (act === 'plat-suppr' && confirm('Supprimer ce plat ?')) {
+    await remove(ref(db, `${base}/plats/${id}`));
+  }
+  if (act === 'plat-haut' || act === 'plat-bas') {
+    const p = R.carte.plats[id];
+    const freres = platsTries().filter(([, x]) => x.catId === p.catId);
+    const i = freres.findIndex(([pid]) => pid === id);
+    const j = act === 'plat-haut' ? i - 1 : i + 1;
+    if (j < 0 || j >= freres.length) return;
+    await update(ref(db), {
+      [`${base}/plats/${freres[i][0]}/ordre`]: freres[j][1].ordre ?? j,
+      [`${base}/plats/${freres[j][0]}/ordre`]: freres[i][1].ordre ?? i
+    });
+  }
+});
+
+/* --- Menu du jour --- */
+function rendreJour() {
+  const j = R.menuDuJour || {};
+  remplirSiInactif($('form-jour'), {
+    'j-entree': j.entree,
+    'j-plat': j.plat,
+    'j-dessert': j.dessert,
+    'j-prix': j.prixFormule,
+    'j-actif': j.actif
+  });
+}
+$('form-jour').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  await set(ref(db, `users/${uid}/velox_menu_admin/menuDuJour`), {
+    entree: $('j-entree').value.trim(),
+    plat: $('j-plat').value.trim(),
+    dessert: $('j-dessert').value.trim(),
+    prixFormule: parseFloat($('j-prix').value) || 0,
+    actif: $('j-actif').checked,
+    date: new Date().toISOString().slice(0, 10)
+  });
+  toast('Menu du jour publié.');
+});
+
+/* --- Mon resto --- */
+$('r-themes').innerHTML = Object.entries(THEMES).map(([id, t]) => `
+  <label><input type="radio" name="theme" value="${id}">
+  <span class="pastille" style="background:${t.accent}"></span>${t.nom}</label>`).join('');
+
+function rendreResto() {
+  const p = R.profil || {};
+  remplirSiInactif($('form-resto'), {
+    'r-nom': p.nom,
+    'r-adresse': p.adresse,
+    'r-tel': p.tel,
+    'r-horaires': p.horaires,
+    'r-lien': urlPublique()
+  });
+  const radio = document.querySelector(`#r-themes input[value="${p.theme || 'bordeaux'}"]`);
+  if (radio && !$('form-resto').contains(document.activeElement)) radio.checked = true;
+
+  const scans = (R.stats && R.stats.scans) || {};
+  const depuis = Date.now() - 7 * 86400000;
+  const total = Object.entries(scans)
+    .filter(([d]) => new Date(d + 'T00:00:00Z').getTime() >= depuis)
+    .reduce((acc, [, n]) => acc + (Number(n) || 0), 0);
+  $('r-scans').textContent = `Scans du menu ces 7 derniers jours : ${total}`;
+}
+
+$('form-resto').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const radio = document.querySelector('#r-themes input:checked');
+  await update(ref(db, `users/${uid}/velox_menu_admin/profil`), {
+    nom: $('r-nom').value.trim(),
+    adresse: $('r-adresse').value.trim(),
+    tel: $('r-tel').value.trim(),
+    horaires: $('r-horaires').value,
+    theme: radio ? radio.value : 'bordeaux'
+  });
+  toast('Informations enregistrées.');
+});
+
+/* --- QR --- */
+function rendreQR() {
+  const url = urlPublique();
+  $('qr-url').textContent = url;
+  $('qr-conteneur').innerHTML = '';
+  $('qr-kit').innerHTML = '';
+  $('kit-nom').textContent = (R.profil && R.profil.nom) || '';
+  new QRCode($('qr-conteneur'), { text: url, width: 220, height: 220 });
+  new QRCode($('qr-kit'), { text: url, width: 180, height: 180 });
+}
+$('btn-dl-qr').addEventListener('click', () => {
+  const canvas = $('qr-conteneur').querySelector('canvas');
+  const img = $('qr-conteneur').querySelector('img');
+  const data = canvas ? canvas.toDataURL('image/png') : (img && img.src);
+  if (!data) return;
+  const a = document.createElement('a');
+  a.href = data;
+  a.download = `qr-${(R.profil && R.profil.slug) || 'menu'}.png`;
+  a.click();
+});
+$('btn-imprimer-kit').addEventListener('click', () => {
+  document.body.classList.add('impression');
+  window.print();
+});
+window.addEventListener('afterprint', () => document.body.classList.remove('impression'));
+
+/* --- Pro --- */
+function rendrePro() {
+  $('pro-statut').innerHTML = estPro()
+    ? '<div class="bandeau ok">Plan Pro actif — merci !</div>'
+    : `<div class="bandeau">Plan gratuit : ${platsTries().length}/${LIMITE_PLATS_GRATUIT} plats utilisés.</div>`;
+  $('btn-payer').hidden = estPro();
+}
+$('btn-payer').addEventListener('click', () => window.open(PAYMENT_LINK, '_blank'));
+</script>
+</body>
+</html>
