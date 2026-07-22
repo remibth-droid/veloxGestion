@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velox Résa — Administration</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--papier:#FBFAF7;--encre:#1C1B18;--accent:#6E1F2E;--accent-pale:#F3E7E9;
+    --zinc:#6B6E73;--trait:#E4E0D8;--vert:#1E6B45;--vert-fond:#E8F2EC;
+    --orange:#A8632B;--orange-fond:#F8EDE2;--rouge:#8f2020;--rouge-fond:#F6E4E4}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--encre);
+    font:400 1rem/1.55 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .appbar{display:flex;align-items:center;gap:12px;padding:12px 18px;background:#fff;border-bottom:1px solid var(--trait)}
+  .marque{font:800 1.05rem "Archivo",sans-serif;color:var(--accent)}
+  .marque span{color:var(--encre)}
+  .appbar .droite{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--zinc)}
+  .page{max-width:760px;margin:0 auto;padding:18px 16px 80px}
+  nav.onglets{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 18px}
+  nav.onglets button{font:600 .85rem "Public Sans",sans-serif;padding:8px 14px;border:1px solid var(--trait);
+    border-radius:99px;background:#fff;color:var(--zinc);cursor:pointer;position:relative}
+  nav.onglets button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  nav.onglets .pastille{position:absolute;top:-6px;right:-4px;background:var(--orange);color:#fff;
+    font:700 .66rem "Public Sans",sans-serif;border-radius:99px;padding:1px 6px}
+  h1{font:800 1.5rem "Archivo",sans-serif;margin:8px 0 14px}
+  h2{font:800 1.12rem "Archivo",sans-serif;margin:0 0 12px}
+  h3{font:600 .95rem "Public Sans",sans-serif;margin:16px 0 8px}
+  .carte{background:#fff;border:1px solid var(--trait);border-radius:10px;padding:18px;margin-bottom:16px}
+  label{display:block;font-weight:600;font-size:.83rem;margin:10px 0 4px}
+  input,select,textarea{width:100%;padding:9px 11px;font:inherit;color:var(--encre);
+    background:var(--papier);border:1px solid var(--trait);border-radius:7px}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+  .rang{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .rang3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:640px){.rang,.rang3{grid-template-columns:1fr}}
+  button.action{font:600 .9rem "Public Sans",sans-serif;background:var(--accent);color:#fff;
+    border:0;border-radius:7px;padding:10px 16px;cursor:pointer;margin-top:12px}
+  button.mini{font:600 .75rem "Public Sans",sans-serif;background:#fff;border:1px solid var(--trait);
+    border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--zinc)}
+  button.mini.ok{color:var(--vert)}
+  button.mini.danger{color:var(--rouge)}
+  .liste{border-top:1px solid var(--trait)}
+  .item{display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px solid var(--trait);font-size:.9rem;flex-wrap:wrap}
+  .item .heure{font:800 .95rem "Archivo",sans-serif;color:var(--accent);font-variant-numeric:tabular-nums;width:52px}
+  .item .nom{flex:1;min-width:140px}
+  .item .nom small{display:block;color:var(--zinc);font-size:.78rem}
+  .item .couv{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+  .badge{font:600 .72rem "Public Sans",sans-serif;border-radius:99px;padding:2px 10px;white-space:nowrap}
+  .st-attente{background:var(--orange-fond);color:var(--orange)}
+  .st-confirmee{background:var(--vert-fond);color:var(--vert)}
+  .st-refusee{background:var(--rouge-fond);color:var(--rouge)}
+  .st-annulee{background:#EEECE7;color:var(--zinc)}
+  .service-titre{display:flex;align-items:baseline;gap:10px;margin:18px 0 4px}
+  .service-titre b{font:800 .8rem "Archivo",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+  .service-titre .jauge{font-size:.8rem;color:var(--zinc);font-variant-numeric:tabular-nums}
+  .puces{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .puces label{display:flex;align-items:center;gap:5px;margin:0;font-weight:400;font-size:.82rem;
+    border:1px solid var(--trait);border-radius:99px;padding:5px 10px;background:var(--papier);cursor:pointer}
+  .puces input{width:auto}
+  .note{font-size:.8rem;color:var(--zinc)}
+  .bandeau{background:var(--orange-fond);border:1px solid #EAD3B8;color:var(--orange);
+    border-radius:8px;padding:10px 14px;font-size:.88rem;margin:10px 0}
+  .ok-bandeau{background:var(--vert-fond);border-color:#BFD9CB;color:var(--vert)}
+  #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--encre);
+    color:#fff;padding:10px 18px;border-radius:8px;font-size:.88rem;opacity:0;pointer-events:none;transition:opacity .25s}
+  #toast.visible{opacity:1}
+  section[hidden]{display:none}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <span class="marque">VELOX<span> Résa</span></span>
+  <div class="droite">
+    <span id="email-user"></span>
+    <button class="mini" id="btn-logout" hidden>Se déconnecter</button>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- ===== AUTH ===== -->
+  <section id="vue-auth">
+    <h1>Réservations de votre restaurant</h1>
+    <div class="carte">
+      <h2>Connexion</h2>
+      <p class="note">Utilisez le même compte que Velox Menu — les deux outils partagent votre restaurant.</p>
+      <label for="auth-email">E-mail</label>
+      <input id="auth-email" type="email" autocomplete="email">
+      <label for="auth-pass">Mot de passe</label>
+      <input id="auth-pass" type="password" autocomplete="current-password">
+      <button class="action" id="btn-auth">Se connecter</button>
+    </div>
+  </section>
+
+  <!-- ===== SANS RESTO ===== -->
+  <section id="vue-sans-resto" hidden>
+    <div class="carte">
+      <h2>Aucun restaurant lié à ce compte</h2>
+      <p>Créez d'abord votre restaurant dans <b>Velox Menu</b> (admin), puis revenez ici :
+      Velox Résa s'y branchera automatiquement.</p>
+    </div>
+  </section>
+
+  <!-- ===== APP ===== -->
+  <section id="vue-app" hidden>
+    <nav class="onglets" role="tablist">
+      <button data-onglet="jour" aria-selected="true">Aujourd'hui<span class="pastille" id="pastille-attente" hidden></span></button>
+      <button data-onglet="agenda" aria-selected="false">Agenda</button>
+      <button data-onglet="reglages" aria-selected="false">Réglages</button>
+    </nav>
+
+    <!-- --- Aujourd'hui --- -->
+    <section id="onglet-jour">
+      <div class="carte">
+        <h2 id="titre-jour">Aujourd'hui</h2>
+        <div id="liste-jour"></div>
+      </div>
+    </section>
+
+    <!-- --- Agenda --- -->
+    <section id="onglet-agenda" hidden>
+      <div class="carte">
+        <h2>Agenda</h2>
+        <label for="ag-date">Choisir une date</label>
+        <input id="ag-date" type="date">
+        <div id="liste-agenda" style="margin-top:8px"></div>
+      </div>
+    </section>
+
+    <!-- --- Réglages --- -->
+    <section id="onglet-reglages" hidden>
+      <div class="carte">
+        <h2>Réglages des réservations</h2>
+        <form id="form-config">
+          <label class="puces"><input type="checkbox" id="c-actif"> Réservations en ligne activées
+            (affiche le bouton « Réserver » sur votre menu public)</label>
+
+          <div class="rang3">
+            <div><label for="c-couverts">Couverts max / service</label>
+              <input id="c-couverts" type="number" min="1" max="500" value="30"></div>
+            <div><label for="c-groupe">Taille max d'un groupe</label>
+              <input id="c-groupe" type="number" min="1" max="50" value="8"></div>
+            <div><label for="c-delai">Délai minimum (heures)</label>
+              <input id="c-delai" type="number" min="0" max="72" value="2"></div>
+          </div>
+
+          <h3>Service du midi</h3>
+          <div class="rang3">
+            <div><label class="puces" style="margin-top:26px"><input type="checkbox" id="c-midi-actif" checked> Ouvert</label></div>
+            <div><label for="c-midi-debut">Premier créneau</label><input id="c-midi-debut" type="time" value="12:00"></div>
+            <div><label for="c-midi-fin">Dernier créneau</label><input id="c-midi-fin" type="time" value="13:30"></div>
+          </div>
+
+          <h3>Service du soir</h3>
+          <div class="rang3">
+            <div><label class="puces" style="margin-top:26px"><input type="checkbox" id="c-soir-actif" checked> Ouvert</label></div>
+            <div><label for="c-soir-debut">Premier créneau</label><input id="c-soir-debut" type="time" value="19:00"></div>
+            <div><label for="c-soir-fin">Dernier créneau</label><input id="c-soir-fin" type="time" value="21:30"></div>
+          </div>
+
+          <div class="rang">
+            <div><label for="c-pas">Intervalle des créneaux</label>
+              <select id="c-pas"><option value="15">15 min</option><option value="30" selected>30 min</option><option value="60">60 min</option></select></div>
+            <div><label for="c-tel">Téléphone affiché aux clients</label><input id="c-tel" type="tel"></div>
+          </div>
+
+          <h3>Jours de fermeture</h3>
+          <div class="puces" id="c-jours"></div>
+
+          <label class="puces" style="margin-top:14px"><input type="checkbox" id="c-auto" checked>
+            Confirmation automatique (sinon chaque demande reste « en attente » jusqu'à votre validation)</label>
+
+          <label for="c-url">Adresse publique de la page de réservation</label>
+          <input id="c-url">
+          <p class="note">Pré-remplie automatiquement. C'est ce lien que le bouton « Réserver » de votre menu utilisera.</p>
+
+          <button class="action" type="submit">Enregistrer les réglages</button>
+        </form>
+      </div>
+    </section>
+  </section>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {
+  getDatabase, ref, get, set, update, onValue
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { firebaseConfig } from './firebase-config.js';
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const JOURS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+const STATUTS = {
+  attente: 'En attente', confirmee: 'Confirmée', refusee: 'Refusée', annulee: 'Annulée'
+};
+const aujourdhuiISO = () => new Date().toISOString().slice(0, 10);
+
+let toastTimer;
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('visible'), 2600);
+}
+function remplirSiInactif(conteneur, valeurs) {
+  if (conteneur.contains(document.activeElement)) return;
+  for (const [id, v] of Object.entries(valeurs)) {
+    const el = $(id);
+    if (!el) continue;
+    if (el.type === 'checkbox') el.checked = !!v;
+    else el.value = v ?? '';
+  }
+}
+
+/* ---------- État ---------- */
+let uid = null, restoId = null;
+let CONF = null;         // restaurants/{rid}/resa/config
+let DEM = {};            // resaDemandes/{rid}
+let PROFIL = {};
+
+/* ---------- Auth ---------- */
+$('btn-auth').addEventListener('click', async () => {
+  const email = $('auth-email').value.trim();
+  const pass = $('auth-pass').value;
+  if (!email || !pass) return toast('E-mail et mot de passe requis.');
+  try { await signInWithEmailAndPassword(auth, email, pass); }
+  catch (e) { toast('Échec : ' + (e.code || e.message).replace('auth/', '').replace(/-/g, ' ')); }
+});
+$('btn-logout').addEventListener('click', () => signOut(auth));
+
+onAuthStateChanged(auth, async (user) => {
+  uid = user ? user.uid : null;
+  $('email-user').textContent = user ? user.email : '';
+  $('btn-logout').hidden = !user;
+  if (!user) { montrer('auth'); return; }
+  restoId = uid;
+  PROFIL = (await get(ref(db, `users/${uid}/velox_menu_admin/profil`))).val();
+  if (!PROFIL) { montrer('sans-resto'); return; }
+  montrer('app');
+  onValue(ref(db, `users/${uid}/velox_resa_admin/config`), (s) => { CONF = s.val(); rendreTout(); });
+  onValue(ref(db, `resaDemandes/${restoId}`), (s) => { DEM = s.val() || {}; rendreTout(); });
+});
+
+function montrer(vue) {
+  $('vue-auth').hidden = vue !== 'auth';
+  $('vue-sans-resto').hidden = vue !== 'sans-resto';
+  $('vue-app').hidden = vue !== 'app';
+}
+
+/* ---------- Onglets ---------- */
+document.querySelectorAll('nav.onglets button').forEach((b) => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('nav.onglets button').forEach((x) => x.setAttribute('aria-selected', 'false'));
+    b.setAttribute('aria-selected', 'true');
+    for (const o of ['jour', 'agenda', 'reglages']) $('onglet-' + o).hidden = o !== b.dataset.onglet;
+  });
+});
+
+/* ---------- Rendu ---------- */
+function rendreTout() {
+  const attente = Object.values(DEM).filter((d) => d.statut === 'attente' && d.date >= aujourdhuiISO()).length;
+  $('pastille-attente').textContent = attente;
+  $('pastille-attente').hidden = attente === 0;
+
+  const dateFr = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  $('titre-jour').textContent = 'Aujourd’hui — ' + dateFr;
+  $('liste-jour').innerHTML = htmlPourDate(aujourdhuiISO());
+  if ($('ag-date').value) $('liste-agenda').innerHTML = htmlPourDate($('ag-date').value);
+  rendreConfig();
+}
+
+function demandesPour(dateISO) {
+  return Object.entries(DEM)
+    .filter(([, d]) => d.date === dateISO)
+    .sort((a, b) => a[1].heure.localeCompare(b[1].heure));
+}
+
+function htmlPourDate(dateISO) {
+  const lignes = demandesPour(dateISO);
+  if (!CONF) return '<div class="bandeau">Configurez d’abord vos réservations dans l’onglet Réglages.</div>';
+  if (!lignes.length) return '<p class="note" style="padding:10px 2px">Aucune réservation pour cette date.</p>';
+
+  let html = '';
+  for (const service of ['midi', 'soir']) {
+    const duService = lignes.filter(([, d]) => d.service === service);
+    if (!duService.length) continue;
+    const couvertsActifs = duService
+      .filter(([, d]) => d.statut === 'attente' || d.statut === 'confirmee')
+      .reduce((a, [, d]) => a + (Number(d.couverts) || 0), 0);
+    html += `<div class="service-titre"><b>${service === 'midi' ? 'Midi' : 'Soir'}</b>
+      <span class="jauge">${couvertsActifs}/${CONF.couvertsMax || '—'} couverts</span></div><div class="liste">`;
+    for (const [id, d] of duService) {
+      const actions =
+        d.statut === 'attente'
+          ? `<button class="mini ok" data-statut="confirmee" data-id="${id}">Confirmer</button>
+             <button class="mini danger" data-statut="refusee" data-id="${id}">Refuser</button>`
+          : d.statut === 'confirmee'
+            ? `<button class="mini danger" data-statut="annulee" data-id="${id}">Annuler</button>`
+            : '';
+      html += `
+      <div class="item">
+        <span class="heure">${esc(d.heure)}</span>
+        <span class="nom">${esc(d.nom)}
+          <small><a href="tel:${esc(d.tel)}">${esc(d.tel)}</a>${d.note ? ' · ' + esc(d.note) : ''}</small>
+        </span>
+        <span class="couv">${d.couverts} couv.</span>
+        <span class="badge st-${d.statut}">${STATUTS[d.statut] || d.statut}</span>
+        ${actions}
+      </div>`;
+    }
+    html += '</div>';
+  }
+  return html;
+}
+
+$('ag-date').value = aujourdhuiISO();
+$('ag-date').addEventListener('input', () => {
+  $('liste-agenda').innerHTML = htmlPourDate($('ag-date').value);
+});
+
+/* ---------- Actions sur les demandes ---------- */
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('button[data-statut]');
+  if (!b) return;
+  const id = b.dataset.id;
+  const nouveau = b.dataset.statut;
+  const d = DEM[id];
+  if (!d) return;
+  const ancien = d.statut;
+  await update(ref(db, `resaDemandes/${restoId}/${id}`), { statut: nouveau });
+  // Le compteur public est incrémenté à la création : on le libère si la résa tombe.
+  const tombee = (nouveau === 'refusee' || nouveau === 'annulee') &&
+                 (ancien === 'attente' || ancien === 'confirmee');
+  if (tombee) {
+    const cheminCompteur = ref(db, `vitrines/${restoId}/resaCompteurs/${d.date}/${d.service}`);
+    const actuel = Number((await get(cheminCompteur)).val()) || 0;
+    await set(cheminCompteur, Math.max(0, actuel - (Number(d.couverts) || 0)));
+  }
+  toast('Réservation ' + (STATUTS[nouveau] || nouveau).toLowerCase() + '.');
+});
+
+/* ---------- Réglages ---------- */
+$('c-jours').innerHTML = JOURS.map((j, i) =>
+  `<label><input type="checkbox" value="${i}" ${i === 0 ? 'checked' : ''}> ${j}</label>`).join('');
+
+function urlPubliqueDefaut() {
+  return location.origin + location.pathname.replace(/admin\.html.*$/, '') +
+    'reserver.html?r=' + (PROFIL.slug || '');
+}
+
+function rendreConfig() {
+  const c = CONF || {};
+  const s = c.services || {};
+  remplirSiInactif($('form-config'), {
+    'c-actif': c.actif,
+    'c-couverts': c.couvertsMax ?? 30,
+    'c-groupe': c.tailleMaxGroupe ?? 8,
+    'c-delai': c.delaiMinHeures ?? 2,
+    'c-midi-actif': s.midi ? s.midi.actif : true,
+    'c-midi-debut': (s.midi && s.midi.debut) || '12:00',
+    'c-midi-fin': (s.midi && s.midi.fin) || '13:30',
+    'c-soir-actif': s.soir ? s.soir.actif : true,
+    'c-soir-debut': (s.soir && s.soir.debut) || '19:00',
+    'c-soir-fin': (s.soir && s.soir.fin) || '21:30',
+    'c-pas': String(c.pas ?? 30),
+    'c-tel': c.telAffiche ?? (PROFIL.tel || ''),
+    'c-auto': c.confirmationAuto !== false,
+    'c-url': c.urlPublique || urlPubliqueDefaut()
+  });
+  if (!$('form-config').contains(document.activeElement)) {
+    document.querySelectorAll('#c-jours input').forEach((cb) =>
+      cb.checked = (c.joursFermes || [0]).includes(Number(cb.value)));
+  }
+}
+
+$('form-config').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const config = {
+    actif: $('c-actif').checked,
+    couvertsMax: parseInt($('c-couverts').value, 10) || 30,
+    tailleMaxGroupe: parseInt($('c-groupe').value, 10) || 8,
+    delaiMinHeures: parseFloat($('c-delai').value) || 0,
+    pas: parseInt($('c-pas').value, 10) || 30,
+    telAffiche: $('c-tel').value.trim(),
+    confirmationAuto: $('c-auto').checked,
+    urlPublique: $('c-url').value.trim() || urlPubliqueDefaut(),
+    joursFermes: [...document.querySelectorAll('#c-jours input:checked')].map((c) => Number(c.value)),
+    services: {
+      midi: { actif: $('c-midi-actif').checked, debut: $('c-midi-debut').value, fin: $('c-midi-fin').value },
+      soir: { actif: $('c-soir-actif').checked, debut: $('c-soir-debut').value, fin: $('c-soir-fin').value }
+    }
+  };
+  await set(ref(db, `users/${uid}/velox_resa_admin/config`), config);
+  // Miroir public minimal pour la page de réservation et le bouton du menu.
+  await set(ref(db, `vitrines/${uid}/resaPublic`), {
+    actif: config.actif,
+    urlPublique: config.urlPublique,
+    couvertsMax: config.couvertsMax,
+    tailleMaxGroupe: config.tailleMaxGroupe,
+    delaiMinHeures: config.delaiMinHeures,
+    pas: config.pas,
+    telAffiche: config.telAffiche,
+    confirmationAuto: config.confirmationAuto,
+    joursFermes: config.joursFermes,
+    services: config.services
+  });
+  // Répercute aussi le bouton "Réserver" dans le miroir menu public s'il existe.
+  try { await set(ref(db, `vitrines/${uid}/public/resaPublic`), { actif: config.actif, urlPublique: config.urlPublique }); } catch (e) {}
+  toast('Réglages enregistrés.');
+});
+</script>
+</body>
+</html>

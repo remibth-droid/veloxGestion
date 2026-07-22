@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Réserver une table</title>
+<meta name="description" content="Réservez votre table en ligne, sans commission.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--papier:#FBFAF7;--encre:#1C1B18;--accent:#6E1F2E;--accent-pale:#F3E7E9;
+    --zinc:#6B6E73;--trait:#E4E0D8;--vert:#1E6B45;--vert-fond:#E8F2EC}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--encre);
+    font:400 1rem/1.55 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .entete{background:var(--accent);color:#fff;padding:24px 18px 20px}
+  .entete .interieur{max-width:560px;margin:0 auto}
+  .entete h1{font:800 clamp(1.4rem,5.5vw,1.9rem)/1.1 "Archivo",sans-serif;margin:0}
+  .entete .sous{font-size:.85rem;opacity:.92;margin-top:4px}
+  .page{max-width:560px;margin:0 auto;padding:18px 16px 70px}
+  .carte{background:#fff;border:1px solid var(--trait);border-radius:12px;padding:20px}
+  h2{font:800 .82rem "Archivo",sans-serif;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent);margin:20px 0 8px}
+  h2:first-child{margin-top:0}
+  label{display:block;font-weight:600;font-size:.83rem;margin:10px 0 4px}
+  input,select,textarea{width:100%;padding:10px 12px;font:inherit;color:var(--encre);
+    background:var(--papier);border:1px solid var(--trait);border-radius:7px}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+  .rang{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .choix{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .choix button{font:600 .88rem "Public Sans",sans-serif;padding:9px 16px;border:1px solid var(--trait);
+    border-radius:8px;background:#fff;color:var(--encre);cursor:pointer;font-variant-numeric:tabular-nums}
+  .choix button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .choix button:disabled{opacity:.35;cursor:not-allowed}
+  button.action{width:100%;font:600 1rem "Public Sans",sans-serif;background:var(--accent);color:#fff;
+    border:0;border-radius:8px;padding:13px 16px;cursor:pointer;margin-top:16px}
+  .note{font-size:.8rem;color:var(--zinc)}
+  .bandeau{background:#F8EDE2;border:1px solid #EAD3B8;color:#A8632B;
+    border-radius:8px;padding:10px 14px;font-size:.88rem;margin:10px 0}
+  .confirmation{text-align:center;padding:10px 0}
+  .confirmation .pastille{width:56px;height:56px;border-radius:50%;background:var(--vert-fond);
+    color:var(--vert);font-size:1.6rem;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+  .confirmation h2{color:var(--encre);text-transform:none;letter-spacing:0;font-size:1.2rem;text-align:center}
+  .recap{margin:14px auto 0;max-width:320px;text-align:left;background:var(--accent-pale);
+    border:1px solid #E3CDD2;border-radius:10px;padding:12px 16px;font-variant-numeric:tabular-nums}
+  .recap div{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:.92rem}
+  .recap b{font-weight:600}
+  .etat{padding:50px 16px;text-align:center;color:var(--zinc)}
+  footer.velox{text-align:center;padding:20px;font-size:.75rem;color:var(--zinc)}
+  footer.velox a{color:var(--accent);font-weight:600;text-decoration:none}
+  [hidden]{display:none !important}
+</style>
+</head>
+<body>
+
+<header class="entete">
+  <div class="interieur">
+    <h1 id="nom-resto">Réserver une table</h1>
+    <div class="sous" id="sous-resto"></div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="etat" id="etat">Chargement…</div>
+
+  <div class="carte" id="indisponible" hidden>
+    <h2 style="text-transform:none;letter-spacing:0;font-size:1.1rem;color:var(--encre)">
+      Les réservations en ligne sont fermées pour le moment</h2>
+    <p>Pour réserver, appelez-nous directement :</p>
+    <p><a id="tel-indispo" href="#" style="font:800 1.2rem 'Archivo',sans-serif;color:var(--accent)"></a></p>
+  </div>
+
+  <form class="carte" id="formulaire" hidden>
+    <h2>1. Votre date</h2>
+    <input id="f-date" type="date">
+    <div class="bandeau" id="msg-date" hidden></div>
+
+    <div id="bloc-service" hidden>
+      <h2>2. Le service</h2>
+      <div class="choix" id="choix-service"></div>
+    </div>
+
+    <div id="bloc-couverts" hidden>
+      <h2>3. Nombre de personnes</h2>
+      <div class="choix" id="choix-couverts"></div>
+      <div class="bandeau" id="msg-complet" hidden></div>
+    </div>
+
+    <div id="bloc-heure" hidden>
+      <h2>4. L'heure d'arrivée</h2>
+      <div class="choix" id="choix-heure"></div>
+    </div>
+
+    <div id="bloc-coords" hidden>
+      <h2>5. Vos coordonnées</h2>
+      <div class="rang">
+        <div><label for="f-nom">Nom</label><input id="f-nom" autocomplete="name"></div>
+        <div><label for="f-tel">Téléphone</label><input id="f-tel" type="tel" autocomplete="tel"></div>
+      </div>
+      <label for="f-note">Une précision ? (allergie, poussette, terrasse…)</label>
+      <input id="f-note">
+      <button class="action" type="submit" id="btn-envoyer">Réserver</button>
+      <p class="note" style="margin-top:10px">Aucune carte bancaire demandée. En cas d'imprévu,
+        prévenez le restaurant par téléphone.</p>
+    </div>
+  </form>
+
+  <div class="carte confirmation" id="confirmation" hidden>
+    <div class="pastille">✓</div>
+    <h2 id="conf-titre">Réservation confirmée</h2>
+    <p class="note" id="conf-sous"></p>
+    <div class="recap" id="conf-recap"></div>
+    <p class="note" style="margin-top:14px">Un changement de plan ? Appelez-nous :
+      <a id="conf-tel" href="#"></a></p>
+  </div>
+</main>
+
+<footer class="velox">Réservations par <a href="https://veloxgestion.fr">Velox Résa</a> — sans commission</footer>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, get, set, push } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { firebaseConfig } from './firebase-config.js';
+
+const THEMES = { bordeaux: '#6E1F2E', ardoise: '#31404C', olive: '#4A5D3A', ocre: '#A8632B', marine: '#1F3A6E' };
+const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+let restoId = null, PROFIL = {}, CONF = null;
+const choix = { date: null, service: null, couverts: null, heure: null };
+let restants = 0;
+
+const slug = new URLSearchParams(location.search).get('r');
+if (!slug) $('etat').textContent = 'Lien de réservation incomplet.';
+else demarrer();
+
+async function demarrer() {
+  try {
+    const ownerUid = (await get(ref(db, `slugs/${slug}`))).val();
+    if (!ownerUid) { $('etat').textContent = 'Restaurant introuvable.'; return; }
+    restoId = ownerUid;
+    const vit = (await get(ref(db, `vitrines/${ownerUid}/public/profil`))).val() || {};
+    PROFIL = vit;
+    CONF = (await get(ref(db, `vitrines/${ownerUid}/resaPublic`))).val();
+
+    document.title = 'Réserver — ' + (PROFIL.nom || 'Restaurant');
+    document.documentElement.style.setProperty('--accent', THEMES[PROFIL.theme] || THEMES.bordeaux);
+    $('nom-resto').textContent = PROFIL.nom || 'Réserver une table';
+    $('sous-resto').textContent = PROFIL.adresse || '';
+    $('etat').hidden = true;
+
+    if (!CONF || !CONF.actif) {
+      const tel = (CONF && CONF.telAffiche) || PROFIL.tel || '';
+      $('tel-indispo').textContent = tel || 'voir notre page';
+      if (tel) $('tel-indispo').href = 'tel:' + tel;
+      $('indisponible').hidden = false;
+      return;
+    }
+
+    const min = new Date();
+    const max = new Date(Date.now() + 60 * 86400000);
+    $('f-date').min = min.toISOString().slice(0, 10);
+    $('f-date').max = max.toISOString().slice(0, 10);
+    $('formulaire').hidden = false;
+  } catch (e) {
+    $('etat').textContent = 'Impossible de charger la page. Réessayez.';
+  }
+}
+
+/* ---------- Étape 1 : date ---------- */
+$('f-date').addEventListener('input', () => {
+  reinitialiser(['service', 'couverts', 'heure']);
+  const v = $('f-date').value;
+  if (!v) return;
+  const jour = new Date(v + 'T00:00:00').getDay();
+  if ((CONF.joursFermes || []).includes(jour)) {
+    $('msg-date').textContent = `Nous sommes fermés le ${JOURS[jour]}. Choisissez un autre jour.`;
+    $('msg-date').hidden = false;
+    return;
+  }
+  $('msg-date').hidden = true;
+  choix.date = v;
+  rendreServices();
+});
+
+function reinitialiser(niveaux) {
+  for (const n of niveaux) choix[n] = null;
+  if (niveaux.includes('service')) $('bloc-service').hidden = true;
+  $('bloc-couverts').hidden = true;
+  $('bloc-heure').hidden = true;
+  $('bloc-coords').hidden = true;
+  $('msg-complet').hidden = true;
+}
+
+/* ---------- Étape 2 : service ---------- */
+function rendreServices() {
+  const s = CONF.services || {};
+  const dispo = ['midi', 'soir'].filter((k) => s[k] && s[k].actif);
+  if (!dispo.length) { $('msg-date').textContent = 'Aucun service ouvert à la réservation.'; $('msg-date').hidden = false; return; }
+  $('choix-service').innerHTML = dispo.map((k) =>
+    `<button type="button" data-service="${k}" aria-pressed="false">${k === 'midi' ? 'Midi' : 'Soir'}</button>`).join('');
+  $('bloc-service').hidden = false;
+}
+$('choix-service').addEventListener('click', async (e) => {
+  const b = e.target.closest('button[data-service]');
+  if (!b) return;
+  document.querySelectorAll('#choix-service button').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+  b.setAttribute('aria-pressed', 'true');
+  choix.service = b.dataset.service;
+  choix.couverts = null; choix.heure = null;
+  $('bloc-heure').hidden = true; $('bloc-coords').hidden = true;
+  await rendreCouverts();
+});
+
+/* ---------- Étape 3 : couverts (avec capacité restante) ---------- */
+async function rendreCouverts() {
+  const pris = Number((await get(ref(db,
+    `vitrines/${restoId}/resaCompteurs/${choix.date}/${choix.service}`))).val()) || 0;
+  restants = Math.max(0, (CONF.couvertsMax || 30) - pris);
+  if (restants <= 0) {
+    $('choix-couverts').innerHTML = '';
+    const tel = CONF.telAffiche || PROFIL.tel || '';
+    $('msg-complet').innerHTML = `Ce service est complet en ligne.${tel ? ` Tentez votre chance par téléphone : <a href="tel:${esc(tel)}">${esc(tel)}</a>` : ''}`;
+    $('msg-complet').hidden = false;
+    $('bloc-couverts').hidden = false;
+    return;
+  }
+  $('msg-complet').hidden = true;
+  const maxi = Math.min(CONF.tailleMaxGroupe || 8, restants);
+  $('choix-couverts').innerHTML = Array.from({ length: maxi }, (_, i) =>
+    `<button type="button" data-couverts="${i + 1}" aria-pressed="false">${i + 1}</button>`).join('');
+  $('bloc-couverts').hidden = false;
+}
+$('choix-couverts').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-couverts]');
+  if (!b) return;
+  document.querySelectorAll('#choix-couverts button').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+  b.setAttribute('aria-pressed', 'true');
+  choix.couverts = Number(b.dataset.couverts);
+  rendreHeures();
+});
+
+/* ---------- Étape 4 : créneaux ---------- */
+const enMinutes = (hm) => { const [h, m] = hm.split(':').map(Number); return h * 60 + m; };
+const enHM = (min) => String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0');
+
+function rendreHeures() {
+  const s = CONF.services[choix.service];
+  const pas = CONF.pas || 30;
+  const creneaux = [];
+  for (let m = enMinutes(s.debut); m <= enMinutes(s.fin); m += pas) creneaux.push(enHM(m));
+
+  const maintenant = new Date();
+  const estAujourdhui = choix.date === maintenant.toISOString().slice(0, 10);
+  const limite = maintenant.getHours() * 60 + maintenant.getMinutes() + (CONF.delaiMinHeures || 0) * 60;
+
+  $('choix-heure').innerHTML = creneaux.map((h) => {
+    const passe = estAujourdhui && enMinutes(h) < limite;
+    return `<button type="button" data-heure="${h}" aria-pressed="false" ${passe ? 'disabled' : ''}>${h}</button>`;
+  }).join('');
+  $('bloc-heure').hidden = false;
+  if (creneaux.every((h) => estAujourdhui && enMinutes(h) < limite)) {
+    $('choix-heure').innerHTML += `<p class="note">Trop tard pour réserver en ligne aujourd'hui — appelez-nous directement.</p>`;
+  }
+}
+$('choix-heure').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-heure]');
+  if (!b || b.disabled) return;
+  document.querySelectorAll('#choix-heure button').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+  b.setAttribute('aria-pressed', 'true');
+  choix.heure = b.dataset.heure;
+  $('bloc-coords').hidden = false;
+  $('bloc-coords').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+/* ---------- Étape 5 : envoi ---------- */
+$('formulaire').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nom = $('f-nom').value.trim();
+  const tel = $('f-tel').value.trim();
+  if (!choix.date || !choix.service || !choix.couverts || !choix.heure) return;
+  if (!nom || tel.replace(/\D/g, '').length < 8) {
+    $('msg-complet').textContent = 'Indiquez votre nom et un numéro de téléphone valide.';
+    $('msg-complet').hidden = false;
+    return;
+  }
+  $('btn-envoyer').disabled = true;
+
+  try {
+    // Revérification de la capacité juste avant l'écriture.
+    const cheminCompteur = ref(db, `vitrines/${restoId}/resaCompteurs/${choix.date}/${choix.service}`);
+    const pris = Number((await get(cheminCompteur)).val()) || 0;
+    if (pris + choix.couverts > (CONF.couvertsMax || 30)) {
+      $('msg-complet').textContent = 'Ce service vient de se remplir. Essayez un autre créneau ou appelez-nous.';
+      $('msg-complet').hidden = false;
+      $('btn-envoyer').disabled = false;
+      return;
+    }
+
+    const statut = CONF.confirmationAuto !== false ? 'confirmee' : 'attente';
+    await set(push(ref(db, `resaDemandes/${restoId}`)), {
+      date: choix.date, heure: choix.heure, service: choix.service,
+      couverts: choix.couverts, nom, tel,
+      note: $('f-note').value.trim(),
+      statut, creeLe: Date.now()
+    });
+    await set(cheminCompteur, pris + choix.couverts);
+
+    const dateFr = new Date(choix.date + 'T00:00:00')
+      .toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+    $('conf-titre').textContent = statut === 'confirmee' ? 'Réservation confirmée !' : 'Demande envoyée !';
+    $('conf-sous').textContent = statut === 'confirmee'
+      ? 'Nous vous attendons — à très vite.'
+      : 'Le restaurant va valider votre demande et vous rappellera si besoin.';
+    $('conf-recap').innerHTML =
+      `<div><span>Restaurant</span><b>${esc(PROFIL.nom || '')}</b></div>` +
+      `<div><span>Date</span><b>${esc(dateFr)}</b></div>` +
+      `<div><span>Heure</span><b>${esc(choix.heure)}</b></div>` +
+      `<div><span>Personnes</span><b>${choix.couverts}</b></div>` +
+      `<div><span>Au nom de</span><b>${esc(nom)}</b></div>`;
+    const telResto = CONF.telAffiche || PROFIL.tel || '';
+    $('conf-tel').textContent = telResto;
+    if (telResto) $('conf-tel').href = 'tel:' + telResto;
+    $('formulaire').hidden = true;
+    $('confirmation').hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    $('msg-complet').textContent = 'Envoi impossible. Réessayez ou appelez le restaurant.';
+    $('msg-complet').hidden = false;
+    $('btn-envoyer').disabled = false;
+  }
+});
+</script>
+</body>
+</html>

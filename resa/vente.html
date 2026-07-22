@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velox Résa — Réservations en ligne sans commission pour restaurant</title>
+<meta name="description" content="Prise de réservation en ligne pour votre restaurant, sans commission par couvert. Vos clients réservent depuis votre menu, vous confirmez d'un tap. Inclus dans Velox Menu Pro.">
+<meta property="og:title" content="Velox Résa — vos réservations, zéro commission">
+<meta property="og:description" content="Fini les 2 € par couvert des plateformes. Réservation en ligne intégrée à votre menu.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--papier:#FBFAF7;--encre:#1C1B18;--accent:#6E1F2E;--accent-pale:#F3E7E9;
+    --zinc:#6B6E73;--trait:#E4E0D8;--vert:#1E6B45;--vert-fond:#E8F2EC;--rouge:#8f2020;--rouge-fond:#F6E4E4}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--encre);
+    font:400 1.02rem/1.6 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .conteneur{max-width:980px;margin:0 auto;padding:0 20px}
+  a{color:var(--accent)}
+  header.site{padding:18px 0}
+  header.site .conteneur{display:flex;align-items:center;gap:14px}
+  .marque{font:800 1.15rem "Archivo",sans-serif;color:var(--accent);text-decoration:none}
+  .marque span{color:var(--encre)}
+  header.site .cta-entete{margin-left:auto}
+  .btn{display:inline-block;font:600 .95rem "Public Sans",sans-serif;text-decoration:none;border-radius:8px;padding:12px 22px;cursor:pointer}
+  .btn.plein{background:var(--accent);color:#fff}
+  .btn.contour{border:1px solid var(--trait);color:var(--encre);background:#fff}
+  .btn.grand{font-size:1.05rem;padding:14px 28px}
+  .hero{padding:40px 0 72px}
+  .hero .conteneur{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+  @media(max-width:820px){.hero .conteneur{grid-template-columns:1fr}}
+  .surtitre{font:800 .78rem "Archivo",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+  h1{font:800 clamp(2rem,5.5vw,3rem)/1.08 "Archivo",sans-serif;letter-spacing:-.015em;margin:12px 0 16px}
+  .hero p.accroche{font-size:1.12rem;color:#3c3a35;max-width:52ch;margin:0 0 24px}
+  .hero .rassure{font-size:.85rem;color:var(--zinc);margin-top:14px}
+  /* Comparatif plateforme vs Velox */
+  .compare{background:#fff;border:1px solid var(--trait);border-radius:14px;overflow:hidden;
+    box-shadow:0 24px 48px -26px rgba(28,27,24,.3)}
+  .compare .tete{display:grid;grid-template-columns:1fr 1fr}
+  .compare .tete>div{padding:14px 18px;font:800 .82rem "Archivo",sans-serif;letter-spacing:.04em;text-transform:uppercase}
+  .compare .tete .plateforme{background:var(--rouge-fond);color:var(--rouge)}
+  .compare .tete .velox{background:var(--vert-fond);color:var(--vert)}
+  .compare .rangee{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--trait)}
+  .compare .rangee>div{padding:14px 18px;font-size:.92rem;display:flex;align-items:center;gap:8px}
+  .compare .rangee .plateforme{color:#3c3a35;border-right:1px solid var(--trait)}
+  .compare .cout{font:800 1.05rem "Archivo",sans-serif}
+  .compare .cout.rouge{color:var(--rouge)}.compare .cout.vert{color:var(--vert)}
+  section.bloc{padding:64px 0}
+  section.alt{background:#fff;border-top:1px solid var(--trait);border-bottom:1px solid var(--trait)}
+  h2{font:800 clamp(1.4rem,4vw,1.9rem)/1.15 "Archivo",sans-serif;letter-spacing:-.01em;margin:0 0 10px}
+  .sous-titre{color:var(--zinc);max-width:60ch;margin:0 0 34px}
+  .calcul{max-width:720px;margin:0 auto;text-align:center}
+  .calcul .gros{font:800 clamp(1.6rem,5vw,2.4rem) "Archivo",sans-serif;color:var(--accent);font-variant-numeric:tabular-nums;margin:18px 0 10px}
+  .grille3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:760px){.grille3{grid-template-columns:1fr}}
+  .carte{background:#fff;border:1px solid var(--trait);border-radius:12px;padding:22px}
+  section.alt .carte{background:var(--papier)}
+  .carte h3{font:800 1.02rem "Archivo",sans-serif;margin:0 0 8px}
+  .carte p{margin:0;font-size:.93rem;color:#3c3a35}
+  .etape .numero{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+    border-radius:50%;background:var(--accent);color:#fff;font:800 1rem "Archivo",sans-serif;margin-bottom:12px}
+  .fonctions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 26px;margin-top:8px}
+  @media(max-width:760px){.fonctions{grid-template-columns:1fr}}
+  .fonction{display:flex;gap:10px;align-items:flex-start;font-size:.95rem}
+  .fonction::before{content:"✓";color:var(--vert);font-weight:700}
+  details{border-bottom:1px solid var(--trait);padding:14px 0}
+  summary{font-weight:600;cursor:pointer}
+  details p{margin:10px 0 2px;color:#3c3a35}
+  .final{text-align:center;padding:80px 20px}
+  footer.site{border-top:1px solid var(--trait);padding:28px 0 40px;font-size:.82rem;color:var(--zinc)}
+  footer.site .conteneur{display:flex;flex-wrap:wrap;gap:10px 24px}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="conteneur">
+    <a class="marque" href="../index.html">VELOX<span> Résa</span></a>
+    <a class="btn contour cta-entete" href="admin.html">Se connecter</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="conteneur">
+    <div>
+      <span class="surtitre">Réservations en ligne</span>
+      <h1>Vos réservations, sans laisser 2 € par couvert.</h1>
+      <p class="accroche">Vos clients réservent directement depuis votre menu, vous confirmez d'un
+      tap depuis le téléphone. Zéro commission, zéro intermédiaire entre votre salle et vous.</p>
+      <a class="btn plein grand" href="admin.html">Activer mes réservations</a>
+      <p class="rassure">Inclus dans Velox Menu Pro · Sans commission · Sans engagement</p>
+    </div>
+
+    <div class="compare" aria-hidden="true">
+      <div class="tete"><div class="plateforme">Plateformes</div><div class="velox">Velox Résa</div></div>
+      <div class="rangee"><div class="plateforme">Par couvert réservé</div><div><span class="cout vert">0 €</span></div></div>
+      <div class="rangee"><div class="plateforme"><span class="cout rouge">~2 €</span></div><div>Forfait fixe</div></div>
+      <div class="rangee"><div class="plateforme">Vos clients = les leurs</div><div>Vos clients restent à vous</div></div>
+      <div class="rangee"><div class="plateforme">Concurrents affichés</div><div>Votre resto, seul</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="bloc alt">
+  <div class="conteneur">
+    <div class="calcul">
+      <h2>Ce que les plateformes vous coûtent vraiment</h2>
+      <p class="sous-titre" style="margin-left:auto;margin-right:auto">Un restaurant qui fait
+      40 couverts réservés par semaine à 2 € de commission :</p>
+      <div class="gros">2 € × 40 × 52 = 4 160 € / an</div>
+      <p style="max-width:56ch;margin:0 auto;color:#3c3a35">Chaque année, sur la simple prise de
+      réservation. Velox Résa, c'est un forfait mensuel fixe — et vos habitués vous appartiennent.</p>
+    </div>
+  </div>
+</section>
+
+<section class="bloc">
+  <div class="conteneur">
+    <h2>Simple pour vous, simple pour eux</h2>
+    <p class="sous-titre">Aucune installation, aucune formation : c'est déjà dans votre menu Velox.</p>
+    <div class="grille3">
+      <div class="carte etape"><span class="numero">1</span><h3>Le client scanne</h3>
+        <p>Depuis votre menu QR, un bouton « Réserver ». Il choisit la date, le service, le nombre de couverts et l'heure.</p></div>
+      <div class="carte etape"><span class="numero">2</span><h3>Vous êtes prévenu</h3>
+        <p>La demande arrive dans votre espace, avec une pastille. Confirmation automatique ou validation manuelle, à votre choix.</p></div>
+      <div class="carte etape"><span class="numero">3</span><h3>Vous confirmez d'un tap</h3>
+        <p>La capacité par service se met à jour toute seule : quand c'est plein, la réservation en ligne se ferme.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="bloc alt">
+  <div class="conteneur">
+    <h2>Tout ce qu'il faut pour tenir un cahier de réservations</h2>
+    <div class="fonctions">
+      <div class="fonction">Capacité par service midi et soir</div>
+      <div class="fonction">Taille de groupe et délai minimum réglables</div>
+      <div class="fonction">Agenda jour par jour</div>
+      <div class="fonction">Coordonnées client cliquables</div>
+      <div class="fonction">Jours de fermeture gérés</div>
+      <div class="fonction">Bouton intégré à votre menu</div>
+    </div>
+  </div>
+</section>
+
+<section class="bloc">
+  <div class="conteneur">
+    <h2>Questions fréquentes</h2>
+    <details open><summary>Faut-il un logiciel ou une app en plus ?</summary>
+      <p>Non. Si vous avez Velox Menu, Résa s'active dans le même espace, avec le même compte.
+      Vos clients réservent depuis une page web, sans rien installer.</p></details>
+    <details><summary>Que se passe-t-il quand c'est complet ?</summary>
+      <p>Vous fixez une capacité par service. Une fois atteinte, la réservation en ligne se ferme
+      automatiquement et propose au client de vous appeler.</p></details>
+    <details><summary>Je préfère valider chaque demande moi-même, c'est possible ?</summary>
+      <p>Oui. Vous choisissez entre confirmation automatique et validation manuelle : dans ce cas,
+      chaque demande reste « en attente » jusqu'à votre feu vert.</p></details>
+    <details><summary>Et si un client ne vient pas ?</summary>
+      <p>Vous annulez la réservation en un tap, ce qui libère les couverts. Un rappel par téléphone
+      reste la meilleure parade — vous avez son numéro directement.</p></details>
+  </div>
+</section>
+
+<div class="final">
+  <h2>Reprenez la main sur vos réservations</h2>
+  <a class="btn plein grand" href="admin.html">Activer mes réservations</a>
+  <p style="color:var(--zinc);font-size:.85rem;margin-top:14px">Inclus dans Velox Menu Pro · Sans commission</p>
+</div>
+
+<footer class="site">
+  <div class="conteneur">
+    <span>© Velox — outils pour restaurateurs indépendants</span>
+    <a href="../index.html">Suite Velox</a>
+    <a href="../menu/vente.html">Velox Menu</a>
+    <a href="../avis/vente.html">Velox Avis</a>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+ {"@type":"Question","name":"Faut-il un logiciel en plus pour Velox Résa ?","acceptedAnswer":{"@type":"Answer","text":"Non, si vous avez Velox Menu, Résa s'active dans le même espace avec le même compte. Les clients réservent depuis une page web sans rien installer."}},
+ {"@type":"Question","name":"Velox Résa prend-il une commission ?","acceptedAnswer":{"@type":"Answer","text":"Non, aucune commission par couvert. C'est un forfait mensuel fixe, inclus dans Velox Menu Pro."}},
+ {"@type":"Question","name":"Que se passe-t-il quand le service est complet ?","acceptedAnswer":{"@type":"Answer","text":"La réservation en ligne se ferme automatiquement une fois la capacité atteinte et invite le client à appeler le restaurant."}},
+ {"@type":"Question","name":"Peut-on valider manuellement chaque réservation ?","acceptedAnswer":{"@type":"Answer","text":"Oui, vous choisissez entre confirmation automatique et validation manuelle de chaque demande."}}
+]}
+</script>
+</body>
+</html>
