@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Votre avis compte</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--papier:#FBFAF7;--encre:#1C1B18;--accent:#6E1F2E;--accent-pale:#F3E7E9;
+    --zinc:#6B6E73;--trait:#E4E0D8;--vert:#1E6B45;--vert-fond:#E8F2EC;--etoile:#D9A21B}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--encre);
+    font:400 1rem/1.55 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .entete{background:var(--accent);color:#fff;padding:26px 18px 22px;text-align:center}
+  .entete h1{font:800 clamp(1.4rem,5.5vw,1.9rem)/1.1 "Archivo",sans-serif;margin:0}
+  .entete .sous{font-size:.85rem;opacity:.92;margin-top:4px}
+  .page{max-width:480px;margin:0 auto;padding:22px 16px 70px}
+  .carte{background:#fff;border:1px solid var(--trait);border-radius:14px;padding:24px 20px;text-align:center}
+  h2{font:800 1.15rem "Archivo",sans-serif;margin:0 0 6px}
+  p{margin:0 0 12px}
+  .note{font-size:.8rem;color:var(--zinc)}
+
+  .etoiles{display:flex;justify-content:center;gap:6px;margin:18px 0 6px}
+  .etoiles button{font-size:2.6rem;line-height:1;background:none;border:0;cursor:pointer;
+    color:var(--trait);padding:2px;transition:transform .08s}
+  .etoiles button.pleine{color:var(--etoile)}
+  .etoiles button:active{transform:scale(1.15)}
+  .etoiles[data-verrou] button{cursor:default}
+  .legende-note{font-size:.85rem;color:var(--zinc);min-height:1.2em}
+
+  .panneau{margin-top:18px;text-align:left}
+  .btn{display:block;width:100%;text-align:center;font:600 1rem "Public Sans",sans-serif;
+    text-decoration:none;border:0;border-radius:9px;padding:13px 16px;cursor:pointer;margin-top:10px}
+  .btn.plein{background:var(--accent);color:#fff}
+  .btn.google{background:#fff;border:2px solid var(--accent);color:var(--accent);font-weight:700}
+  .lien-discret{display:block;text-align:center;margin-top:14px;font-size:.85rem;color:var(--zinc)}
+  .lien-discret a{color:var(--zinc)}
+
+  label{display:block;font-weight:600;font-size:.83rem;margin:12px 0 4px;text-align:left}
+  input,textarea{width:100%;padding:10px 12px;font:inherit;color:var(--encre);
+    background:var(--papier);border:1px solid var(--trait);border-radius:7px}
+  textarea{min-height:96px;resize:vertical}
+  input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+  .merci .pastille{width:56px;height:56px;border-radius:50%;background:var(--vert-fond);
+    color:var(--vert);font-size:1.6rem;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+  .etat{padding:50px 16px;text-align:center;color:var(--zinc)}
+  footer.velox{text-align:center;padding:20px;font-size:.75rem;color:var(--zinc)}
+  footer.velox a{color:var(--accent);font-weight:600;text-decoration:none}
+  [hidden]{display:none !important}
+</style>
+</head>
+<body>
+
+<header class="entete">
+  <h1 id="nom-resto">Votre avis compte</h1>
+  <div class="sous" id="sous-resto"></div>
+</header>
+
+<main class="page">
+  <div class="etat" id="etat">Chargement…</div>
+
+  <div class="carte" id="bloc-note" hidden>
+    <h2 id="question">Comment s'est passé votre repas ?</h2>
+    <p class="note">Un tap suffit — promis, c'est rapide.</p>
+    <div class="etoiles" id="etoiles">
+      <button type="button" data-note="1" aria-label="1 étoile">★</button>
+      <button type="button" data-note="2" aria-label="2 étoiles">★</button>
+      <button type="button" data-note="3" aria-label="3 étoiles">★</button>
+      <button type="button" data-note="4" aria-label="4 étoiles">★</button>
+      <button type="button" data-note="5" aria-label="5 étoiles">★</button>
+    </div>
+    <div class="legende-note" id="legende-note"></div>
+
+    <!-- Panneau note haute -->
+    <div class="panneau" id="panneau-haut" hidden>
+      <p style="text-align:center">Merci beaucoup ! Pour un restaurant indépendant,
+      un avis public change vraiment la donne.</p>
+      <a class="btn google" id="btn-google-haut" target="_blank" rel="noopener">⭐ Laisser un avis sur Google</a>
+      <span class="lien-discret"><a href="#" id="lien-form-haut">Quelque chose à améliorer quand même ? Dites-le nous directement</a></span>
+    </div>
+
+    <!-- Panneau note basse -->
+    <div class="panneau" id="panneau-bas" hidden>
+      <p style="text-align:center"><b>Aïe.</b> Dites-nous ce qui n'a pas été —
+      votre message part directement au patron, qui lit tout.</p>
+    </div>
+
+    <!-- Formulaire privé (commun) -->
+    <form class="panneau" id="form-prive" hidden>
+      <label for="f-message">Votre message</label>
+      <textarea id="f-message" placeholder="Le service, un plat, l'attente… soyez direct, ça nous aide."></textarea>
+      <label for="f-nom">Prénom (optionnel)</label>
+      <input id="f-nom" autocomplete="given-name">
+      <label for="f-contact">Téléphone ou e-mail, si vous souhaitez une réponse (optionnel)</label>
+      <input id="f-contact">
+      <button class="btn plein" type="submit">Envoyer au patron</button>
+      <span class="lien-discret" id="lien-google-bas-conteneur" hidden>
+        <a id="lien-google-bas" target="_blank" rel="noopener">Vous pouvez aussi publier un avis Google</a>
+      </span>
+    </form>
+  </div>
+
+  <div class="carte merci" id="bloc-merci" hidden>
+    <div class="pastille">✓</div>
+    <h2>Message bien envoyé</h2>
+    <p class="note">Il arrive directement chez le patron — merci d'avoir pris le temps,
+    c'est comme ça qu'on s'améliore.</p>
+  </div>
+
+  <div class="carte" id="indisponible" hidden>
+    <h2>Page indisponible</h2>
+    <p class="note">La collecte d'avis n'est pas activée pour ce restaurant.</p>
+  </div>
+</main>
+
+<footer class="velox">Avis clients par <a href="https://veloxgestion.fr">Velox Avis</a></footer>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, get, set, push } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { firebaseConfig } from './firebase-config.js';
+
+const THEMES = { bordeaux: '#6E1F2E', ardoise: '#31404C', olive: '#4A5D3A', ocre: '#A8632B', marine: '#1F3A6E' };
+const LEGENDES = ['', 'Très décevant', 'Décevant', 'Moyen', 'Très bien', 'Excellent !'];
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const $ = (id) => document.getElementById(id);
+
+let restoId = null, CONF = null;
+let noteChoisie = null;
+
+const slug = new URLSearchParams(location.search).get('r');
+if (!slug) $('etat').textContent = 'Lien incomplet.';
+else demarrer();
+
+async function demarrer() {
+  try {
+    const ownerUid = (await get(ref(db, `slugs/${slug}`))).val();
+    if (!ownerUid) { $('etat').textContent = 'Restaurant introuvable.'; return; }
+    restoId = ownerUid;
+    const profil = (await get(ref(db, `vitrines/${ownerUid}/public/profil`))).val() || {};
+    CONF = (await get(ref(db, `vitrines/${ownerUid}/avisPublic`))).val();
+
+    document.title = 'Votre avis — ' + (profil.nom || 'Restaurant');
+    document.documentElement.style.setProperty('--accent', THEMES[profil.theme] || THEMES.bordeaux);
+    $('nom-resto').textContent = profil.nom || 'Votre avis compte';
+    $('sous-resto').textContent = profil.adresse || '';
+    $('etat').hidden = true;
+
+    if (!CONF || !CONF.actif) { $('indisponible').hidden = false; return; }
+    if (CONF.messageAccueil) $('question').textContent = CONF.messageAccueil;
+    if (CONF.lienGoogle) {
+      $('btn-google-haut').href = CONF.lienGoogle;
+      $('lien-google-bas').href = CONF.lienGoogle;
+      $('lien-google-bas-conteneur').hidden = false;
+    } else {
+      $('btn-google-haut').hidden = true;
+    }
+    $('bloc-note').hidden = false;
+  } catch (e) {
+    $('etat').textContent = 'Impossible de charger la page. Réessayez.';
+  }
+}
+
+/* ---------- Notation ---------- */
+$('etoiles').addEventListener('click', async (e) => {
+  const b = e.target.closest('button[data-note]');
+  if (!b || $('etoiles').dataset.verrou) return;
+  noteChoisie = Number(b.dataset.note);
+  $('etoiles').dataset.verrou = '1';
+
+  document.querySelectorAll('#etoiles button').forEach((x) =>
+    x.classList.toggle('pleine', Number(x.dataset.note) <= noteChoisie));
+  $('legende-note').textContent = LEGENDES[noteChoisie];
+
+  // Statistique anonyme (meilleur effort, jamais bloquant).
+  try {
+    const chemin = ref(db, `vitrines/${restoId}/avisStats/${noteChoisie}`);
+    const actuel = Number((await get(chemin)).val()) || 0;
+    await set(chemin, actuel + 1);
+  } catch (err) { /* silencieux */ }
+
+  if (noteChoisie >= 4) {
+    $('panneau-haut').hidden = false;
+  } else {
+    $('panneau-bas').hidden = false;
+    $('form-prive').hidden = false;
+    $('f-message').focus();
+  }
+});
+
+$('lien-form-haut').addEventListener('click', (e) => {
+  e.preventDefault();
+  $('form-prive').hidden = false;
+  $('f-message').focus();
+});
+
+/* ---------- Retour privé ---------- */
+$('form-prive').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const message = $('f-message').value.trim();
+  if (!message) { $('f-message').focus(); return; }
+  try {
+    await set(push(ref(db, `avisPrives/${restoId}`)), {
+      note: noteChoisie || 0,
+      message,
+      nom: $('f-nom').value.trim(),
+      contact: $('f-contact').value.trim(),
+      traite: false,
+      creeLe: Date.now()
+    });
+    $('bloc-note').hidden = true;
+    $('bloc-merci').hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    alert('Envoi impossible pour le moment — réessayez dans un instant.');
+  }
+});
+</script>
+</body>
+</html>

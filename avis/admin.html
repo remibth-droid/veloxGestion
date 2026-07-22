@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velox Avis — Administration</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--papier:#FBFAF7;--encre:#1C1B18;--accent:#6E1F2E;--accent-pale:#F3E7E9;
+    --zinc:#6B6E73;--trait:#E4E0D8;--vert:#1E6B45;--vert-fond:#E8F2EC;
+    --orange:#A8632B;--orange-fond:#F8EDE2;--etoile:#D9A21B}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--encre);
+    font:400 1rem/1.55 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .appbar{display:flex;align-items:center;gap:12px;padding:12px 18px;background:#fff;border-bottom:1px solid var(--trait)}
+  .marque{font:800 1.05rem "Archivo",sans-serif;color:var(--accent)}
+  .marque span{color:var(--encre)}
+  .appbar .droite{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--zinc)}
+  .page{max-width:760px;margin:0 auto;padding:18px 16px 80px}
+  nav.onglets{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 18px}
+  nav.onglets button{font:600 .85rem "Public Sans",sans-serif;padding:8px 14px;border:1px solid var(--trait);
+    border-radius:99px;background:#fff;color:var(--zinc);cursor:pointer;position:relative}
+  nav.onglets button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  nav.onglets .pastille{position:absolute;top:-6px;right:-4px;background:var(--orange);color:#fff;
+    font:700 .66rem "Public Sans",sans-serif;border-radius:99px;padding:1px 6px}
+  h1{font:800 1.5rem "Archivo",sans-serif;margin:8px 0 14px}
+  h2{font:800 1.12rem "Archivo",sans-serif;margin:0 0 12px}
+  .carte{background:#fff;border:1px solid var(--trait);border-radius:10px;padding:18px;margin-bottom:16px}
+  label{display:block;font-weight:600;font-size:.83rem;margin:10px 0 4px}
+  input,select,textarea{width:100%;padding:9px 11px;font:inherit;color:var(--encre);
+    background:var(--papier);border:1px solid var(--trait);border-radius:7px}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+  button.action{font:600 .9rem "Public Sans",sans-serif;background:var(--accent);color:#fff;
+    border:0;border-radius:7px;padding:10px 16px;cursor:pointer;margin-top:12px}
+  button.sobre{background:#fff;color:var(--encre);border:1px solid var(--trait)}
+  button.mini{font:600 .75rem "Public Sans",sans-serif;background:#fff;border:1px solid var(--trait);
+    border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--zinc)}
+  button.mini.danger{color:#8f2020}
+  .note{font-size:.8rem;color:var(--zinc)}
+  .puces label{display:inline-flex;align-items:center;gap:6px;font-weight:400;font-size:.85rem;
+    border:1px solid var(--trait);border-radius:99px;padding:6px 12px;background:var(--papier);cursor:pointer}
+  .puces input{width:auto}
+
+  .retour{border:1px solid var(--trait);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+  .retour.non-traite{border-color:#EAD3B8;background:#FFFDF9}
+  .retour .haut{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  .retour .etoiles{color:var(--etoile);letter-spacing:2px}
+  .retour .quand{font-size:.78rem;color:var(--zinc)}
+  .retour .qui{font-size:.82rem;color:var(--zinc)}
+  .retour .message{white-space:pre-line}
+  .badge{font:600 .7rem "Public Sans",sans-serif;border-radius:99px;padding:2px 8px}
+  .b-orange{background:var(--orange-fond);color:var(--orange)}
+  .b-vert{background:var(--vert-fond);color:var(--vert)}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+  .kpi{background:#fff;border:1px solid var(--trait);border-radius:10px;padding:14px}
+  .kpi .v{font:800 1.5rem "Archivo",sans-serif;color:var(--accent);font-variant-numeric:tabular-nums}
+  .kpi .l{font-size:.78rem;color:var(--zinc)}
+  .barre-ligne{display:flex;align-items:center;gap:10px;margin:6px 0;font-variant-numeric:tabular-nums;font-size:.9rem}
+  .barre-ligne .lib{width:34px;color:var(--etoile);font-weight:700}
+  .barre-fond{flex:1;height:14px;background:var(--papier);border:1px solid var(--trait);border-radius:99px;overflow:hidden}
+  .barre-rempli{height:100%;background:var(--accent)}
+  .barre-ligne .val{width:44px;text-align:right;font-weight:600}
+
+  #qr-conteneur{display:flex;justify-content:center;padding:14px;background:#fff}
+  .kit{display:none}
+  #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--encre);
+    color:#fff;padding:10px 18px;border-radius:8px;font-size:.88rem;opacity:0;pointer-events:none;transition:opacity .25s}
+  #toast.visible{opacity:1}
+  section[hidden]{display:none}
+  @media print{
+    body.impression *{display:none !important}
+    body.impression .kit, body.impression .kit *{display:block !important}
+    .kit{width:105mm;margin:20mm auto;text-align:center;font-family:"Public Sans",sans-serif}
+    .kit .kit-nom{font:800 18pt "Archivo",sans-serif;margin-bottom:4mm}
+    .kit .kit-titre{font:700 13pt "Public Sans",sans-serif;margin-bottom:5mm}
+    .kit #qr-kit{display:flex !important;justify-content:center;margin-bottom:5mm}
+    .kit .kit-phrase{font-size:11pt}
+  }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <span class="marque">VELOX<span> Avis</span></span>
+  <div class="droite">
+    <span id="email-user"></span>
+    <button class="mini" id="btn-logout" hidden>Se déconnecter</button>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- ===== AUTH ===== -->
+  <section id="vue-auth">
+    <h1>Avis clients de votre restaurant</h1>
+    <div class="carte">
+      <h2>Connexion</h2>
+      <p class="note">Même compte que Velox Menu — les outils partagent votre restaurant.</p>
+      <label for="auth-email">E-mail</label>
+      <input id="auth-email" type="email" autocomplete="email">
+      <label for="auth-pass">Mot de passe</label>
+      <input id="auth-pass" type="password" autocomplete="current-password">
+      <button class="action" id="btn-auth">Se connecter</button>
+    </div>
+  </section>
+
+  <!-- ===== SANS RESTO ===== -->
+  <section id="vue-sans-resto" hidden>
+    <div class="carte">
+      <h2>Aucun restaurant lié à ce compte</h2>
+      <p>Créez d'abord votre restaurant dans <b>Velox Menu</b> (admin), puis revenez ici.</p>
+    </div>
+  </section>
+
+  <!-- ===== APP ===== -->
+  <section id="vue-app" hidden>
+    <nav class="onglets" role="tablist">
+      <button data-onglet="retours" aria-selected="true">Retours<span class="pastille" id="pastille-nouveaux" hidden></span></button>
+      <button data-onglet="stats" aria-selected="false">Stats</button>
+      <button data-onglet="reglages" aria-selected="false">Réglages &amp; QR</button>
+    </nav>
+
+    <!-- --- Retours --- -->
+    <section id="onglet-retours">
+      <div class="carte">
+        <h2>Retours privés</h2>
+        <div class="puces" style="margin-bottom:12px">
+          <label><input type="radio" name="filtre" value="a-traiter" checked> À traiter</label>
+          <label><input type="radio" name="filtre" value="tous"> Tous</label>
+        </div>
+        <div id="liste-retours"></div>
+      </div>
+    </section>
+
+    <!-- --- Stats --- -->
+    <section id="onglet-stats" hidden>
+      <div class="kpis" id="kpis"></div>
+      <div class="carte">
+        <h2>Répartition des notes</h2>
+        <div id="barres"></div>
+        <p class="note" style="margin-top:10px">Chaque tap sur une étoile est compté, même si le client
+        ne laisse pas de message ensuite.</p>
+      </div>
+    </section>
+
+    <!-- --- Réglages --- -->
+    <section id="onglet-reglages" hidden>
+      <div class="carte">
+        <h2>Réglages</h2>
+        <form id="form-config">
+          <label class="puces"><input type="checkbox" id="c-actif"> Page d'avis activée</label>
+          <label for="c-google">Lien « Laisser un avis Google »</label>
+          <input id="c-google" placeholder="https://g.page/r/…">
+          <p class="note">Où le trouver : fiche Google Business → « Demander des avis » → copier le lien court.
+          Sans lien, seule la partie « retour privé » est proposée.</p>
+          <label for="c-question">Question d'accueil</label>
+          <input id="c-question" placeholder="Comment s'est passé votre repas ?">
+          <label for="c-url">Adresse publique de la page d'avis</label>
+          <input id="c-url">
+          <button class="action" type="submit">Enregistrer</button>
+        </form>
+      </div>
+
+      <div class="carte">
+        <h2>QR code « Votre avis »</h2>
+        <div id="qr-conteneur"></div>
+        <p class="note" style="text-align:center" id="qr-url"></p>
+        <button class="action" id="btn-dl-qr">Télécharger le PNG</button>
+        <button class="action sobre" id="btn-imprimer-kit">Imprimer le chevalet A6</button>
+        <p class="note">À poser près de la caisse ou à glisser avec l'addition — c'est le moment
+        où on obtient le plus d'avis.</p>
+      </div>
+    </section>
+  </section>
+</div>
+
+<div class="kit">
+  <div class="kit-nom" id="kit-nom"></div>
+  <div class="kit-titre">Votre avis compte ⭐</div>
+  <div id="qr-kit"></div>
+  <div class="kit-phrase">Scannez — 20 secondes, promis</div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {
+  getDatabase, ref, get, set, update, remove, onValue
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { firebaseConfig } from './firebase-config.js';
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+let toastTimer;
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('visible'), 2600);
+}
+function remplirSiInactif(conteneur, valeurs) {
+  if (conteneur.contains(document.activeElement)) return;
+  for (const [id, v] of Object.entries(valeurs)) {
+    const el = $(id);
+    if (!el) continue;
+    if (el.type === 'checkbox') el.checked = !!v;
+    else el.value = v ?? '';
+  }
+}
+
+/* ---------- État ---------- */
+let uid = null, restoId = null;
+let PROFIL = {}, CONF = null, STATS = {}, RETOURS = {};
+
+/* ---------- Auth ---------- */
+$('btn-auth').addEventListener('click', async () => {
+  const email = $('auth-email').value.trim();
+  const pass = $('auth-pass').value;
+  if (!email || !pass) return toast('E-mail et mot de passe requis.');
+  try { await signInWithEmailAndPassword(auth, email, pass); }
+  catch (e) { toast('Échec : ' + (e.code || e.message).replace('auth/', '').replace(/-/g, ' ')); }
+});
+$('btn-logout').addEventListener('click', () => signOut(auth));
+
+onAuthStateChanged(auth, async (user) => {
+  uid = user ? user.uid : null;
+  $('email-user').textContent = user ? user.email : '';
+  $('btn-logout').hidden = !user;
+  if (!user) { montrer('auth'); return; }
+  restoId = uid;
+  PROFIL = (await get(ref(db, `users/${uid}/velox_menu_admin/profil`))).val();
+  if (!PROFIL) { montrer('sans-resto'); return; }
+  montrer('app');
+  onValue(ref(db, `users/${uid}/velox_avis_admin/config`), (s) => { CONF = s.val() || null; rendreTout(); });
+  onValue(ref(db, `vitrines/${uid}/avisStats`), (s) => { STATS = s.val() || {}; rendreTout(); });
+  onValue(ref(db, `avisPrives/${restoId}`), (s) => { RETOURS = s.val() || {}; rendreTout(); });
+});
+
+function montrer(vue) {
+  $('vue-auth').hidden = vue !== 'auth';
+  $('vue-sans-resto').hidden = vue !== 'sans-resto';
+  $('vue-app').hidden = vue !== 'app';
+}
+
+/* ---------- Onglets ---------- */
+document.querySelectorAll('nav.onglets button').forEach((b) => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('nav.onglets button').forEach((x) => x.setAttribute('aria-selected', 'false'));
+    b.setAttribute('aria-selected', 'true');
+    for (const o of ['retours', 'stats', 'reglages']) $('onglet-' + o).hidden = o !== b.dataset.onglet;
+    if (b.dataset.onglet === 'reglages') rendreQR();
+  });
+});
+
+function rendreTout() { rendreRetours(); rendreStats(); rendreConfig(); }
+
+/* ================= RETOURS ================= */
+const retoursTries = () => Object.entries(RETOURS).sort((a, b) => (b[1].creeLe || 0) - (a[1].creeLe || 0));
+
+document.querySelectorAll('input[name="filtre"]').forEach((r) => r.addEventListener('change', rendreRetours));
+
+function rendreRetours() {
+  const filtre = document.querySelector('input[name="filtre"]:checked').value;
+  const tous = retoursTries();
+  const nonTraites = tous.filter(([, r]) => !r.traite).length;
+  $('pastille-nouveaux').textContent = nonTraites;
+  $('pastille-nouveaux').hidden = nonTraites === 0;
+
+  const liste = filtre === 'a-traiter' ? tous.filter(([, r]) => !r.traite) : tous;
+  $('liste-retours').innerHTML = liste.length ? liste.map(([id, r]) => {
+    const quand = r.creeLe ? new Date(r.creeLe).toLocaleDateString('fr-FR',
+      { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+    const contact = r.contact
+      ? (r.contact.includes('@')
+        ? `<a href="mailto:${esc(r.contact)}">${esc(r.contact)}</a>`
+        : `<a href="tel:${esc(r.contact)}">${esc(r.contact)}</a>`)
+      : '';
+    return `
+    <div class="retour ${r.traite ? '' : 'non-traite'}">
+      <div class="haut">
+        <span class="etoiles">${'★'.repeat(r.note || 0)}${'☆'.repeat(Math.max(0, 5 - (r.note || 0)))}</span>
+        <span class="quand">${esc(quand)}</span>
+        <span class="badge ${r.traite ? 'b-vert' : 'b-orange'}">${r.traite ? 'Traité' : 'À traiter'}</span>
+        <span style="margin-left:auto"></span>
+        <button class="mini" data-basculer="${id}">${r.traite ? 'Rouvrir' : 'Marquer traité'}</button>
+        <button class="mini danger" data-suppr="${id}">Suppr.</button>
+      </div>
+      <div class="message">${esc(r.message)}</div>
+      ${(r.nom || contact) ? `<div class="qui" style="margin-top:6px">${esc(r.nom || 'Anonyme')}${contact ? ' · ' + contact : ''}</div>` : ''}
+    </div>`;
+  }).join('')
+  : `<p class="note" style="padding:10px 2px">${filtre === 'a-traiter'
+      ? 'Rien à traiter — tout est à jour.' : 'Aucun retour privé pour le moment.'}</p>`;
+}
+
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.basculer) {
+    const id = b.dataset.basculer;
+    await update(ref(db, `avisPrives/${restoId}/${id}`), { traite: !RETOURS[id].traite });
+  }
+  if (b.dataset.suppr && confirm('Supprimer définitivement ce retour ?')) {
+    await remove(ref(db, `avisPrives/${restoId}/${b.dataset.suppr}`));
+  }
+});
+
+/* ================= STATS ================= */
+function rendreStats() {
+  const notes = [1, 2, 3, 4, 5].map((n) => Number(STATS[n]) || 0);
+  const total = notes.reduce((a, b) => a + b, 0);
+  const moyenne = total ? notes.reduce((a, b, i) => a + b * (i + 1), 0) / total : 0;
+  const satisfaits = total ? Math.round(((notes[3] + notes[4]) / total) * 100) : 0;
+
+  $('kpis').innerHTML = `
+    <div class="kpi"><div class="v">${total}</div><div class="l">notes données</div></div>
+    <div class="kpi"><div class="v">${total ? moyenne.toLocaleString('fr-FR', { maximumFractionDigits: 2 }) : '—'}</div><div class="l">note moyenne</div></div>
+    <div class="kpi"><div class="v">${total ? satisfaits + ' %' : '—'}</div><div class="l">de 4-5 étoiles</div></div>
+    <div class="kpi"><div class="v">${Object.keys(RETOURS).length}</div><div class="l">retours privés reçus</div></div>`;
+
+  const max = Math.max(1, ...notes);
+  $('barres').innerHTML = [5, 4, 3, 2, 1].map((n) => `
+    <div class="barre-ligne">
+      <span class="lib">${n}★</span>
+      <div class="barre-fond"><div class="barre-rempli" style="width:${(notes[n - 1] / max) * 100}%"></div></div>
+      <span class="val">${notes[n - 1]}</span>
+    </div>`).join('');
+}
+
+/* ================= RÉGLAGES & QR ================= */
+const urlPubliqueDefaut = () =>
+  location.origin + location.pathname.replace(/admin\.html.*$/, '') + 'avis.html?r=' + (PROFIL.slug || '');
+
+function rendreConfig() {
+  const c = CONF || {};
+  remplirSiInactif($('form-config'), {
+    'c-actif': c.actif,
+    'c-google': c.lienGoogle,
+    'c-question': c.messageAccueil,
+    'c-url': c.urlPublique || urlPubliqueDefaut()
+  });
+}
+
+$('form-config').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const cfg = {
+    actif: $('c-actif').checked,
+    lienGoogle: $('c-google').value.trim(),
+    messageAccueil: $('c-question').value.trim(),
+    urlPublique: $('c-url').value.trim() || urlPubliqueDefaut()
+  };
+  await set(ref(db, `users/${uid}/velox_avis_admin/config`), cfg);
+  await set(ref(db, `vitrines/${uid}/avisPublic`), cfg);
+  toast('Réglages enregistrés.');
+  rendreQR();
+});
+
+function rendreQR() {
+  const url = (CONF && CONF.urlPublique) || urlPubliqueDefaut();
+  $('qr-url').textContent = url;
+  $('qr-conteneur').innerHTML = '';
+  $('qr-kit').innerHTML = '';
+  $('kit-nom').textContent = PROFIL.nom || '';
+  new QRCode($('qr-conteneur'), { text: url, width: 220, height: 220 });
+  new QRCode($('qr-kit'), { text: url, width: 170, height: 170 });
+}
+$('btn-dl-qr').addEventListener('click', () => {
+  const canvas = $('qr-conteneur').querySelector('canvas');
+  const img = $('qr-conteneur').querySelector('img');
+  const data = canvas ? canvas.toDataURL('image/png') : (img && img.src);
+  if (!data) return;
+  const a = document.createElement('a');
+  a.href = data;
+  a.download = `qr-avis-${PROFIL.slug || 'resto'}.png`;
+  a.click();
+});
+$('btn-imprimer-kit').addEventListener('click', () => {
+  document.body.classList.add('impression');
+  window.print();
+});
+window.addEventListener('afterprint', () => document.body.classList.remove('impression'));
+</script>
+</body>
+</html>
