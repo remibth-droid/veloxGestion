@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velox Planning — Planning d'équipe restaurant avec heures sup HCR calculées</title>
+<meta name="description" content="Le planning de votre équipe qui calcule les heures supplémentaires en convention HCR directement sur la grille. Majorations 10/20/50 %, contrats 35/37/39 h, impression pour la cuisine. 9 €/mois.">
+<meta property="og:title" content="Velox Planning — votre planning connaît la convention HCR">
+<meta property="og:description" content="Grille d'équipe + calcul des heures sup HCR en direct. Plus d'erreur de majoration.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--papier:#FBFAF7;--encre:#1C1B18;--accent:#6E1F2E;--accent-pale:#F3E7E9;
+    --zinc:#6B6E73;--trait:#E4E0D8;--vert:#1E6B45;--vert-fond:#E8F2EC;--orange:#A8632B;--orange-fond:#F8EDE2;--rouge:#8f2020}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--encre);
+    font:400 1.02rem/1.6 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .conteneur{max-width:980px;margin:0 auto;padding:0 20px}
+  a{color:var(--accent)}
+  header.site{padding:18px 0}
+  header.site .conteneur{display:flex;align-items:center;gap:14px}
+  .marque{font:800 1.15rem "Archivo",sans-serif;color:var(--accent);text-decoration:none}
+  .marque span{color:var(--encre)}
+  header.site .cta-entete{margin-left:auto}
+  .btn{display:inline-block;font:600 .95rem "Public Sans",sans-serif;text-decoration:none;border-radius:8px;padding:12px 22px;cursor:pointer}
+  .btn.plein{background:var(--accent);color:#fff}
+  .btn.contour{border:1px solid var(--trait);color:var(--encre);background:#fff}
+  .btn.grand{font-size:1.05rem;padding:14px 28px}
+  .hero{padding:40px 0 72px}
+  .hero .conteneur{display:grid;grid-template-columns:1.02fr .98fr;gap:44px;align-items:center}
+  @media(max-width:820px){.hero .conteneur{grid-template-columns:1fr}}
+  .surtitre{font:800 .78rem "Archivo",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+  h1{font:800 clamp(2rem,5.5vw,3rem)/1.08 "Archivo",sans-serif;letter-spacing:-.015em;margin:12px 0 16px}
+  .hero p.accroche{font-size:1.12rem;color:#3c3a35;max-width:52ch;margin:0 0 24px}
+  .hero .rassure{font-size:.85rem;color:var(--zinc);margin-top:14px}
+  /* Mini grille planning */
+  .mini{background:#fff;border:1px solid var(--trait);border-radius:14px;overflow:hidden;
+    box-shadow:0 24px 48px -26px rgba(28,27,24,.3);font-variant-numeric:tabular-nums}
+  .mini .tete{background:var(--papier);padding:12px 16px;font:800 .8rem "Archivo",sans-serif;
+    letter-spacing:.04em;text-transform:uppercase;color:var(--zinc);border-bottom:1px solid var(--trait)}
+  .mini .row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;
+    padding:12px 16px;border-bottom:1px solid var(--trait);font-size:.9rem}
+  .mini .row:last-child{border-bottom:0}
+  .mini .nom{font-weight:600}.mini .nom small{display:block;color:var(--zinc);font-weight:400;font-size:.8rem}
+  .mini .tot{font:800 .95rem "Archivo",sans-serif}
+  .badge{font:600 .72rem "Public Sans",sans-serif;border-radius:99px;padding:2px 9px;white-space:nowrap}
+  .b-vert{background:var(--vert-fond);color:var(--vert)}
+  .b-orange{background:var(--orange-fond);color:var(--orange)}
+  .b-rouge{background:#F6E4E4;color:var(--rouge)}
+  section.bloc{padding:64px 0}
+  section.alt{background:#fff;border-top:1px solid var(--trait);border-bottom:1px solid var(--trait)}
+  h2{font:800 clamp(1.4rem,4vw,1.9rem)/1.15 "Archivo",sans-serif;letter-spacing:-.01em;margin:0 0 10px}
+  .sous-titre{color:var(--zinc);max-width:60ch;margin:0 0 34px}
+  .grille3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:760px){.grille3{grid-template-columns:1fr}}
+  .carte{background:#fff;border:1px solid var(--trait);border-radius:12px;padding:22px}
+  section.alt .carte{background:var(--papier)}
+  .carte h3{font:800 1.02rem "Archivo",sans-serif;margin:0 0 8px}
+  .carte p{margin:0;font-size:.93rem;color:#3c3a35}
+  .etape .numero{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+    border-radius:50%;background:var(--accent);color:#fff;font:800 1rem "Archivo",sans-serif;margin-bottom:12px}
+  .bareme{width:100%;border-collapse:collapse;font-size:.92rem;font-variant-numeric:tabular-nums;margin-top:6px}
+  .bareme th,.bareme td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--trait)}
+  .bareme th{font:800 .74rem "Archivo",sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--zinc)}
+  .fonctions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 26px;margin-top:8px}
+  @media(max-width:760px){.fonctions{grid-template-columns:1fr}}
+  .fonction{display:flex;gap:10px;align-items:flex-start;font-size:.95rem}
+  .fonction::before{content:"✓";color:var(--vert);font-weight:700}
+  .tarif-unique{max-width:420px;margin:0 auto;background:#fff;border:2px solid var(--accent);border-radius:14px;padding:28px;text-align:center}
+  .tarif-unique .prix{font:800 2.6rem "Archivo",sans-serif;margin:6px 0 2px}
+  .tarif-unique .prix small{font:600 .95rem "Public Sans",sans-serif;color:var(--zinc)}
+  .tarif-unique ul{list-style:none;padding:0;margin:16px 0 22px;text-align:left}
+  .tarif-unique li{padding:5px 0;font-size:.93rem;display:flex;gap:8px}
+  .tarif-unique li::before{content:"✓";color:var(--vert);font-weight:700}
+  details{border-bottom:1px solid var(--trait);padding:14px 0}
+  summary{font-weight:600;cursor:pointer}
+  details p{margin:10px 0 2px;color:#3c3a35}
+  .final{text-align:center;padding:80px 20px}
+  footer.site{border-top:1px solid var(--trait);padding:28px 0 40px;font-size:.82rem;color:var(--zinc)}
+  footer.site .conteneur{display:flex;flex-wrap:wrap;gap:10px 24px}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="conteneur">
+    <a class="marque" href="../index.html">VELOX<span> Planning</span></a>
+    <a class="btn contour cta-entete" href="app.html">Se connecter</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="conteneur">
+    <div>
+      <span class="surtitre">Planning d'équipe</span>
+      <h1>Le seul planning qui connaît la convention HCR.</h1>
+      <p class="accroche">Vous posez les services de la semaine, Velox calcule les heures
+      supplémentaires de chaque salarié — au bon taux HCR — directement sur la grille. Fini les
+      erreurs de majoration entre la 39ᵉ et la 44ᵉ heure.</p>
+      <a class="btn plein grand" href="app.html">Créer mon planning</a>
+      <p class="rassure">9 €/mois · Impression pour la cuisine · Sans engagement</p>
+    </div>
+
+    <div class="mini" aria-hidden="true">
+      <div class="tete">Semaine — total &amp; heures sup</div>
+      <div class="row"><div class="nom">Sarah<small>Salle · 39 h</small></div>
+        <div class="tot">39h00</div><span class="badge b-vert">4 h sup incluses</span></div>
+      <div class="row"><div class="nom">Karim<small>Cuisine · 39 h</small></div>
+        <div class="tot">44h30</div><span class="badge b-orange">+5,5 h hors contrat</span></div>
+      <div class="row"><div class="nom">Léa<small>Salle · 35 h</small></div>
+        <div class="tot">49h00</div><span class="badge b-rouge">&gt; 48 h · alerte</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="bloc alt">
+  <div class="conteneur">
+    <h2>Une heure sup mal comptée, c'est une erreur de paie chaque mois</h2>
+    <p class="sous-titre">En restauration, les taux de majoration ne sont pas ceux du régime général.
+    Un contrat 39 h intègre déjà des heures sup à 10 % ; au-delà, ça passe à 20 % puis 50 %. Se tromper,
+    c'est sous-payer (litige) ou surpayer (perte) — Velox applique le bon barème automatiquement.</p>
+    <table class="bareme">
+      <thead><tr><th>Heures de la semaine</th><th>Convention HCR</th><th>Régime général</th></tr></thead>
+      <tbody>
+        <tr><td>36ᵉ à 39ᵉ heure</td><td>+ 10 %</td><td>+ 25 %</td></tr>
+        <tr><td>40ᵉ à 43ᵉ heure</td><td>+ 20 %</td><td>+ 25 %</td></tr>
+        <tr><td>44ᵉ heure et au-delà</td><td>+ 50 %</td><td>+ 50 %</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="bloc">
+  <div class="conteneur">
+    <h2>Le planning en trois gestes</h2>
+    <div class="grille3">
+      <div class="carte etape"><span class="numero">1</span><h3>Votre équipe</h3>
+        <p>Chaque membre avec son poste et son contrat (35, 37 ou 39 h). Une couleur par personne.</p></div>
+      <div class="carte etape"><span class="numero">2</span><h3>Les services</h3>
+        <p>Un tap sur une case pour poser un créneau. Les services de nuit et les pauses sont gérés.</p></div>
+      <div class="carte etape"><span class="numero">3</span><h3>Le récap paie</h3>
+        <p>Total par salarié, heures sup ventilées par taux, brut estimé. Prêt pour votre comptable.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="bloc alt">
+  <div class="conteneur">
+    <h2>Pensé pour le rythme d'un service</h2>
+    <div class="fonctions">
+      <div class="fonction">Calcul heures sup HCR en direct</div>
+      <div class="fonction">Alerte dépassement des 48 h</div>
+      <div class="fonction">Services de nuit et pauses gérés</div>
+      <div class="fonction">« Copier la semaine précédente »</div>
+      <div class="fonction">Impression A4 pour la cuisine</div>
+      <div class="fonction">Récap paie par salarié</div>
+    </div>
+  </div>
+</section>
+
+<section class="bloc">
+  <div class="conteneur">
+    <h2 style="text-align:center">Un tarif simple</h2>
+    <p class="sous-titre" style="text-align:center;margin-left:auto;margin-right:auto">Moins qu'une erreur de paie sur un bulletin.</p>
+    <div class="tarif-unique">
+      <div class="prix">9 €<small> /mois</small></div>
+      <ul>
+        <li>Équipe et semaines illimitées</li>
+        <li>Calcul HCR et régime général</li>
+        <li>Récap paie exportable à l'impression</li>
+        <li>Planning affichable en cuisine</li>
+        <li>Sans engagement</li>
+      </ul>
+      <a class="btn plein grand" href="app.html">Créer mon planning</a>
+    </div>
+  </div>
+</section>
+
+<section class="bloc alt">
+  <div class="conteneur">
+    <h2>Questions fréquentes</h2>
+    <details open><summary>Velox Planning remplace-t-il mon logiciel de paie ?</summary>
+      <p>Non. Il vous donne une lecture claire et fiable des heures sup pour préparer la paie et
+      éviter les erreurs, mais l'établissement des bulletins reste le travail de votre comptable ou
+      de votre logiciel de paie.</p></details>
+    <details><summary>Gère-t-il les contrats 35, 37 et 39 heures ?</summary>
+      <p>Oui. Vous indiquez le contrat de chaque salarié, et Velox distingue les heures structurelles
+      (déjà incluses dans le salaire) des heures à payer en plus.</p></details>
+    <details><summary>Et les services qui finissent après minuit ?</summary>
+      <p>Gérés : un service 18h30 → 00h30 est compté correctement sur son jour de début, pauses
+      non payées déduites.</p></details>
+    <details><summary>Puis-je l'afficher pour l'équipe ?</summary>
+      <p>Oui, une impression A4 paysage propre est prévue pour l'affichage en salle ou en cuisine.</p></details>
+  </div>
+</section>
+
+<div class="final">
+  <h2>Un planning qui parle votre convention</h2>
+  <a class="btn plein grand" href="app.html">Créer mon planning</a>
+  <p style="color:var(--zinc);font-size:.85rem;margin-top:14px">9 €/mois · Sans engagement</p>
+</div>
+
+<footer class="site">
+  <div class="conteneur">
+    <span>© Velox — outils pour restaurateurs indépendants</span>
+    <a href="../index.html">Suite Velox</a>
+    <a href="../calculateurs/heures-sup-hcr.html">Calculateur heures sup gratuit</a>
+    <a href="../menu/vente.html">Velox Menu</a>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+ {"@type":"Question","name":"Velox Planning remplace-t-il un logiciel de paie ?","acceptedAnswer":{"@type":"Answer","text":"Non, il donne une lecture fiable des heures supplémentaires pour préparer la paie et éviter les erreurs, mais les bulletins restent établis par le comptable ou le logiciel de paie."}},
+ {"@type":"Question","name":"Gère-t-il les contrats 35, 37 et 39 heures ?","acceptedAnswer":{"@type":"Answer","text":"Oui, on indique le contrat de chaque salarié et Velox distingue les heures structurelles déjà incluses des heures à payer en plus."}},
+ {"@type":"Question","name":"Les services de nuit sont-ils gérés ?","acceptedAnswer":{"@type":"Answer","text":"Oui, un service qui finit après minuit est compté sur son jour de début, pauses non payées déduites."}},
+ {"@type":"Question","name":"Combien coûte Velox Planning ?","acceptedAnswer":{"@type":"Answer","text":"9 euros par mois, sans engagement, avec équipe et semaines illimitées."}}
+]}
+</script>
+</body>
+</html>

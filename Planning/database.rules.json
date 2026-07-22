@@ -1,0 +1,139 @@
+{
+  "rules": {
+    "empCodes": {
+      "$code": {
+        ".read": "auth !== null",
+        ".write": "auth !== null"
+      }
+    },
+    "codes": {
+      ".read": true,
+      ".write": "auth !== null && auth.uid === 'Ygt3atkCV3NjMQTz8CzABIpYEY03'"
+    },
+    "carte_alfred": {
+      ".read": "auth !== null",
+      ".write": "auth !== null && auth.uid === 'Ygt3atkCV3NjMQTz8CzABIpYEY03'"
+    },
+    "users": {
+      "$uid": {
+        ".read": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid)",
+        "profile": {
+          ".write": "auth !== null && auth.uid === $uid",
+          "subscription": {
+            ".write": false
+          },
+          "role": {
+            ".write": "auth !== null && auth.uid === $uid && !data.exists()"
+          }
+        },
+        "wines": {
+          ".write": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid)"
+        },
+        "sales": {
+          ".write": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid)"
+        },
+        "caves": {
+          ".write": "auth !== null && auth.uid === $uid"
+        },
+        "activityLog": {
+          ".write": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid)"
+        },
+        "loginHistory": {
+          ".write": "auth !== null && auth.uid === $uid"
+        },
+        "velox_cout": {
+          ".write": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid)"
+        },
+        "velox_resa": {
+          ".write": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid)"
+        },
+        "velox_planning": {
+          ".write": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid)"
+        },
+
+        "restoId": {
+          ".write": "auth !== null && auth.uid === $uid"
+        },
+        "velox_menu_admin": {
+          ".write": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid)"
+        },
+        "velox_resa_admin": {
+          ".write": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid)"
+        },
+        "velox_avis_admin": {
+          ".write": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid)"
+        }
+      }
+    },
+
+    "slugs": {
+      ".read": true,
+      "$slug": {
+        ".write": "auth !== null && (!data.exists() || data.val() === root.child('users').child(auth.uid).child('restoId').val())",
+        ".validate": "newData.isString()"
+      }
+    },
+
+    "vitrines": {
+      ".read": true,
+      "$uid": {
+        ".write": "auth !== null && auth.uid === $uid",
+        "stats": {
+          "scans": {
+            "$jour": {
+              ".write": true,
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 10000000"
+            }
+          }
+        },
+        "resaCompteurs": {
+          "$date": {
+            "$service": {
+              ".write": true,
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 100000"
+            }
+          }
+        },
+        "avisStats": {
+          "$note": {
+            ".write": true,
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 1000000"
+          }
+        }
+      }
+    },
+
+    "resaDemandes": {
+      "$uid": {
+        ".read": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid)",
+        "$id": {
+          ".write": "(!data.exists() && newData.exists()) || (auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid))",
+          ".validate": "newData.hasChildren(['date','heure','service','couverts','nom','tel','statut'])"
+        }
+      }
+    },
+
+    "avisPrives": {
+      "$uid": {
+        ".read": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid)",
+        "$id": {
+          ".write": "(!data.exists() && newData.exists()) || (auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('profile').child('linkedPatronUid').val() === $uid))",
+          ".validate": "newData.hasChildren(['note','message','creeLe'])"
+        }
+      }
+    },
+
+    "pendingPayments": {
+      ".read": false,
+      ".write": false
+    },
+    "rateLimit": {
+      ".read": false,
+      ".write": false
+    },
+    "$other": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}
