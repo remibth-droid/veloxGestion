@@ -2,1388 +2,436 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#16130E">
-<title>Velox Heures — Pointeuse</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕐</text></svg>">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velox — la boîte à outils du restaurateur indépendant</title>
+<meta name="description" content="Menus digitaux, réservations sans commission, avis clients, coût matière, planning d'équipe et calculateurs de paie HCR. Des outils simples pour la restauration, développés par quelqu'un qui travaille en salle.">
+<meta property="og:title" content="Velox — la boîte à outils du restaurateur indépendant">
+<meta property="og:description" content="Une suite d'outils pensés pour la restauration, sans commission, sans usine à gaz.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#16130E; --card:#201C15; --line:#2E2820;
-  --text:#EDE6D8; --mut:#8F8674;
-  --amber:#F0A03C; --amber-dark:#1F1608;
-  --red:#D9553C; --green:#8FBF6B; --bar-dim:#6B5A3A;
-  --paper:#F2ECDD; --paper-ink:#211D14; --paper-mut:#6E6753;
-  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{
-  background:var(--bg); color:var(--text);
-  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  min-height:100vh; padding-bottom:96px;
-}
-.wrap{max-width:28rem;margin:0 auto;padding:16px}
-button{cursor:pointer;font-family:inherit;background:none;border:none;color:inherit}
-button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-[hidden]{display:none!important}
+  :root{
+    --papier:#F7F4EC; --papier-2:#FBF9F3; --encre:#191713; --encre-2:#4A463D;
+    --bordeaux:#6E1F2E; --bordeaux-clair:#8A3242; --laiton:#B8863B; --laiton-pale:#EFE2C7;
+    --zinc:#6E6A5F; --trait:#E2DCCE; --vert:#2E6B45;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--papier);color:var(--encre);
+    font:400 1.02rem/1.6 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  a{color:var(--bordeaux)}
+  .mono{font-family:"Spline Sans Mono",ui-monospace,monospace}
 
-/* ---------- en-tête ---------- */
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.brand{font-family:var(--mono);font-size:13px;letter-spacing:.22em;font-weight:700}
-.brand span{color:var(--amber)}
-.head-right{display:flex;align-items:center;gap:10px}
-#headerDate{color:var(--mut);font-size:12px;text-transform:capitalize}
-#gearBtn{color:var(--mut);padding:6px;border-radius:8px;display:flex}
-#gearBtn svg{width:18px;height:18px}
+  /* --- Barre --- */
+  header.top{position:sticky;top:0;z-index:20;background:rgba(247,244,236,.86);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--trait)}
+  header.top .wrap{display:flex;align-items:center;gap:16px;height:64px}
+  .logo{font:900 1.25rem "Archivo",sans-serif;letter-spacing:-.02em;color:var(--bordeaux);text-decoration:none}
+  .logo::after{content:"·";color:var(--laiton);margin:0 2px}
+  .logo span{color:var(--encre)}
+  header.top nav{margin-left:auto;display:flex;gap:26px;align-items:center}
+  header.top nav a{color:var(--encre-2);text-decoration:none;font-weight:500;font-size:.92rem}
+  header.top nav a:hover{color:var(--bordeaux)}
+  .btn{display:inline-block;font:600 .95rem "Public Sans",sans-serif;text-decoration:none;
+    border-radius:9px;padding:11px 20px;cursor:pointer;border:0;transition:transform .12s,box-shadow .12s}
+  .btn.plein{background:var(--bordeaux);color:#fff}
+  .btn.plein:hover{transform:translateY(-1px);box-shadow:0 8px 20px -8px rgba(110,31,46,.6)}
+  .btn.ligne{border:1px solid var(--trait);color:var(--encre);background:var(--papier-2)}
+  .btn.ligne:hover{border-color:var(--bordeaux)}
+  @media(max-width:760px){header.top nav a.lien-nav{display:none}}
 
-.warn{
-  display:flex;align-items:center;gap:8px;
-  background:#2A1C10;border:1px solid #4A331F;color:var(--amber);
-  font-size:12px;border-radius:10px;padding:8px 12px;margin-bottom:12px;
-}
+  /* --- Hero --- */
+  .hero{padding:76px 0 40px;position:relative;overflow:hidden}
+  .hero .wrap{position:relative;z-index:2}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font:600 .78rem "Spline Sans Mono",monospace;
+    letter-spacing:.06em;color:var(--bordeaux);background:var(--laiton-pale);
+    border:1px solid #E4D3AD;border-radius:99px;padding:6px 14px;margin-bottom:22px}
+  .kicker .pt{width:6px;height:6px;border-radius:50%;background:var(--vert)}
+  h1.titre{font:800 clamp(2.4rem,6vw,4.1rem)/1.02 "Archivo",sans-serif;letter-spacing:-.025em;
+    margin:0 0 20px;max-width:16ch}
+  h1.titre em{font-style:normal;color:var(--bordeaux);position:relative;white-space:nowrap}
+  h1.titre em::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.14em;
+    background:var(--laiton);opacity:.5;z-index:-1}
+  .accroche{font-size:1.2rem;color:var(--encre-2);max-width:54ch;margin:0 0 30px}
+  .hero .boutons{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .hero .preuve{margin-top:26px;font-size:.9rem;color:var(--zinc);display:flex;gap:20px;flex-wrap:wrap}
+  .hero .preuve b{color:var(--encre);font-weight:600}
 
-/* ---------- cartes / KPI ---------- */
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.kpi-label{color:var(--mut);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
-.kpi-value{font-family:var(--mono);font-size:22px;font-weight:700;margin-top:4px}
-.kpi-value.red{color:var(--red)}
-.kpi-sub{font-family:var(--mono);font-size:11px;margin-top:2px;color:var(--mut)}
-.chart-title{color:var(--mut);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
-.chart-box{position:relative;height:190px}
-.chart-box.small{height:160px}
+  /* Signature : tampon "fait en salle" en filigrane */
+  .tampon{position:absolute;right:-60px;top:40px;width:340px;height:340px;z-index:1;
+    opacity:.07;transform:rotate(-8deg);pointer-events:none}
+  @media(max-width:900px){.tampon{display:none}}
 
-/* ---------- barre de progression semaine ---------- */
-.prog-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
-.prog-head .pl{color:var(--mut);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
-.prog-head .pv{font-family:var(--mono);font-size:13px;font-weight:700}
-.prog-head .pv b{color:var(--red)}
-.prog-track{height:8px;background:var(--bg);border:1px solid var(--line);border-radius:99px;overflow:hidden;display:flex}
-.prog-fill{background:var(--amber);height:100%}
-.prog-ot{background:var(--red);height:100%}
-.prog-sub{font-family:var(--mono);font-size:11px;color:var(--mut);margin-top:6px}
-.prog-sub.red{color:var(--red)}
+  /* --- Bandeau atelier --- */
+  .atelier{border-top:1px solid var(--trait);border-bottom:1px solid var(--trait);background:var(--papier-2)}
+  .atelier .wrap{display:flex;flex-wrap:wrap;gap:8px 32px;padding:18px 24px;align-items:center;
+    font:500 .9rem "Public Sans",sans-serif;color:var(--encre-2)}
+  .atelier .lab{font:600 .74rem "Spline Sans Mono",monospace;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--zinc)}
+  .atelier .pas{display:inline-flex;align-items:center;gap:8px}
+  .atelier .pas b{color:var(--bordeaux);font-family:"Spline Sans Mono",monospace;font-weight:600}
 
-/* ---------- écran pointage ---------- */
-.status-row{display:flex;align-items:center;justify-content:center;gap:8px;
-  font-size:12px;letter-spacing:.2em;font-weight:700;color:var(--mut);padding-top:20px}
-.status-row.active{color:var(--amber)}
-#statusDot{width:8px;height:8px;border-radius:99px;background:var(--line);display:inline-block}
-.status-row.active #statusDot{background:var(--amber);animation:vhPulse 1.6s ease-in-out infinite}
-@keyframes vhPulse{0%,100%{opacity:1}50%{opacity:.35}}
-#bigTimer{font-family:var(--mono);font-size:50px;font-weight:700;text-align:center;
-  margin-top:10px;font-variant-numeric:tabular-nums}
-#timerSub{color:var(--mut);font-size:13px;text-align:center;margin-top:2px}
+  /* --- Grille produits --- */
+  section{padding:80px 0}
+  .titre-section{font:800 clamp(1.7rem,4vw,2.4rem)/1.1 "Archivo",sans-serif;letter-spacing:-.02em;margin:0 0 10px}
+  .sous-section{color:var(--zinc);max-width:58ch;margin:0 0 40px;font-size:1.05rem}
+  .grille{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
+  .tuile{grid-column:span 2;background:var(--papier-2);border:1px solid var(--trait);border-radius:16px;
+    padding:26px 24px;text-decoration:none;color:inherit;display:flex;flex-direction:column;
+    position:relative;overflow:hidden;transition:transform .16s,border-color .16s,box-shadow .16s}
+  .tuile:hover{transform:translateY(-3px);border-color:var(--bordeaux);box-shadow:0 18px 34px -22px rgba(25,23,19,.5)}
+  .tuile.large{grid-column:span 3}
+  @media(max-width:860px){.grille{grid-template-columns:repeat(2,1fr)}.tuile,.tuile.large{grid-column:span 1}}
+  @media(max-width:520px){.grille{grid-template-columns:1fr}.tuile,.tuile.large{grid-column:span 1}}
+  .tuile .ref{font:600 .72rem "Spline Sans Mono",monospace;color:var(--laiton);letter-spacing:.04em;margin-bottom:14px}
+  .tuile h3{font:700 1.28rem "Archivo",sans-serif;margin:0 0 8px;letter-spacing:-.01em}
+  .tuile p{margin:0 0 18px;font-size:.94rem;color:var(--encre-2);flex:1}
+  .tuile .pied{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.9rem;color:var(--bordeaux)}
+  .tuile .pied .fleche{transition:transform .16s}
+  .tuile:hover .pied .fleche{transform:translateX(4px)}
+  .tuile .prix{position:absolute;top:22px;right:22px;font:600 .74rem "Spline Sans Mono",monospace;
+    color:var(--zinc);background:var(--papier);border:1px solid var(--trait);border-radius:99px;padding:3px 10px}
+  .tuile .glyphe{font-size:1.7rem;margin-bottom:14px;line-height:1}
 
-.btn-main{
-  width:100%;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:10px;
-  padding:20px 0;font-size:17px;font-weight:700;margin-top:20px;
-  background:var(--amber);color:var(--amber-dark);
-  transition:transform .08s ease;
-}
-.btn-main:active{transform:scale(.985)}
-.btn-main.stop{background:var(--red);color:#2A0E07}
-.btn-main svg{width:20px;height:20px}
+  /* --- Prestations --- */
+  .prestations{background:var(--encre);color:var(--papier)}
+  .prestations .titre-section{color:#fff}
+  .prestations .sous-section{color:#B9B3A5}
+  .duo{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+  @media(max-width:820px){.duo{grid-template-columns:1fr;gap:28px}}
+  .prestations ul{list-style:none;padding:0;margin:0}
+  .prestations li{padding:14px 0;border-bottom:1px solid #2E2A22;display:flex;gap:14px;align-items:flex-start}
+  .prestations li:last-child{border-bottom:0}
+  .prestations li .n{font:600 .8rem "Spline Sans Mono",monospace;color:var(--laiton);flex-shrink:0;padding-top:2px}
+  .prestations li b{display:block;font:600 1.05rem "Archivo",sans-serif;margin-bottom:2px}
+  .prestations li span{color:#B9B3A5;font-size:.92rem}
+  .carte-devis{background:#221F19;border:1px solid #322E25;border-radius:18px;padding:30px}
+  .carte-devis .de{font:600 .78rem "Spline Sans Mono",monospace;color:var(--laiton);text-transform:uppercase;letter-spacing:.06em}
+  .carte-devis .montant{font:800 2.8rem "Archivo",sans-serif;margin:6px 0 2px;color:#fff}
+  .carte-devis .montant small{font:600 1rem "Public Sans",sans-serif;color:#B9B3A5}
+  .carte-devis p{color:#B9B3A5;font-size:.92rem;margin:12px 0 20px}
 
-#cancelBtn{display:block;margin:14px auto 0;color:var(--mut);font-size:12px;text-decoration:underline}
-#cancelBtn.confirm{color:var(--red)}
-#clockProg{margin-top:20px}
+  /* --- Bundles --- */
+  .bundles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:820px){.bundles{grid-template-columns:1fr}}
+  .plan{background:var(--papier-2);border:1px solid var(--trait);border-radius:16px;padding:28px}
+  .plan.vedette{border:2px solid var(--bordeaux);position:relative}
+  .plan.vedette .ruban{position:absolute;top:-13px;left:24px;background:var(--bordeaux);color:#fff;
+    font:700 .68rem "Spline Sans Mono",monospace;letter-spacing:.06em;text-transform:uppercase;
+    border-radius:99px;padding:4px 12px}
+  .plan h3{font:700 1.2rem "Archivo",sans-serif;margin:0 0 4px}
+  .plan .tarif{font:800 2.4rem "Archivo",sans-serif;margin:6px 0}
+  .plan .tarif small{font:600 .95rem "Public Sans",sans-serif;color:var(--zinc)}
+  .plan ul{list-style:none;padding:0;margin:14px 0 22px}
+  .plan li{padding:6px 0;font-size:.93rem;display:flex;gap:9px;color:var(--encre-2)}
+  .plan li::before{content:"→";color:var(--laiton);font-weight:700}
 
-/* ---------- ticket ---------- */
-.ticket{background:var(--paper);color:var(--paper-ink);font-family:var(--mono);
-  border-radius:8px;padding:16px;margin-top:16px}
-.ticket .t-brand{text-align:center;font-size:11px;letter-spacing:.18em;color:var(--paper-mut)}
-.ticket .t-resto{text-align:center;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
-.ticket .t-title{text-align:center;font-size:12px;font-weight:700;text-transform:uppercase;margin-top:2px}
-.ticket .t-sep{border-top:1px dashed var(--paper-mut);margin:10px 0}
-.ticket .t-row{display:flex;justify-content:space-between;font-size:13px;padding:2px 0}
-.ticket .t-row b{font-weight:700}
-.ticket .t-gap{color:var(--paper-mut);text-align:center;font-size:11px;padding:2px 0}
-.ticket .t-empty{text-align:center;font-size:12px;color:var(--paper-mut);padding:6px 0}
-.ticket .t-total{display:flex;justify-content:space-between;font-size:14px;font-weight:700}
-.ticket .t-week{display:flex;justify-content:space-between;font-size:11px;color:var(--paper-mut);margin-top:2px}
-.ticket .t-week .rd{color:#B03A24;font-weight:700}
+  /* --- Manifeste --- */
+  .manifeste{background:var(--bordeaux);color:#fff}
+  .manifeste .wrap{max-width:820px;text-align:center}
+  .manifeste .g{font:600 .78rem "Spline Sans Mono",monospace;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--laiton-pale);opacity:.8}
+  .manifeste blockquote{font:600 clamp(1.4rem,3.2vw,2rem)/1.35 "Archivo",sans-serif;margin:18px 0 0;letter-spacing:-.01em}
+  .manifeste blockquote em{font-style:normal;border-bottom:2px solid var(--laiton);padding-bottom:2px}
 
-/* ---------- analyses ---------- */
-#screen-stats{display:flex;flex-direction:column;gap:12px}
-.stats-footer{color:var(--mut);font-size:12px;text-align:center;font-family:var(--mono);padding-top:4px}
-.empty-msg{text-align:center;padding-top:64px;color:var(--mut);font-size:14px;line-height:1.5}
-.split-card{display:flex;align-items:center;gap:16px}
-.split-card .dz{position:relative;width:110px;height:110px;flex:none}
-.split-legend{display:flex;flex-direction:column;gap:8px;font-family:var(--mono);font-size:12px}
-.split-legend .row{display:flex;align-items:center;gap:8px}
-.split-legend .dot{width:8px;height:8px;border-radius:99px;flex:none}
-.split-legend small{color:var(--mut);display:block;font-size:11px}
-
-/* ---------- rapport ---------- */
-#screen-rapport{display:flex;flex-direction:column;gap:12px}
-.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
-.seg button{flex:1;padding:8px 0;border-radius:8px;font-size:13px;font-weight:600;color:var(--mut)}
-.seg button.on{background:var(--amber);color:var(--amber-dark)}
-.period-nav{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.period-nav .pn-btn{padding:8px 14px;border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:16px;line-height:1}
-.period-nav .pn-btn:disabled{opacity:.3;cursor:default}
-.period-nav .pn-label{font-size:14px;font-weight:700;text-transform:capitalize;text-align:center;flex:1}
-.rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-family:var(--mono);font-size:13px}
-.rep-grid .rl{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
-.rep-grid .rv{font-weight:700;text-align:right}
-.rep-grid .rv.red{color:var(--red)}
-.rep-days{font-family:var(--mono);font-size:12px}
-.rep-days .rd-row{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line)}
-.rep-days .rd-row:last-child{border-bottom:none}
-.rep-days .rd-date{color:var(--mut);flex:none;width:64px;text-transform:capitalize}
-.rep-days .rd-times{flex:1;color:var(--text)}
-.rep-days .rd-tot{font-weight:700;flex:none}
-.rep-note{color:var(--mut);font-size:11px;line-height:1.5}
-.report-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.report-actions button{border:1px solid var(--line);border-radius:12px;padding:10px 4px;font-size:12px;font-weight:600;color:var(--amber);display:flex;flex-direction:column;align-items:center;gap:4px}
-.report-actions svg{width:16px;height:16px}
-
-/* ---------- historique ---------- */
-#screen-history{display:flex;flex-direction:column;gap:16px}
-.btn-add{width:100%;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:12px 0;font-size:14px;font-weight:600;color:var(--amber);border:1px dashed var(--line)}
-.day-head{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px;margin-bottom:8px}
-.day-head .d{font-size:13px;font-weight:700;text-transform:capitalize}
-.day-head .t{color:var(--amber);font-family:var(--mono);font-size:13px;font-weight:700}
-.shift-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px;
-  display:flex;flex-direction:column;gap:4px}
-.shift-row{display:flex;align-items:center;gap:8px;padding:8px;font-family:var(--mono)}
-.shift-row .times{font-size:13px;flex:1}
-.shift-row .times small{color:var(--mut);font-size:10px}
-.shift-row .dur{color:var(--mut);font-size:12px;min-width:46px;text-align:right}
-.icon-btn{padding:6px;border-radius:8px;color:var(--mut);display:flex}
-.icon-btn svg{width:14px;height:14px}
-.icon-btn.confirm{color:var(--red)}
-
-/* ---------- nav basse ---------- */
-nav{position:fixed;bottom:0;left:0;right:0;
-  background:rgba(22,19,14,.92);backdrop-filter:blur(8px);
-  border-top:1px solid var(--line)}
-nav .inner{max-width:28rem;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
-nav button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 0;color:var(--mut)}
-nav button.on{color:var(--amber)}
-nav button span{font-size:10px;letter-spacing:.06em}
-nav button.on span{font-weight:700}
-nav svg{width:20px;height:20px}
-
-/* ---------- modals ---------- */
-.overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;
-  padding:16px;background:rgba(10,8,5,.75)}
-@media(min-width:640px){.overlay{align-items:center}}
-.modal-panel{width:100%;max-width:24rem;background:var(--card);border:1px solid var(--line);
-  border-radius:16px;padding:20px;max-height:85vh;overflow-y:auto}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.modal-head .mt{font-weight:700;font-size:16px}
-.field{display:block;margin-bottom:12px}
-.field span{color:var(--mut);font-size:12px;display:block;margin-bottom:6px}
-.field input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);
-  border-radius:10px;padding:10px 12px;font-family:var(--mono);font-size:14px;color-scheme:dark}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.err-msg{color:var(--red);font-size:12px;margin-bottom:10px}
-.btn-save{width:100%;border-radius:12px;padding:12px 0;font-weight:700;font-size:15px;
-  background:var(--amber);color:var(--amber-dark)}
-.settings-hint{color:var(--mut);font-size:11px;line-height:1.5;margin-bottom:14px}
-
-@media(prefers-reduced-motion:reduce){
-  .status-row.active #statusDot{animation:none}
-  .btn-main{transition:none}
-}
-
-/* ---------- impression rapport ---------- */
-@media print{
-  body{background:#fff;color:#000;padding:0}
-  header,nav,.warn,.seg,.period-nav .pn-btn,.report-actions,#gearBtn{display:none!important}
-  .wrap{max-width:100%;padding:0}
-  .card{background:#fff;border:1px solid #bbb;color:#000;border-radius:6px}
-  .kpi-label,.chart-title,.rep-grid .rl,.rep-days .rd-date,.rep-note,.prog-sub{color:#555!important}
-  .rep-grid .rv,.rep-days .rd-times,.rd-tot,.period-nav .pn-label{color:#000!important}
-  .rep-grid .rv.red{color:#B03A24!important}
-  .rep-days .rd-row{border-bottom:1px dashed #ccc}
-}
+  /* --- Pied --- */
+  footer.fin{background:var(--encre);color:#9F9A8D;padding:56px 0 40px}
+  footer.fin .wrap{display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px}
+  @media(max-width:720px){footer.fin .wrap{grid-template-columns:1fr 1fr}}
+  footer.fin .logo{color:#fff}
+  footer.fin h4{font:700 .78rem "Spline Sans Mono",monospace;letter-spacing:.08em;text-transform:uppercase;
+    color:#6E6A5F;margin:0 0 14px}
+  footer.fin a{display:block;color:#C9C4B6;text-decoration:none;padding:5px 0;font-size:.92rem}
+  footer.fin a:hover{color:#fff}
+  footer.fin .bas{grid-column:1/-1;border-top:1px solid #2E2A22;margin-top:20px;padding-top:20px;
+    font-size:.82rem;color:#6E6A5F;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.vu{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}
+    .btn,.tuile{transition:none}}
 </style>
 </head>
 <body>
 
-<div class="wrap">
-  <header>
-    <div class="brand">VELOX<span> HEURES</span></div>
-    <div class="head-right">
-      <div id="headerDate"></div>
-      <button id="gearBtn" aria-label="Réglages">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
-    </div>
-  </header>
-
-  <div id="warnBanner" class="warn" hidden>
-    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    Sauvegarde indisponible — les données de cette session risquent de ne pas être conservées.
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#">Velox<span>Suite</span></a>
+    <nav>
+      <a class="lien-nav" href="#outils">Les outils</a>
+      <a class="lien-nav" href="#prestations">Installation</a>
+      <a class="lien-nav" href="#tarifs">Tarifs</a>
+      <a class="btn ligne" href="menu/admin.html">Espace pro</a>
+    </nav>
   </div>
+</header>
 
-  <!-- ================= POINTAGE ================= -->
-  <section id="screen-clock">
-    <div class="status-row" id="statusRow"><span id="statusDot"></span><span id="statusLabel">HORS SERVICE</span></div>
-    <div id="bigTimer">0h00</div>
-    <div id="timerSub">travaillé aujourd'hui</div>
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <svg class="tampon" viewBox="0 0 200 200" aria-hidden="true">
+    <circle cx="100" cy="100" r="92" fill="none" stroke="var(--bordeaux)" stroke-width="3"/>
+    <circle cx="100" cy="100" r="78" fill="none" stroke="var(--bordeaux)" stroke-width="1"/>
+    <path id="cercle-haut" d="M100 30 a70 70 0 0 1 0 140" fill="none"/>
+    <path id="cercle-bas" d="M100 170 a70 70 0 0 1 0 -140" fill="none"/>
+    <text font-family="Spline Sans Mono, monospace" font-size="15" font-weight="600" fill="var(--bordeaux)" letter-spacing="4">
+      <textPath href="#cercle-haut" startOffset="6%">FAIT EN SALLE</textPath>
+    </text>
+    <text font-family="Spline Sans Mono, monospace" font-size="15" font-weight="600" fill="var(--bordeaux)" letter-spacing="4">
+      <textPath href="#cercle-bas" startOffset="10%">PAS EN RÉUNION</textPath>
+    </text>
+    <text x="100" y="112" text-anchor="middle" font-family="Archivo" font-size="52" font-weight="900" fill="var(--bordeaux)">V</text>
+  </svg>
+  <div class="wrap">
+    <span class="kicker"><span class="pt"></span>Outils pour la restauration indépendante</span>
+    <h1 class="titre">La boîte à outils du <em>restaurateur</em>, pas du groupe.</h1>
+    <p class="accroche">Menus digitaux, réservations sans commission, avis clients, coût matière,
+    planning d'équipe. Chaque outil règle une corvée précise de votre service — et rien de plus.</p>
+    <div class="boutons">
+      <a class="btn plein" href="#outils">Voir les outils</a>
+      <a class="btn ligne" href="#prestations">Je veux qu'on m'installe tout</a>
+    </div>
+    <div class="preuve">
+      <span><b>7</b> outils connectés</span>
+      <span><b>0</b> commission par couvert</span>
+      <span><b>1</b> seul compte pour tout</span>
+    </div>
+  </div>
+</section>
 
-    <button id="mainBtn" class="btn-main">
-      <svg id="iconPlay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-      <svg id="iconStop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" hidden><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
-      <span id="mainBtnLabel">Commencer le service</span>
-    </button>
-    <button id="cancelBtn" hidden>Annuler ce service</button>
+<!-- ===== BANDEAU ATELIER ===== -->
+<div class="atelier">
+  <div class="wrap">
+    <span class="lab">Le principe</span>
+    <span class="pas"><b>01</b> Vous créez votre restaurant une fois</span>
+    <span class="pas"><b>02</b> Vous activez les outils qui vous servent</span>
+    <span class="pas"><b>03</b> Tout partage le même compte et vos données</span>
+  </div>
+</div>
 
-    <div class="card" id="clockProg"></div>
-    <div class="ticket" id="ticket"></div>
-  </section>
+<!-- ===== OUTILS ===== -->
+<section id="outils">
+  <div class="wrap">
+    <h2 class="titre-section reveal">Sept outils, une seule maison</h2>
+    <p class="sous-section reveal">Prenez-en un, prenez-les tous. Ils fonctionnent seuls, mais parlent
+    la même langue quand vous les réunissez : le menu affiche le bouton de réservation, le planning
+    connaît vos heures sup, les avis remontent au bon endroit.</p>
 
-  <!-- ================= ANALYSES ================= -->
-  <section id="screen-stats" hidden>
-    <div id="statsEmpty" class="empty-msg" hidden>Pas encore de données.<br>Lance ton premier service pour voir les analyses.</div>
-    <div id="statsBody" style="display:flex;flex-direction:column;gap:12px">
-      <div class="card" id="statsProg"></div>
-      <div class="grid2" id="kpisTop"></div>
-      <div class="card"><div class="chart-title">14 derniers jours</div><div class="chart-box"><canvas id="c14"></canvas></div></div>
-      <div class="card"><div class="chart-title">Par semaine — contrat vs heures sup</div><div class="chart-box"><canvas id="c8"></canvas></div></div>
-      <div class="card"><div class="chart-title">Profil par jour de semaine (moyenne)</div><div class="chart-box small"><canvas id="cwd"></canvas></div></div>
-      <div class="card"><div class="chart-title">Répartition midi / soir</div>
-        <div class="split-card">
-          <div class="dz"><canvas id="cms"></canvas></div>
-          <div class="split-legend" id="msLegend"></div>
-        </div>
+    <div class="grille">
+      <a class="tuile large reveal" href="menu/vente.html">
+        <span class="prix">gratuit · 9 €/mois</span>
+        <span class="glyphe">🍽️</span>
+        <span class="ref">VELOX · MENU</span>
+        <h3>Menu digital &amp; QR code</h3>
+        <p>Votre carte en ligne, le menu du jour changé en 30 secondes depuis le téléphone,
+        version anglaise et allergènes. Un QR à imprimer une seule fois.</p>
+        <span class="pied">Découvrir <span class="fleche">→</span></span>
+      </a>
+
+      <a class="tuile large reveal" href="resa/vente.html">
+        <span class="prix">inclus Pro</span>
+        <span class="glyphe">🗓️</span>
+        <span class="ref">VELOX · RÉSA</span>
+        <h3>Réservations sans commission</h3>
+        <p>Vos clients réservent depuis le menu, vous confirmez d'un tap. Capacité par service,
+        jamais 2 € prélevés par couvert comme sur les plateformes.</p>
+        <span class="pied">Découvrir <span class="fleche">→</span></span>
+      </a>
+
+      <a class="tuile reveal" href="avis/vente.html">
+        <span class="glyphe">⭐</span>
+        <span class="ref">VELOX · AVIS</span>
+        <h3>Avis clients</h3>
+        <p>Les contents filent sur Google, les déçus vous écrivent en privé. Vous répondez avant
+        que ça devienne un avis 1 étoile.</p>
+        <span class="pied">Découvrir <span class="fleche">→</span></span>
+      </a>
+
+      <a class="tuile reveal" href="food-cost/index.html">
+        <span class="prix">15 €/mois</span>
+        <span class="glyphe">📊</span>
+        <span class="ref">VELOX · FOOD COST</span>
+        <h3>Coût matière</h3>
+        <p>Fiches techniques, food cost en couleur, prix conseillé. Les plats qui vous font perdre
+        de l'argent passent au rouge.</p>
+        <span class="pied">Découvrir <span class="fleche">→</span></span>
+      </a>
+
+      <a class="tuile reveal" href="Planning/vente.html">
+        <span class="prix">9 €/mois</span>
+        <span class="glyphe">📋</span>
+        <span class="ref">VELOX · PLANNING</span>
+        <h3>Planning d'équipe</h3>
+        <p>La grille de la semaine, avec le calcul des heures sup en convention HCR
+        directement sur chaque ligne. Plus d'erreur de majoration.</p>
+        <span class="pied">Découvrir <span class="fleche">→</span></span>
+      </a>
+
+      <a class="tuile large reveal" href="Gestion/">
+        <span class="prix">l'historique</span>
+        <span class="glyphe">🍷</span>
+        <span class="ref">VELOX · GESTION</span>
+        <h3>Cave à vin</h3>
+        <p>Le premier outil Velox : gestion de cave, stock, ventes et rotations pour les
+        restaurants qui tiennent une vraie carte des vins.</p>
+        <span class="pied">Ouvrir <span class="fleche">→</span></span>
+      </a>
+
+      <a class="tuile large reveal" href="utils/index.html">
+        <span class="prix">gratuit</span>
+        <span class="glyphe">🧰</span>
+        <span class="ref">VELOX · UTILS</span>
+        <h3>Boîte à outils</h3>
+        <p>Factures de micro-entrepreneur, QR codes, compression d'images, conversions de cuisine.
+        Sans inscription, tout dans le navigateur.</p>
+        <span class="pied">Ouvrir <span class="fleche">→</span></span>
+      </a>
+    </div>
+
+    <p class="sous-section reveal" style="margin-top:34px;margin-bottom:0">
+      Déjà client ? Tout se pilote avec un seul compte depuis
+      <a href="menu/admin.html">votre espace pro</a>.</p>
+  </div>
+</section>
+
+<!-- ===== PRESTATIONS ===== -->
+<section class="prestations" id="prestations">
+  <div class="wrap">
+    <div class="duo">
+      <div>
+        <h2 class="titre-section reveal">Pas le temps ? Je m'occupe de tout.</h2>
+        <p class="sous-section reveal">Vous tenez un restaurant, pas une agence web. La mise en
+        place complète, c'est un forfait unique — et vous repartez avec un menu en ligne prêt le soir même.</p>
+        <ul class="reveal">
+          <li><span class="n">01</span><div><b>Saisie de votre carte</b><span>Je photographie votre menu et je saisis tous les plats, prix, descriptions et allergènes.</span></div></li>
+          <li><span class="n">02</span><div><b>QR codes imprimés</b><span>Vos chevalets de table prêts à poser, à votre nom, livrés en main propre.</span></div></li>
+          <li><span class="n">03</span><div><b>Formation de l'équipe</b><span>30 minutes pour que vous et votre personnel sachiez tout changer en autonomie.</span></div></li>
+        </ul>
       </div>
-      <div class="grid2" id="kpisBottom"></div>
-      <div class="card" id="payCard" hidden></div>
-      <div class="stats-footer" id="statsFooter"></div>
+      <div class="carte-devis reveal">
+        <div class="de">Forfait installation</div>
+        <div class="montant">300 €<small> à 500 €</small></div>
+        <p>Une fois, sans engagement. Le tarif dépend de la taille de votre carte et de l'ajout
+        de la version anglaise. L'abonnement mensuel reste optionnel derrière.</p>
+        <a class="btn plein" href="#contact" style="width:100%;text-align:center">Demander un devis</a>
+      </div>
     </div>
-  </section>
-
-  <!-- ================= RAPPORT ================= -->
-  <section id="screen-rapport" hidden>
-    <div class="seg">
-      <button id="segWeek" class="on">Semaine</button>
-      <button id="segMonth">Mois</button>
-    </div>
-    <div class="period-nav">
-      <button class="pn-btn" id="repPrev">&#8249;</button>
-      <div class="pn-label" id="repLabel"></div>
-      <button class="pn-btn" id="repNext">&#8250;</button>
-    </div>
-    <div class="card"><div class="rep-grid" id="repSummary"></div></div>
-    <div class="card"><div class="chart-title" id="repDaysTitle">Détail par jour</div><div class="rep-days" id="repDays"></div></div>
-    <div class="card rep-note" id="repNote" hidden></div>
-    <div class="report-actions">
-      <button id="repCopy">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <span id="repCopyLabel">Copier</span>
-      </button>
-      <button id="repCsv">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        CSV
-      </button>
-      <button id="repPrint">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Imprimer
-      </button>
-    </div>
-  </section>
-
-  <!-- ================= HISTORIQUE ================= -->
-  <section id="screen-history" hidden>
-    <button class="btn-add" id="histAdd">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Ajouter un service oublié
-    </button>
-    <div id="histEmpty" class="empty-msg" hidden>Aucun service enregistré pour l'instant.</div>
-    <div id="histList" style="display:flex;flex-direction:column;gap:16px"></div>
-  </section>
-</div>
-
-<!-- ================= NAV ================= -->
-<nav>
-  <div class="inner">
-    <button data-screen="clock" class="on">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <span>Pointage</span>
-    </button>
-    <button data-screen="stats">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
-      <span>Analyses</span>
-    </button>
-    <button data-screen="rapport">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      <span>Rapport</span>
-    </button>
-    <button data-screen="history">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><polyline points="12 7 12 12 15 15"/></svg>
-      <span>Historique</span>
-    </button>
   </div>
-</nav>
+</section>
 
-<!-- ================= MODAL SERVICE ================= -->
-<div id="modal" class="overlay" hidden>
-  <div class="modal-panel">
-    <div class="modal-head">
-      <div class="mt" id="editTitle">Ajouter un service</div>
-      <button id="editClose" aria-label="Fermer">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+<!-- ===== TARIFS ===== -->
+<section id="tarifs">
+  <div class="wrap">
+    <h2 class="titre-section reveal">Des tarifs de restaurateur</h2>
+    <p class="sous-section reveal">Moins qu'un plat du jour par semaine. Tout est résiliable,
+    et le plan gratuit reste gratuit pour toujours.</p>
+    <div class="bundles">
+      <div class="plan reveal">
+        <h3>Découverte</h3>
+        <div class="tarif">0 €</div>
+        <ul>
+          <li>Menu digital, 15 plats</li>
+          <li>QR code inclus</li>
+          <li>Tous les outils gratuits</li>
+          <li>Calculateurs de paie</li>
+        </ul>
+        <a class="btn ligne" href="menu/admin.html" style="width:100%;text-align:center">Commencer</a>
+      </div>
+      <div class="plan vedette reveal">
+        <span class="ruban">le plus pris</span>
+        <h3>Resto Pro</h3>
+        <div class="tarif">19 €<small> /mois</small></div>
+        <ul>
+          <li>Menu illimité + version anglaise</li>
+          <li>Réservations sans commission</li>
+          <li>Avis clients</li>
+          <li>Coût matière complet</li>
+          <li>Planning &amp; heures sup HCR</li>
+        </ul>
+        <a class="btn plein" href="#contact" style="width:100%;text-align:center">Passer en Pro</a>
+      </div>
+      <div class="plan reveal">
+        <h3>À la carte</h3>
+        <div class="tarif">9-15 €<small> /mois</small></div>
+        <ul>
+          <li>Menu Pro seul — 9 €</li>
+          <li>Coût matière seul — 15 €</li>
+          <li>Planning seul — 9 €</li>
+          <li>On combine ce qu'il vous faut</li>
+        </ul>
+        <a class="btn ligne" href="#contact" style="width:100%;text-align:center">Composer</a>
+      </div>
     </div>
-    <label class="field"><span>Début</span><input type="datetime-local" id="editStart"></label>
-    <label class="field"><span>Fin</span><input type="datetime-local" id="editEnd"></label>
-    <div id="editErr" class="err-msg" hidden></div>
-    <button class="btn-save" id="editSave">Enregistrer</button>
   </div>
-</div>
+</section>
 
-<!-- ================= MODAL RÉGLAGES ================= -->
-<div id="settingsModal" class="overlay" hidden>
-  <div class="modal-panel">
-    <div class="modal-head">
-      <div class="mt">Réglages</div>
-      <button id="setClose" aria-label="Fermer">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <label class="field"><span>Nom du restaurant (affiché sur le ticket et les rapports)</span><input type="text" id="setResto" placeholder="Le Bistrot" maxlength="40"></label>
-    <label class="field"><span>Heures au contrat / semaine</span><input type="number" id="setContract" min="1" max="80" step="0.5" inputmode="decimal"></label>
-    <label class="field"><span>Taux horaire brut en € (0 = pas d'estimation de paie)</span><input type="number" id="setRate" min="0" step="0.01" inputmode="decimal"></label>
-    <div class="settings-hint">Majoration des heures au-delà du contrat. Par défaut : +25 % pour les 8 premières heures sup, +50 % ensuite (règle française classique).</div>
-    <div class="field-row">
-      <label class="field"><span>Majoration 1 (%)</span><input type="number" id="setOt1" min="0" max="200" step="1" inputmode="numeric"></label>
-      <label class="field"><span>Pendant (h sup)</span><input type="number" id="setOt2After" min="0" max="40" step="0.5" inputmode="decimal"></label>
-    </div>
-    <label class="field"><span>Majoration 2 au-delà (%)</span><input type="number" id="setOt2" min="0" max="300" step="1" inputmode="numeric"></label>
-    <div id="setErr" class="err-msg" hidden></div>
-    <button class="btn-save" id="setSave">Enregistrer</button>
+<!-- ===== MANIFESTE ===== -->
+<section class="manifeste">
+  <div class="wrap">
+    <div class="g">Pourquoi Velox</div>
+    <blockquote>Les logiciels de restauration sont faits par des gens qui n'ont jamais fait un
+    service. Velox est né derrière un comptoir : chaque bouton existe parce qu'il <em>fait gagner
+    du temps un soir de rush</em>, pas parce qu'il remplit un tableau de fonctionnalités.</blockquote>
   </div>
-</div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section id="contact">
+  <div class="wrap" style="text-align:center;max-width:640px">
+    <h2 class="titre-section reveal">On en parle ?</h2>
+    <p class="sous-section reveal" style="margin-left:auto;margin-right:auto">Une question, un devis
+    d'installation, l'envie de tester : écrivez-moi, je réponds vite — souvent entre deux services.</p>
+    <div class="reveal" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a class="btn plein" href="mailto:contact@veloxgestion.fr">Écrire à Velox</a>
+      <a class="btn ligne" href="menu/admin.html">Créer mon menu gratuit</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PIED ===== -->
+<footer class="fin">
+  <div class="wrap">
+    <div>
+      <a class="logo" href="#">Velox<span>Suite</span></a>
+      <p style="margin:14px 0 0;max-width:34ch;color:#9F9A8D;font-size:.92rem">
+        Des outils simples pour la restauration indépendante, développés par quelqu'un qui
+        travaille en salle.</p>
+    </div>
+    <div>
+      <h4>Espace pro — accès direct</h4>
+      <a href="menu/admin.html">Menu &amp; QR</a>
+      <a href="resa/admin.html">Réservations</a>
+      <a href="avis/admin.html">Avis clients</a>
+      <a href="food-cost/app.html">Coût matière</a>
+      <a href="Planning/app.html">Planning</a>
+      <a href="Gestion/">Cave à vin</a>
+    </div>
+    <div>
+      <h4>Sans compte</h4>
+      <a href="utils/index.html">Boîte à outils gratuite</a>
+      <a href="#prestations">Installation clé en main</a>
+      <a href="#tarifs">Tarifs</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="bas">
+      <span>© <span id="annee"></span> Velox — veloxgestion.fr</span>
+      <span class="mono">Fait en salle, pas en réunion.</span>
+    </div>
+  </div>
+</footer>
 
 <script>
-"use strict";
-
-/* ================================================================
-   VELOX HEURES v2 — pointeuse restauration : coupures, heures sup,
-   contrat, rapports hebdo/mensuels, exports.
-   Vanilla JS + localStorage + Chart.js (CDN). Aucun build requis.
-   ================================================================ */
-
-var STORAGE_KEY = "velox_heures_v1";
-var CSS = {
-  amber: "#F0A03C", barDim: "#6B5A3A", line: "#2E2820",
-  card: "#201C15", mut: "#8F8674", green: "#8FBF6B", red: "#D9553C",
-  soir: "#8A6335",
-  mono: 'ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace'
-};
-
-var DEFAULT_SETTINGS = {
-  restoName: "",
-  contractHours: 39,
-  hourlyRate: 0,
-  ot1Pct: 25,
-  ot2After: 8,
-  ot2Pct: 50
-};
-
-/* ---------------- état ---------------- */
-var state = { shifts: [], activeStart: null, settings: Object.assign({}, DEFAULT_SETTINGS) };
-var currentScreen = "clock";
-var currentEdit = null;
-var confirmDelId = null;
-var confirmCancel = false;
-var confirmTimer = null;
-var charts = {};
-var reportMode = "week";   // "week" | "month"
-var reportOffset = 0;      // 0 = période courante, -1 = précédente...
-var lastReport = null;     // données du rapport affiché (pour copie/CSV)
-
-/* ---------------- helpers ---------------- */
-function pad2(n) { return String(n).padStart(2, "0"); }
-
-function fmtDur(ms) {
-  if (!ms || ms < 0) ms = 0;
-  var m = Math.round(ms / 60000);
-  return Math.floor(m / 60) + "h" + pad2(m % 60);
-}
-function fmtDurSigned(ms) { return (ms >= 0 ? "+" : "\u2212") + fmtDur(Math.abs(ms)); }
-function fmtClock(ms) {
-  var s = Math.max(0, Math.floor(ms / 1000));
-  return pad2(Math.floor(s / 3600)) + ":" + pad2(Math.floor((s % 3600) / 60)) + ":" + pad2(s % 60);
-}
-function fmtTime(ts) { var d = new Date(ts); return pad2(d.getHours()) + ":" + pad2(d.getMinutes()); }
-function fmtHM(min) {
-  var extra = min >= 1440 ? " (+1)" : "";
-  var m = Math.round(min) % 1440;
-  return pad2(Math.floor(m / 60)) + "h" + pad2(m % 60) + extra;
-}
-function fmtEuro(x) { return x.toFixed(2).replace(".", ",") + " \u20ac"; }
-function fmtDayLong(ts) {
-  return new Date(ts).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
-}
-function fmtDayShort(ts) {
-  return new Date(ts).toLocaleDateString("fr-FR", { weekday: "short", day: "2-digit", month: "2-digit" });
-}
-function fmtDateNum(ts) {
-  var d = new Date(ts);
-  return pad2(d.getDate()) + "/" + pad2(d.getMonth() + 1) + "/" + d.getFullYear();
-}
-function dayStartOf(ts) { var d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime(); }
-function mondayOf(ts) {
-  var d = new Date(ts); d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
-  return d.getTime();
-}
-function addDays(ts, n) { var d = new Date(ts); d.setDate(d.getDate() + n); return d.getTime(); }
-function toLocalInput(ts) {
-  var d = new Date(ts);
-  return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()) +
-    "T" + pad2(d.getHours()) + ":" + pad2(d.getMinutes());
-}
-function fromLocalInput(str) { return str ? new Date(str).getTime() : NaN; }
-function newId() { return "s_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7); }
-function el(id) { return document.getElementById(id); }
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-function numVal(id) {
-  var v = parseFloat(String(el(id).value).replace(",", "."));
-  return isNaN(v) ? NaN : v;
-}
-
-/* ---------------- persistance ---------------- */
-function loadState() {
-  try {
-    var raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      var parsed = JSON.parse(raw);
-      state.shifts = Array.isArray(parsed.shifts) ? parsed.shifts : [];
-      state.activeStart = typeof parsed.activeStart === "number" ? parsed.activeStart : null;
-      state.settings = Object.assign({}, DEFAULT_SETTINGS, parsed.settings || {});
-    }
-  } catch (e) { el("warnBanner").hidden = false; }
-}
-function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-  catch (e) { el("warnBanner").hidden = false; }
-}
-
-/* ---------------- calculs ---------------- */
-function contractMs() { return state.settings.contractHours * 3.6e6; }
-
-function payForWeek(totalMs) {
-  var st = state.settings;
-  if (!st.hourlyRate || st.hourlyRate <= 0) return null;
-  var base = Math.min(totalMs, contractMs());
-  var ot = Math.max(0, totalMs - contractMs());
-  var ot1 = Math.min(ot, st.ot2After * 3.6e6);
-  var ot2 = ot - ot1;
-  var h = function (ms) { return ms / 3.6e6; };
-  return st.hourlyRate * (h(base) + h(ot1) * (1 + st.ot1Pct / 100) + h(ot2) * (1 + st.ot2Pct / 100));
-}
-
-function computeStats() {
-  var now = Date.now();
-  var all = state.shifts
-    .filter(function (s) { return s.end > s.start; })
-    .map(function (s) { return { id: s.id, start: s.start, end: s.end, dur: s.end - s.start, live: false }; });
-  if (state.activeStart) {
-    all.push({ id: "__live", start: state.activeStart, end: now, dur: now - state.activeStart, live: true });
-  }
-  all.sort(function (a, b) { return a.start - b.start; });
-
-  var byDay = new Map();
-  all.forEach(function (s) {
-    var k = dayStartOf(s.start);
-    if (!byDay.has(k)) byDay.set(k, []);
-    byDay.get(k).push(s);
-  });
-  function dayTotal(k) {
-    return (byDay.get(k) || []).reduce(function (t, s) { return t + s.dur; }, 0);
-  }
-  function rangeTotal(a, b) {
-    return all.reduce(function (t, s) { return (s.start >= a && s.start < b) ? t + s.dur : t; }, 0);
-  }
-
-  var cMs = contractMs();
-  var todayKey = dayStartOf(now);
-  var weekStart = mondayOf(now);
-  var prevWeekStart = addDays(weekStart, -7);
-  var mNow = new Date(now);
-  var monthStart = new Date(mNow.getFullYear(), mNow.getMonth(), 1).getTime();
-  var prevMonthStart = new Date(mNow.getFullYear(), mNow.getMonth() - 1, 1).getTime();
-
-  /* totaux par semaine (toutes) + heures sup */
-  var weekMap = new Map();
-  all.forEach(function (s) {
-    var w = mondayOf(s.start);
-    weekMap.set(w, (weekMap.get(w) || 0) + s.dur);
-  });
-  var cumulOt = 0;
-  weekMap.forEach(function (t) { cumulOt += Math.max(0, t - cMs); });
-
-  /* 14 derniers jours */
-  var daily14 = [];
-  for (var i = 13; i >= 0; i--) {
-    var k = addDays(todayKey, -i);
-    var d = new Date(k);
-    daily14.push({
-      label: d.toLocaleDateString("fr-FR", { weekday: "short" }).slice(0, 2) + " " + pad2(d.getDate()),
-      h: +(dayTotal(k) / 3.6e6).toFixed(2),
-      hot: k === todayKey
-    });
-  }
-
-  /* 8 dernières semaines : base + sup */
-  var weekly8 = [];
-  for (var j = 7; j >= 0; j--) {
-    var ws = addDays(weekStart, -7 * j);
-    var wd = new Date(ws);
-    var tot = weekMap.get(ws) || 0;
-    weekly8.push({
-      label: pad2(wd.getDate()) + "/" + pad2(wd.getMonth() + 1),
-      base: +(Math.min(tot, cMs) / 3.6e6).toFixed(2),
-      ot: +(Math.max(0, tot - cMs) / 3.6e6).toFixed(2),
-      hot: ws === weekStart
-    });
-  }
-
-  /* profil par jour de semaine */
-  var wdTot = [0, 0, 0, 0, 0, 0, 0], wdCnt = [0, 0, 0, 0, 0, 0, 0];
-  byDay.forEach(function (_l, key) {
-    var idx = (new Date(key).getDay() + 6) % 7;
-    wdTot[idx] += dayTotal(key); wdCnt[idx] += 1;
-  });
-  var wdLabels = ["lun", "mar", "mer", "jeu", "ven", "sam", "dim"];
-  var weekdayAvg = wdLabels.map(function (label, idx) {
-    return { label: label, h: wdCnt[idx] ? +((wdTot[idx] / wdCnt[idx]) / 3.6e6).toFixed(2) : 0, hot: false };
-  });
-
-  /* coupures */
-  var gapSum = 0, gapCnt = 0;
-  byDay.forEach(function (list) {
-    for (var g = 1; g < list.length; g++) {
-      var gap = list[g].start - list[g - 1].end;
-      if (gap > 0) { gapSum += gap; gapCnt += 1; }
-    }
-  });
-
-  /* 30 derniers jours */
-  var d30 = addDays(todayKey, -29);
-  var workedDays30 = 0, total30 = 0;
-  byDay.forEach(function (_l, key) {
-    if (key >= d30) { workedDays30 += 1; total30 += dayTotal(key); }
-  });
-
-  /* record jour + plus long service */
-  var bestDay = null, longestShift = null;
-  byDay.forEach(function (_l, key) {
-    var t = dayTotal(key);
-    if (!bestDay || t > bestDay.t) bestDay = { k: key, t: t };
-  });
-  var completed = all.filter(function (s) { return !s.live; });
-  completed.forEach(function (s) {
-    if (!longestShift || s.dur > longestShift.dur) longestShift = s;
-  });
-
-  /* midi / soir + heures moyennes de début et fin */
-  var midi = { n: 0, ms: 0 }, soir = { n: 0, ms: 0 };
-  var startSum = 0, endSum = 0;
-  completed.forEach(function (s) {
-    var sd = new Date(s.start);
-    var startMin = sd.getHours() * 60 + sd.getMinutes();
-    var endMin = startMin + s.dur / 60000;
-    startSum += startMin; endSum += endMin;
-    if (sd.getHours() < 16) { midi.n += 1; midi.ms += s.dur; }
-    else { soir.n += 1; soir.ms += s.dur; }
-  });
-
-  var weekTotal = rangeTotal(weekStart, addDays(weekStart, 7));
-  var completedTotal = completed.reduce(function (t, s) { return t + s.dur; }, 0);
-
-  return {
-    now: now,
-    todayShifts: byDay.get(todayKey) || [],
-    todayTotal: dayTotal(todayKey),
-    weekTotal: weekTotal,
-    weekOt: Math.max(0, weekTotal - cMs),
-    prevWeekTotal: rangeTotal(prevWeekStart, weekStart),
-    monthTotal: rangeTotal(monthStart, now + 1),
-    prevMonthTotal: rangeTotal(prevMonthStart, monthStart),
-    cumulOt: cumulOt,
-    weekMap: weekMap,
-    byDay: byDay,
-    daily14: daily14, weekly8: weekly8, weekdayAvg: weekdayAvg,
-    avgShift: completed.length ? completedTotal / completed.length : 0,
-    avgGap: gapCnt ? gapSum / gapCnt : 0,
-    gapCnt: gapCnt,
-    workedDays30: workedDays30,
-    avgPerWorkedDay30: workedDays30 ? total30 / workedDays30 : 0,
-    bestDay: bestDay,
-    longestShift: longestShift,
-    midi: midi, soir: soir,
-    avgStartMin: completed.length ? startSum / completed.length : null,
-    avgEndMin: completed.length ? endSum / completed.length : null,
-    totalAll: completedTotal,
-    nbServices: completed.length,
-    hasData: all.length > 0
-  };
-}
-
-/* ---------------- barre de progression semaine ---------------- */
-function progressHtml(S) {
-  var cMs = contractMs();
-  var scale = Math.max(S.weekTotal, cMs);
-  var baseW = scale ? Math.min(S.weekTotal, cMs) / scale * 100 : 0;
-  var otW = scale ? S.weekOt / scale * 100 : 0;
-  var head = '<div class="prog-head"><span class="pl">Semaine en cours</span>' +
-    '<span class="pv">' + fmtDur(S.weekTotal) + ' / ' + fmtDur(cMs) +
-    (S.weekOt > 0 ? ' <b>+' + fmtDur(S.weekOt) + '</b>' : '') + '</span></div>';
-  var bar = '<div class="prog-track"><div class="prog-fill" style="width:' + baseW.toFixed(1) + '%"></div>' +
-    '<div class="prog-ot" style="width:' + otW.toFixed(1) + '%"></div></div>';
-  var sub = S.weekOt > 0
-    ? '<div class="prog-sub red">Contrat d\u00e9pass\u00e9 : ' + fmtDur(S.weekOt) + ' d\u2019heures sup cette semaine</div>'
-    : '<div class="prog-sub">Reste ' + fmtDur(cMs - S.weekTotal) + ' avant le contrat (' + state.settings.contractHours + ' h)</div>';
-  return head + bar + sub;
-}
-
-/* ---------------- écran pointage ---------------- */
-function renderClock() {
-  var S = computeStats();
-  var active = !!state.activeStart;
-
-  el("statusRow").classList.toggle("active", active);
-  el("statusLabel").textContent = active ? "EN SERVICE" : "HORS SERVICE";
-  el("bigTimer").textContent = active ? fmtClock(S.now - state.activeStart) : fmtDur(S.todayTotal);
-  el("timerSub").textContent = active ? ("depuis " + fmtTime(state.activeStart)) : "travaillé aujourd'hui";
-
-  el("mainBtn").classList.toggle("stop", active);
-  el("iconPlay").hidden = active;
-  el("iconStop").hidden = !active;
-  el("mainBtnLabel").textContent = active ? "Terminer le service" : "Commencer le service";
-
-  var cancel = el("cancelBtn");
-  cancel.hidden = !active;
-  cancel.classList.toggle("confirm", confirmCancel);
-  cancel.textContent = confirmCancel
-    ? "Confirmer l'annulation ? (rien ne sera enregistré)"
-    : "Annuler ce service";
-
-  el("clockProg").innerHTML = progressHtml(S);
-  renderTicket(S);
-}
-
-function renderTicket(S) {
-  var html = "";
-  html += '<div class="t-brand">\u2605 VELOX HEURES \u2605</div>';
-  if (state.settings.restoName) {
-    html += '<div class="t-resto">' + esc(state.settings.restoName) + "</div>";
-  }
-  html += '<div class="t-title">Ticket du jour \u2014 ' + fmtDayShort(S.now) + "</div>";
-  html += '<div class="t-sep"></div>';
-
-  if (!S.todayShifts.length) {
-    html += '<div class="t-empty">aucun service aujourd\u2019hui</div>';
+  document.getElementById('annee').textContent = new Date().getFullYear();
+  // Révélations au défilement (respecte prefers-reduced-motion via CSS)
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('vu'); io.unobserve(e.target); }
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
   } else {
-    S.todayShifts.forEach(function (s, i) {
-      if (i > 0) {
-        var gap = s.start - S.todayShifts[i - 1].end;
-        if (gap > 0) {
-          html += '<div class="t-gap">\u00b7 \u00b7 \u00b7 &nbsp;coupure ' + fmtDur(gap) + '&nbsp; \u00b7 \u00b7 \u00b7</div>';
-        }
-      }
-      html += '<div class="t-row"><span>SERVICE ' + (i + 1) + (s.live ? " *" : "") + "</span>" +
-        "<span>" + fmtTime(s.start) + "\u2013" + (s.live ? "\u2026" : fmtTime(s.end)) + "</span>" +
-        "<b>" + fmtDur(s.dur) + "</b></div>";
-    });
+    document.querySelectorAll('.reveal').forEach((el) => el.classList.add('vu'));
   }
-
-  html += '<div class="t-sep"></div>';
-  html += '<div class="t-total"><span>TOTAL JOUR</span><span>' + fmtDur(S.todayTotal) + "</span></div>";
-  html += '<div class="t-week"><span>SEMAINE EN COURS</span><span>' + fmtDur(S.weekTotal) + "</span></div>";
-  if (S.weekOt > 0) {
-    html += '<div class="t-week"><span class="rd">DONT HEURES SUP</span><span class="rd">' + fmtDur(S.weekOt) + "</span></div>";
-  }
-  el("ticket").innerHTML = html;
-}
-
-/* ---------------- graphiques ---------------- */
-function baseScales() {
-  return {
-    x: {
-      grid: { display: false },
-      border: { display: false },
-      ticks: { color: CSS.mut, font: { family: CSS.mono, size: 10 }, maxRotation: 0, autoSkip: true }
-    },
-    y: {
-      beginAtZero: true,
-      grid: { color: CSS.line },
-      border: { display: false },
-      ticks: { color: CSS.mut, font: { family: CSS.mono, size: 10 } }
-    }
-  };
-}
-function baseTooltip(extra) {
-  return Object.assign({
-    backgroundColor: CSS.card, borderColor: CSS.line, borderWidth: 1,
-    titleColor: CSS.mut, bodyColor: CSS.amber,
-    titleFont: { family: CSS.mono, size: 11 }, bodyFont: { family: CSS.mono, size: 12 },
-    displayColors: false
-  }, extra || {});
-}
-
-function makeBar(canvasId, rows) {
-  if (charts[canvasId]) charts[canvasId].destroy();
-  charts[canvasId] = new Chart(el(canvasId), {
-    type: "bar",
-    data: {
-      labels: rows.map(function (r) { return r.label; }),
-      datasets: [{
-        data: rows.map(function (r) { return r.h; }),
-        backgroundColor: rows.map(function (r) { return r.hot ? CSS.amber : CSS.barDim; }),
-        borderRadius: 4, maxBarThickness: 24
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, animation: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: baseTooltip({
-          callbacks: { label: function (c) { return fmtDur(c.parsed.y * 3.6e6) + " travaill\u00e9"; } }
-        })
-      },
-      scales: baseScales()
-    }
-  });
-}
-
-function makeWeeklyStacked(canvasId, rows) {
-  if (charts[canvasId]) charts[canvasId].destroy();
-  var cH = state.settings.contractHours;
-  charts[canvasId] = new Chart(el(canvasId), {
-    type: "bar",
-    data: {
-      labels: rows.map(function (r) { return r.label; }),
-      datasets: [
-        {
-          type: "line", label: "contrat",
-          data: rows.map(function () { return cH; }),
-          borderColor: CSS.mut, borderDash: [5, 4], borderWidth: 1.5,
-          pointRadius: 0, tension: 0, stack: "seuil"
-        },
-        {
-          type: "bar", label: "base",
-          data: rows.map(function (r) { return r.base; }),
-          backgroundColor: rows.map(function (r) { return r.hot ? CSS.amber : CSS.barDim; }),
-          borderRadius: 3, maxBarThickness: 24, stack: "h"
-        },
-        {
-          type: "bar", label: "sup",
-          data: rows.map(function (r) { return r.ot; }),
-          backgroundColor: CSS.red,
-          borderRadius: 3, maxBarThickness: 24, stack: "h"
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, animation: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: baseTooltip({
-          filter: function (item) { return item.dataset.type !== "line"; },
-          callbacks: {
-            label: function (c) {
-              var v = fmtDur(c.parsed.y * 3.6e6);
-              return c.dataset.label === "sup"
-                ? (c.parsed.y > 0 ? "heures sup : " + v : null)
-                : "heures : " + v;
-            },
-            footer: function (items) {
-              var t = items.reduce(function (a, it) { return a + it.parsed.y; }, 0);
-              return "total : " + fmtDur(t * 3.6e6);
-            }
-          },
-          footerColor: CSS.mut,
-          footerFont: { family: CSS.mono, size: 11 }
-        })
-      },
-      scales: (function () {
-        var sc = baseScales();
-        sc.x.stacked = true; sc.y.stacked = true;
-        return sc;
-      })()
-    }
-  });
-}
-
-function makeDoughnut(canvasId, midiMs, soirMs) {
-  if (charts[canvasId]) charts[canvasId].destroy();
-  charts[canvasId] = new Chart(el(canvasId), {
-    type: "doughnut",
-    data: {
-      labels: ["Midi", "Soir"],
-      datasets: [{
-        data: [midiMs / 3.6e6, soirMs / 3.6e6],
-        backgroundColor: [CSS.amber, CSS.soir],
-        borderColor: CSS.card, borderWidth: 3
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, animation: false, cutout: "62%",
-      plugins: {
-        legend: { display: false },
-        tooltip: baseTooltip({
-          callbacks: { label: function (c) { return c.label + " : " + fmtDur(c.parsed * 3.6e6); } }
-        })
-      }
-    }
-  });
-}
-
-/* ---------------- écran analyses ---------------- */
-function kpiHtml(label, value, sub, subColor, valueRed) {
-  var subDiv = sub
-    ? '<div class="kpi-sub"' + (subColor ? ' style="color:' + subColor + '"' : "") + ">" + sub + "</div>"
-    : "";
-  return '<div class="card"><div class="kpi-label">' + label + '</div>' +
-    '<div class="kpi-value' + (valueRed ? " red" : "") + '">' + value + "</div>" + subDiv + "</div>";
-}
-
-function renderStats() {
-  var S = computeStats();
-  el("statsEmpty").hidden = S.hasData;
-  el("statsBody").style.display = S.hasData ? "flex" : "none";
-  if (!S.hasData) return;
-
-  var st = state.settings;
-  el("statsProg").innerHTML = progressHtml(S);
-
-  var dw = S.weekTotal - S.prevWeekTotal;
-  var dm = S.monthTotal - S.prevMonthTotal;
-
-  /* heures sup du mois : somme hebdo des semaines commençant dans le mois */
-  var mNow = new Date(S.now);
-  var monthStart = new Date(mNow.getFullYear(), mNow.getMonth(), 1).getTime();
-  var nextMonthStart = new Date(mNow.getFullYear(), mNow.getMonth() + 1, 1).getTime();
-  var monthOt = 0;
-  S.weekMap.forEach(function (t, w) {
-    if (w >= monthStart && w < nextMonthStart) monthOt += Math.max(0, t - contractMs());
-  });
-
-  el("kpisTop").innerHTML =
-    kpiHtml("Cette semaine", fmtDur(S.weekTotal),
-      S.weekOt > 0 ? "+" + fmtDur(S.weekOt) + " au-del\u00e0 du contrat"
-        : (S.prevWeekTotal ? fmtDurSigned(dw) + " vs sem. pass\u00e9e" : "1re semaine suivie"),
-      S.weekOt > 0 ? CSS.red : (S.prevWeekTotal ? (dw >= 0 ? CSS.green : CSS.red) : CSS.mut),
-      S.weekOt > 0) +
-    kpiHtml("Ce mois-ci", fmtDur(S.monthTotal),
-      S.prevMonthTotal ? fmtDurSigned(dm) + " vs mois pass\u00e9" : "1er mois suivi",
-      S.prevMonthTotal ? (dm >= 0 ? CSS.green : CSS.red) : CSS.mut, false) +
-    kpiHtml("Heures sup du mois", monthOt > 0 ? fmtDur(monthOt) : "0h00",
-      "semaines d\u00e9butant dans le mois", null, monthOt > 0) +
-    kpiHtml("Heures sup cumul\u00e9es", S.cumulOt > 0 ? fmtDur(S.cumulOt) : "0h00",
-      "depuis le d\u00e9but du suivi", null, S.cumulOt > 0);
-
-  makeBar("c14", S.daily14);
-  makeWeeklyStacked("c8", S.weekly8);
-  makeBar("cwd", S.weekdayAvg);
-  makeDoughnut("cms", S.midi.ms, S.soir.ms);
-
-  el("msLegend").innerHTML =
-    '<div class="row"><span class="dot" style="background:' + CSS.amber + '"></span><div>Midi \u2014 ' + fmtDur(S.midi.ms) +
-    '<small>' + S.midi.n + ' service' + (S.midi.n > 1 ? "s" : "") + ' (d\u00e9but avant 16h)</small></div></div>' +
-    '<div class="row"><span class="dot" style="background:' + CSS.soir + '"></span><div>Soir \u2014 ' + fmtDur(S.soir.ms) +
-    '<small>' + S.soir.n + ' service' + (S.soir.n > 1 ? "s" : "") + '</small></div></div>' +
-    (S.avgStartMin !== null
-      ? '<div class="row" style="color:' + CSS.mut + '">Prise de poste moy. ' + fmtHM(S.avgStartMin) +
-        ' \u00b7 fin moy. ' + fmtHM(S.avgEndMin) + '</div>'
-      : "");
-
-  el("kpisBottom").innerHTML =
-    kpiHtml("Moy. / jour travaill\u00e9", fmtDur(S.avgPerWorkedDay30),
-      S.workedDays30 + " j travaill\u00e9s sur 30 j", null, false) +
-    kpiHtml("Coupure moyenne", S.gapCnt ? fmtDur(S.avgGap) : "\u2014",
-      S.gapCnt ? S.gapCnt + " coupure" + (S.gapCnt > 1 ? "s" : "") : "aucune coupure", null, false) +
-    kpiHtml("Service moyen", fmtDur(S.avgShift),
-      S.nbServices + " service" + (S.nbServices > 1 ? "s" : "") + " au total", null, false) +
-    kpiHtml("Plus long service", S.longestShift ? fmtDur(S.longestShift.dur) : "\u2014",
-      S.longestShift ? fmtDayShort(S.longestShift.start) : "", null, false);
-
-  /* estimation paie */
-  var payCard = el("payCard");
-  if (st.hourlyRate > 0) {
-    var payWeek = payForWeek(S.weekTotal);
-    var payMonth = 0;
-    S.weekMap.forEach(function (t, w) {
-      if (w >= monthStart && w < nextMonthStart) payMonth += payForWeek(t);
-    });
-    payCard.hidden = false;
-    payCard.innerHTML =
-      '<div class="chart-title">Estimation paie brute</div>' +
-      '<div class="rep-grid">' +
-      '<span class="rl">Semaine en cours</span><span class="rv">' + fmtEuro(payWeek) + "</span>" +
-      '<span class="rl">Mois (sem. d\u00e9butant dans le mois)</span><span class="rv">' + fmtEuro(payMonth) + "</span>" +
-      "</div>" +
-      '<div class="rep-note" style="margin-top:8px">Base ' + st.contractHours + ' h au taux de ' + fmtEuro(st.hourlyRate) +
-      '/h, majorations +' + st.ot1Pct + ' % (' + st.ot2After + ' premi\u00e8res h sup) puis +' + st.ot2Pct + ' %. Estimation indicative, hors primes, avantages et cotisations.</div>';
-  } else {
-    payCard.hidden = true;
-  }
-
-  el("statsFooter").textContent = "Total enregistr\u00e9 : " + fmtDur(S.totalAll) +
-    (st.restoName ? " \u2014 " + st.restoName : "");
-}
-
-/* ---------------- rapport ---------------- */
-function reportPeriod() {
-  var now = Date.now();
-  if (reportMode === "week") {
-    var start = addDays(mondayOf(now), 7 * reportOffset);
-    return { start: start, end: addDays(start, 7) };
-  }
-  var d = new Date(now);
-  var start2 = new Date(d.getFullYear(), d.getMonth() + reportOffset, 1).getTime();
-  var end2 = new Date(d.getFullYear(), d.getMonth() + reportOffset + 1, 1).getTime();
-  return { start: start2, end: end2 };
-}
-
-function buildReport() {
-  var p = reportPeriod();
-  var st = state.settings;
-  var shifts = state.shifts
-    .filter(function (s) { return s.end > s.start && s.start >= p.start && s.start < p.end; })
-    .sort(function (a, b) { return a.start - b.start; });
-
-  var byDay = new Map();
-  shifts.forEach(function (s) {
-    var k = dayStartOf(s.start);
-    if (!byDay.has(k)) byDay.set(k, []);
-    byDay.get(k).push(s);
-  });
-
-  var total = 0, gapCnt = 0, gapSum = 0;
-  var days = [];
-  byDay.forEach(function (list, k) {
-    var dayTot = 0, times = [];
-    list.forEach(function (s, i) {
-      dayTot += s.end - s.start;
-      times.push(fmtTime(s.start) + "\u2013" + fmtTime(s.end));
-      if (i > 0) {
-        var gap = s.start - list[i - 1].end;
-        if (gap > 0) { gapCnt += 1; gapSum += gap; }
-      }
-    });
-    total += dayTot;
-    days.push({ k: k, times: times.join(" \u00b7 "), tot: dayTot });
-  });
-  days.sort(function (a, b) { return a.k - b.k; });
-
-  /* heures sup + paie */
-  var ot = 0, pay = null;
-  if (reportMode === "week") {
-    ot = Math.max(0, total - contractMs());
-    pay = payForWeek(total);
-  } else {
-    var weekMap = new Map();
-    shiftsAllInWeeks(p, weekMap);
-    ot = 0; pay = st.hourlyRate > 0 ? 0 : null;
-    weekMap.forEach(function (t) {
-      ot += Math.max(0, t - contractMs());
-      if (pay !== null) pay += payForWeek(t);
-    });
-  }
-
-  var label;
-  if (reportMode === "week") {
-    label = "Semaine du " + fmtDayShort(p.start) + " au " + fmtDayShort(addDays(p.end, -1));
-  } else {
-    label = new Date(p.start).toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
-  }
-
-  return {
-    period: p, label: label, days: days, total: total,
-    nbDays: days.length, nbServices: shifts.length,
-    gapCnt: gapCnt, avgGap: gapCnt ? gapSum / gapCnt : 0,
-    ot: ot, pay: pay, shifts: shifts
-  };
-}
-
-/* total par semaine, sur les semaines dont le lundi tombe dans la période */
-function shiftsAllInWeeks(p, weekMap) {
-  state.shifts.forEach(function (s) {
-    if (s.end <= s.start) return;
-    var w = mondayOf(s.start);
-    if (w >= p.start && w < p.end) {
-      weekMap.set(w, (weekMap.get(w) || 0) + (s.end - s.start));
-    }
-  });
-}
-
-function renderReport() {
-  var R = buildReport();
-  lastReport = R;
-  var st = state.settings;
-
-  el("segWeek").classList.toggle("on", reportMode === "week");
-  el("segMonth").classList.toggle("on", reportMode === "month");
-  el("repLabel").textContent = R.label;
-  el("repNext").disabled = reportOffset >= 0;
-
-  var g = "";
-  if (st.restoName) g += '<span class="rl">Restaurant</span><span class="rv">' + esc(st.restoName) + "</span>";
-  g += '<span class="rl">Total travaill\u00e9</span><span class="rv">' + fmtDur(R.total) + "</span>";
-  g += '<span class="rl">Jours travaill\u00e9s</span><span class="rv">' + R.nbDays + "</span>";
-  g += '<span class="rl">Services</span><span class="rv">' + R.nbServices + "</span>";
-  g += '<span class="rl">Coupures</span><span class="rv">' + R.gapCnt +
-    (R.gapCnt ? " (moy " + fmtDur(R.avgGap) + ")" : "") + "</span>";
-  g += '<span class="rl">Contrat</span><span class="rv">' + st.contractHours + " h/sem</span>";
-  g += '<span class="rl">Heures sup</span><span class="rv' + (R.ot > 0 ? " red" : "") + '">' +
-    (R.ot > 0 ? fmtDur(R.ot) : "0h00") + "</span>";
-  if (R.pay !== null) {
-    g += '<span class="rl">Paie brute estim\u00e9e</span><span class="rv">' + fmtEuro(R.pay) + "</span>";
-  }
-  el("repSummary").innerHTML = g;
-
-  var dh = "";
-  if (!R.days.length) {
-    dh = '<div class="rd-row"><span style="color:' + CSS.mut + '">Aucun service sur cette p\u00e9riode.</span></div>';
-  } else {
-    R.days.forEach(function (d) {
-      dh += '<div class="rd-row"><span class="rd-date">' + fmtDayShort(d.k) + '</span>' +
-        '<span class="rd-times">' + d.times + '</span>' +
-        '<span class="rd-tot">' + fmtDur(d.tot) + "</span></div>";
-    });
-  }
-  el("repDays").innerHTML = dh;
-
-  var note = el("repNote");
-  if (reportMode === "month") {
-    note.hidden = false;
-    note.textContent = "Les heures sup et la paie du mois sont calculées semaine par semaine (semaines dont le lundi tombe dans le mois), conformément au décompte hebdomadaire.";
-  } else {
-    note.hidden = true;
-  }
-}
-
-/* ---------------- exports ---------------- */
-function reportAsText() {
-  var R = lastReport || buildReport();
-  var st = state.settings;
-  var L = [];
-  L.push("VELOX HEURES \u2014 RAPPORT " + (reportMode === "week" ? "SEMAINE" : "MENSUEL"));
-  if (st.restoName) L.push(st.restoName);
-  L.push(R.label.charAt(0).toUpperCase() + R.label.slice(1));
-  L.push("------------------------------");
-  R.days.forEach(function (d) {
-    L.push(fmtDayShort(d.k) + "  " + d.times + "  " + fmtDur(d.tot));
-  });
-  if (!R.days.length) L.push("Aucun service sur cette p\u00e9riode.");
-  L.push("------------------------------");
-  L.push("TOTAL : " + fmtDur(R.total));
-  L.push("Contrat : " + st.contractHours + " h/sem \u2014 Heures sup : " + fmtDur(R.ot));
-  L.push("Services : " + R.nbServices + " \u00b7 Jours : " + R.nbDays +
-    " \u00b7 Coupures : " + R.gapCnt + (R.gapCnt ? " (moy " + fmtDur(R.avgGap) + ")" : ""));
-  if (R.pay !== null) L.push("Paie brute estim\u00e9e : " + fmtEuro(R.pay));
-  L.push("");
-  L.push("G\u00e9n\u00e9r\u00e9 le " + fmtDateNum(Date.now()) + " avec Velox Heures");
-  return L.join("\n");
-}
-
-function copyReport() {
-  var txt = reportAsText();
-  var done = function () {
-    el("repCopyLabel").textContent = "Copi\u00e9 \u2713";
-    setTimeout(function () { el("repCopyLabel").textContent = "Copier"; }, 1600);
-  };
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(txt).then(done, function () { legacyCopy(txt); done(); });
-  } else {
-    legacyCopy(txt); done();
-  }
-}
-function legacyCopy(txt) {
-  var ta = document.createElement("textarea");
-  ta.value = txt;
-  ta.style.position = "fixed"; ta.style.opacity = "0";
-  document.body.appendChild(ta);
-  ta.select();
-  try { document.execCommand("copy"); } catch (e) {}
-  ta.remove();
-}
-
-function downloadCsv() {
-  var R = lastReport || buildReport();
-  var rows = ["date;jour;debut;fin;duree_minutes;duree"];
-  R.shifts.forEach(function (s) {
-    var d = new Date(s.start);
-    rows.push(
-      fmtDateNum(s.start) + ";" +
-      d.toLocaleDateString("fr-FR", { weekday: "long" }) + ";" +
-      fmtTime(s.start) + ";" + fmtTime(s.end) + ";" +
-      Math.round((s.end - s.start) / 60000) + ";" +
-      fmtDur(s.end - s.start)
-    );
-  });
-  var blob = new Blob(["\ufeff" + rows.join("\r\n")], { type: "text/csv;charset=utf-8" });
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "velox-heures_" + (reportMode === "week" ? "semaine" : "mois") + "_" +
-    new Date(R.period.start).toISOString().slice(0, 10) + ".csv";
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
-}
-
-/* ---------------- écran historique ---------------- */
-var SVG_PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>';
-var SVG_TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
-
-function renderHistory() {
-  var sorted = state.shifts.slice().sort(function (a, b) { return b.start - a.start; });
-  el("histEmpty").hidden = sorted.length > 0;
-
-  var groups = new Map();
-  sorted.forEach(function (s) {
-    var k = dayStartOf(s.start);
-    if (!groups.has(k)) groups.set(k, []);
-    groups.get(k).push(s);
-  });
-
-  var html = "";
-  groups.forEach(function (list, k) {
-    var total = list.reduce(function (t, s) { return t + (s.end - s.start); }, 0);
-    html += '<div><div class="day-head"><span class="d">' + fmtDayLong(k) + "</span>" +
-      '<span class="t">' + fmtDur(total) + "</span></div>";
-    html += '<div class="shift-card">';
-    list.slice().sort(function (a, b) { return a.start - b.start; }).forEach(function (s) {
-      var plus1 = dayStartOf(s.end) !== dayStartOf(s.start) ? " <small>(+1 j)</small>" : "";
-      var delConfirm = confirmDelId === s.id ? " confirm" : "";
-      html += '<div class="shift-row">' +
-        '<span class="times">' + fmtTime(s.start) + " \u2192 " + fmtTime(s.end) + plus1 + "</span>" +
-        '<span class="dur">' + fmtDur(s.end - s.start) + "</span>" +
-        '<button class="icon-btn" data-action="edit" data-id="' + s.id + '" aria-label="Modifier">' + SVG_PENCIL + "</button>" +
-        '<button class="icon-btn' + delConfirm + '" data-action="del" data-id="' + s.id + '" aria-label="Supprimer">' + SVG_TRASH + "</button>" +
-        "</div>";
-    });
-    html += "</div></div>";
-  });
-  el("histList").innerHTML = html;
-}
-
-/* ---------------- actions pointage ---------------- */
-function resetConfirms() {
-  confirmDelId = null;
-  confirmCancel = false;
-  if (confirmTimer) { clearTimeout(confirmTimer); confirmTimer = null; }
-}
-function armConfirmTimeout(cb) {
-  if (confirmTimer) clearTimeout(confirmTimer);
-  confirmTimer = setTimeout(function () { resetConfirms(); cb(); }, 2500);
-}
-
-function toggleService() {
-  resetConfirms();
-  if (state.activeStart) {
-    state.shifts.push({ id: newId(), start: state.activeStart, end: Date.now() });
-    state.activeStart = null;
-  } else {
-    state.activeStart = Date.now();
-  }
-  saveState();
-  renderClock();
-}
-
-function onCancelClick() {
-  if (confirmCancel) {
-    state.activeStart = null;
-    resetConfirms();
-    saveState();
-  } else {
-    confirmCancel = true;
-    armConfirmTimeout(renderClock);
-  }
-  renderClock();
-}
-
-function onHistoryClick(e) {
-  var btn = e.target.closest("button[data-action]");
-  if (!btn) return;
-  var id = btn.getAttribute("data-id");
-  var action = btn.getAttribute("data-action");
-
-  if (action === "edit") {
-    resetConfirms();
-    var s = state.shifts.find(function (x) { return x.id === id; });
-    if (s) openEditor({ id: s.id, start: s.start, end: s.end });
-  } else if (action === "del") {
-    if (confirmDelId === id) {
-      state.shifts = state.shifts.filter(function (x) { return x.id !== id; });
-      resetConfirms();
-      saveState();
-    } else {
-      resetConfirms();
-      confirmDelId = id;
-      armConfirmTimeout(renderHistory);
-    }
-    renderHistory();
-  }
-}
-
-/* ---------------- modal service ---------------- */
-function openEditor(edit) {
-  currentEdit = edit;
-  el("editTitle").textContent = edit.id ? "Modifier le service" : "Ajouter un service";
-  el("editStart").value = toLocalInput(edit.start);
-  el("editEnd").value = toLocalInput(edit.end);
-  el("editErr").hidden = true;
-  el("modal").hidden = false;
-}
-function closeEditor() { el("modal").hidden = true; currentEdit = null; }
-
-function submitEditor() {
-  var s = fromLocalInput(el("editStart").value);
-  var e = fromLocalInput(el("editEnd").value);
-  var err = "";
-  if (isNaN(s) || isNaN(e)) err = "Renseigne les deux horaires.";
-  else if (e <= s) err = "La fin doit \u00eatre apr\u00e8s le d\u00e9but.";
-  else if (e - s > 24 * 3.6e6) err = "Un service ne peut pas d\u00e9passer 24 h.";
-  if (err) {
-    var box = el("editErr");
-    box.textContent = err;
-    box.hidden = false;
-    return;
-  }
-  if (currentEdit && currentEdit.id) {
-    var existing = state.shifts.find(function (x) { return x.id === currentEdit.id; });
-    if (existing) { existing.start = s; existing.end = e; }
-  } else {
-    state.shifts.push({ id: newId(), start: s, end: e });
-  }
-  saveState();
-  closeEditor();
-  refreshCurrent();
-}
-
-/* ---------------- modal réglages ---------------- */
-function openSettings() {
-  var st = state.settings;
-  el("setResto").value = st.restoName;
-  el("setContract").value = st.contractHours;
-  el("setRate").value = st.hourlyRate;
-  el("setOt1").value = st.ot1Pct;
-  el("setOt2After").value = st.ot2After;
-  el("setOt2").value = st.ot2Pct;
-  el("setErr").hidden = true;
-  el("settingsModal").hidden = false;
-}
-function closeSettings() { el("settingsModal").hidden = true; }
-
-function submitSettings() {
-  var contract = numVal("setContract");
-  var rate = numVal("setRate");
-  var ot1 = numVal("setOt1");
-  var ot2After = numVal("setOt2After");
-  var ot2 = numVal("setOt2");
-  var err = "";
-  if (isNaN(contract) || contract <= 0 || contract > 80) err = "Heures au contrat invalides (entre 1 et 80).";
-  else if (isNaN(rate) || rate < 0) err = "Taux horaire invalide.";
-  else if (isNaN(ot1) || ot1 < 0 || isNaN(ot2) || ot2 < 0 || isNaN(ot2After) || ot2After < 0) err = "Majorations invalides.";
-  if (err) {
-    var box = el("setErr");
-    box.textContent = err;
-    box.hidden = false;
-    return;
-  }
-  state.settings = {
-    restoName: el("setResto").value.trim().slice(0, 40),
-    contractHours: contract,
-    hourlyRate: rate,
-    ot1Pct: ot1,
-    ot2After: ot2After,
-    ot2Pct: ot2
-  };
-  saveState();
-  closeSettings();
-  refreshCurrent();
-}
-
-/* ---------------- navigation ---------------- */
-function refreshCurrent() {
-  if (currentScreen === "clock") renderClock();
-  if (currentScreen === "stats") renderStats();
-  if (currentScreen === "rapport") renderReport();
-  if (currentScreen === "history") renderHistory();
-}
-
-function setScreen(id) {
-  resetConfirms();
-  currentScreen = id;
-  ["clock", "stats", "rapport", "history"].forEach(function (sc) {
-    el("screen-" + sc).hidden = sc !== id;
-  });
-  document.querySelectorAll("nav button[data-screen]").forEach(function (b) {
-    b.classList.toggle("on", b.getAttribute("data-screen") === id);
-  });
-  refreshCurrent();
-}
-
-/* ---------------- init ---------------- */
-function init() {
-  loadState();
-  el("headerDate").textContent = fmtDayShort(Date.now());
-
-  el("mainBtn").addEventListener("click", toggleService);
-  el("cancelBtn").addEventListener("click", onCancelClick);
-  el("histAdd").addEventListener("click", function () {
-    resetConfirms();
-    openEditor({ start: Date.now() - 4 * 3.6e6, end: Date.now() });
-  });
-  el("histList").addEventListener("click", onHistoryClick);
-
-  el("editClose").addEventListener("click", closeEditor);
-  el("editSave").addEventListener("click", submitEditor);
-  el("modal").addEventListener("click", function (e) {
-    if (e.target === el("modal")) closeEditor();
-  });
-
-  el("gearBtn").addEventListener("click", openSettings);
-  el("setClose").addEventListener("click", closeSettings);
-  el("setSave").addEventListener("click", submitSettings);
-  el("settingsModal").addEventListener("click", function (e) {
-    if (e.target === el("settingsModal")) closeSettings();
-  });
-
-  el("segWeek").addEventListener("click", function () { reportMode = "week"; reportOffset = 0; renderReport(); });
-  el("segMonth").addEventListener("click", function () { reportMode = "month"; reportOffset = 0; renderReport(); });
-  el("repPrev").addEventListener("click", function () { reportOffset -= 1; renderReport(); });
-  el("repNext").addEventListener("click", function () { if (reportOffset < 0) { reportOffset += 1; renderReport(); } });
-  el("repCopy").addEventListener("click", copyReport);
-  el("repCsv").addEventListener("click", downloadCsv);
-  el("repPrint").addEventListener("click", function () { window.print(); });
-
-  document.querySelectorAll("nav button[data-screen]").forEach(function (b) {
-    b.addEventListener("click", function () { setScreen(b.getAttribute("data-screen")); });
-  });
-
-  setScreen("clock");
-
-  setInterval(function () {
-    if (currentScreen === "clock") renderClock();
-    el("headerDate").textContent = fmtDayShort(Date.now());
-  }, 1000);
-}
-
-document.addEventListener("DOMContentLoaded", init);
-
-/* Exposition window.* (compatibilité debug / console) */
-window.veloxHeures = {
-  state: function () { return state; },
-  stats: computeStats,
-  setScreen: setScreen,
-  report: buildReport
-};
 </script>
 </body>
 </html>
