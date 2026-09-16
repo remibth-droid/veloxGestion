@@ -4,7 +4,7 @@
 export const firebaseConfig = {
   apiKey: "AIzaSyC8OgrDoj-D5tpWDlIK7EmEiIM0_Bwuhig",
   authDomain: "cave-2004.firebaseapp.com",
-  databaseURL: "https://cave-2004.firebaseapp.com",
+  databaseURL: "https://cave-2004-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "cave-2004",
   appId: "1:142269678134:web:48805cde3f78a65531ce97",
 };
