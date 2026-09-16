@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F5F3">
+<meta name="robots" content="noindex">
+<title>Panel du repas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --papier: #F2F5F3;
+    --encre: #1F3A2E;
+    --gris: #5C6B63;
+    --trait: #D3DCD6;
+    --vert: #137A45;
+    --rouge: #C23B30;
+    --titre: "Barlow Condensed", "Arial Narrow", "sans-serif-condensed", system-ui, sans-serif;
+    --texte: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--papier);
+    color: var(--encre);
+    font: 400 17px/1.45 var(--texte);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body.scan-ouvert { overflow: hidden; }
+  button, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--vert); outline-offset: 3px; }
+
+  /* ---------- Page ---------- */
+  .page {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: calc(34px + env(safe-area-inset-top)) 22px calc(128px + env(safe-area-inset-bottom));
+  }
+  h1 {
+    margin: 0;
+    font: 700 52px/0.95 var(--titre);
+    letter-spacing: -0.005em;
+  }
+  .sous-titre { margin: 12px 0 0; color: var(--gris); }
+  .statut { margin: 32px 0 0; color: var(--gris); }
+  .ecran { margin-top: 32px; }
+
+  .erreur {
+    margin: 24px 0 0;
+    padding: 12px 14px;
+    border-left: 4px solid var(--rouge);
+    border-radius: 2px 10px 10px 2px;
+    background: #FBECEA;
+    color: #8A2A21;
+  }
+
+  .bouton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 58px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 16px;
+    background: var(--encre);
+    color: #fff;
+    font-size: 19px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform .12s ease;
+  }
+  .bouton:active { transform: scale(.98); }
+  .bouton:disabled { opacity: .55; cursor: default; transform: none; }
+  .bouton svg { flex: none; width: 24px; height: 24px; }
+  .lien {
+    padding: 8px 0;
+    border: 0;
+    background: none;
+    color: var(--gris);
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  /* ---------- Tableau ---------- */
+  .resume { margin: 0; font-size: 19px; font-weight: 500; }
+  .partage {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+    margin: 6px 0 0;
+    color: var(--gris);
+    font-size: 15px;
+  }
+  .partage .lien { padding: 4px 0; }
+
+  .bloc { margin-top: 32px; }
+  .bloc-tete {
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--encre);
+  }
+  h2 { margin: 0; font: 600 26px/1.1 var(--titre); }
+  .liste { list-style: none; margin: 0; padding: 0; }
+  .vide { margin: 16px 0 0; color: var(--gris); }
+
+  .invite { border-bottom: 1px solid var(--trait); }
+  .invite summary {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    column-gap: 14px;
+    align-items: center;
+    padding: 14px 0;
+    list-style: none;
+    cursor: pointer;
+  }
+  .invite summary::-webkit-details-marker { display: none; }
+  .invite-nom {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 21px;
+    font-weight: 500;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+  .invite-boisson {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+  }
+  .invite-heure {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    font: 600 24px/1.1 var(--titre);
+    font-variant-numeric: tabular-nums;
+  }
+  .invite-etat {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    color: var(--gris);
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .coche {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 2px solid var(--trait);
+    border-radius: 50%;
+    color: transparent;
+  }
+  .coche svg { width: 18px; height: 18px; }
+  .est-arrive .invite-etat { color: var(--vert); font-weight: 500; }
+  .est-arrive .coche { background: var(--vert); border-color: var(--vert); color: #fff; }
+
+  .invite-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 0 16px;
+  }
+  .action {
+    min-height: 44px;
+    padding: 0 16px;
+    border: 2px solid var(--encre);
+    border-radius: 12px;
+    background: transparent;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .action.danger { border-color: var(--rouge); color: var(--rouge); }
+  .action.danger.a-confirmer { background: var(--rouge); color: #fff; }
+
+  .boisson {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--trait);
+  }
+  .boisson-nom { overflow-wrap: anywhere; }
+  .boisson-nombre {
+    font: 600 22px/1.1 var(--titre);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .barre {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 14px 22px calc(14px + env(safe-area-inset-bottom));
+    background: var(--papier);
+    border-top: 1px solid var(--trait);
+  }
+  .barre .bouton { max-width: 516px; margin: 0 auto; min-height: 60px; }
+
+  /* ---------- Scanner ---------- */
+  .scan {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    overflow: hidden;
+    background: #000;
+    color: #fff;
+  }
+  .scan video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .viseur {
+    position: absolute;
+    left: 50%;
+    top: 47%;
+    width: min(70vw, 50vh, 340px);
+    height: min(70vw, 50vh, 340px);
+    transform: translate(-50%, -50%);
+    border-radius: 9%;
+    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .5);
+  }
+  .viseur svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+  .viseur path { vector-effect: non-scaling-stroke; }
+  .scan-haut {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: calc(14px + env(safe-area-inset-top)) 16px 0;
+  }
+  .fermer {
+    min-height: 44px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, .6);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .scan-compteur {
+    margin: 0;
+    padding: 3px 14px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, .6);
+    font: 600 22px/1.3 var(--titre);
+    font-variant-numeric: tabular-nums;
+  }
+  .scan-etat {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(44px + env(safe-area-inset-bottom));
+    margin: 0;
+    padding: 0 28px;
+    text-align: center;
+    font-size: 19px;
+    font-weight: 500;
+  }
+
+  /* ---------- Verdict ---------- */
+  .verdict {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px 96px;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .verdict.est-ok { background: var(--vert); }
+  .verdict.est-ko { background: var(--rouge); }
+  .verdict-icone {
+    width: 104px;
+    height: 104px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .verdict-icone circle { transform-box: fill-box; transform-origin: center; }
+  .est-ok .trait-ko,
+  .est-ko .trait-ok { display: none; }
+  .verdict-mot {
+    width: 100%;
+    margin: 18px 0 10px;
+    white-space: nowrap;
+    font: 700 clamp(72px, 22vw, 128px)/0.9 var(--titre);
+    letter-spacing: -0.01em;
+  }
+  .verdict-nom {
+    margin: 0;
+    font: 700 46px/1.05 var(--titre);
+    overflow-wrap: anywhere;
+  }
+  .verdict-infos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 420px;
+    margin: 22px 0 0;
+    padding-top: 18px;
+    border-top: 2px solid rgba(255, 255, 255, .45);
+  }
+  .verdict-infos dt { font-size: 16px; }
+  .verdict-infos dd {
+    margin: 2px 0 0;
+    font: 700 30px/1.1 var(--titre);
+    overflow-wrap: anywhere;
+  }
+  .verdict-detail { margin: 18px 0 0; font-size: 19px; font-weight: 500; }
+  .verdict-suite {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(32px + env(safe-area-inset-bottom));
+    margin: 0;
+    font-size: 16px;
+  }
+  .verdict.anime circle { animation: apparait .28s ease-out both; }
+  .verdict.anime .trait {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: trace .42s .14s cubic-bezier(.3, .7, .4, 1) forwards;
+  }
+  .verdict.anime .trait-ko + .trait-ko { animation-delay: .3s; }
+  @keyframes apparait { from { opacity: 0; transform: scale(.7); } }
+  @keyframes trace { to { stroke-dashoffset: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .verdict.anime circle,
+    .verdict.anime .trait { animation: none; stroke-dashoffset: 0; }
+    .bouton { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="page">
+  <header>
+    <h1 id="titre">Repas entre amis</h1>
+    <p class="sous-titre">Panel de l’organisateur</p>
+  </header>
+
+  <p class="statut" id="statut">Chargement…</p>
+
+  <!-- Tableau -->
+  <section class="ecran" id="ecran-tableau" hidden>
+    <p class="resume" id="resume"></p>
+    <p class="partage">
+      <span id="lien-inscription"></span>
+      <button class="lien" type="button" id="copier-lien">Copier le lien</button>
+    </p>
+
+    <section class="bloc" aria-labelledby="titre-invites">
+      <div class="bloc-tete"><h2 id="titre-invites">Invités</h2></div>
+      <ul class="liste" id="invites"></ul>
+      <p class="vide" id="vide" hidden>Personne ne s’est encore inscrit. Envoie le lien ou l’affiche à tes amis : leur inscription apparaîtra ici en direct.</p>
+    </section>
+
+    <section class="bloc" id="bloc-boissons" aria-labelledby="titre-boissons" hidden>
+      <div class="bloc-tete"><h2 id="titre-boissons">Boissons à prévoir</h2></div>
+      <ul class="liste" id="boissons"></ul>
+    </section>
+
+  </section>
+
+  <p class="erreur" id="erreur" role="alert" hidden></p>
+</main>
+
+<div class="barre" id="barre" hidden>
+  <button class="bouton" id="bouton-scan" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 8V5.5A2.5 2.5 0 0 1 5.5 3H8M16 3h2.5A2.5 2.5 0 0 1 21 5.5V8M21 16v2.5a2.5 2.5 0 0 1-2.5 2.5H16M8 21H5.5A2.5 2.5 0 0 1 3 18.5V16M7 12h10"/>
+    </svg>
+    Scanner une invitation
+  </button>
+</div>
+
+<section class="scan" id="scan" aria-label="Scanner" hidden>
+  <video id="video" autoplay muted playsinline></video>
+  <div class="viseur" aria-hidden="true">
+    <svg viewBox="0 0 100 100">
+      <path d="M0 22V9A9 9 0 0 1 9 0H22M78 0H91A9 9 0 0 1 100 9V22M100 78V91A9 9 0 0 1 91 100H78M22 100H9A9 9 0 0 1 0 91V78"/>
+    </svg>
+  </div>
+  <div class="scan-haut">
+    <button class="fermer" id="fermer" type="button">Fermer</button>
+    <p class="scan-compteur" id="scan-compteur"></p>
+  </div>
+  <p class="scan-etat" id="scan-etat" aria-live="polite"></p>
+</section>
+
+<div class="verdict" id="verdict" role="alert" hidden>
+  <svg class="verdict-icone" viewBox="0 0 112 112" aria-hidden="true">
+    <circle cx="56" cy="56" r="52"/>
+    <path class="trait trait-ok" pathLength="100" d="M34 58L49 73L79 41"/>
+    <path class="trait trait-ko" pathLength="100" d="M40 40L72 72"/>
+    <path class="trait trait-ko" pathLength="100" d="M72 40L40 72"/>
+  </svg>
+  <p class="verdict-mot" id="verdict-mot"></p>
+  <p class="verdict-nom" id="verdict-nom"></p>
+  <dl class="verdict-infos" id="verdict-infos" hidden>
+    <div><dt>Boisson</dt><dd id="verdict-boisson"></dd></div>
+    <div><dt>Arrivée prévue</dt><dd id="verdict-heure"></dd></div>
+  </dl>
+  <p class="verdict-detail" id="verdict-detail" hidden></p>
+  <p class="verdict-suite">Touche l’écran pour continuer</p>
+</div>
+
+<script>
+  setTimeout(function () {
+    if (window.__repasDemarre) return;
+    var p = document.getElementById("statut");
+    if (p) p.textContent = "Cette page a besoin d’un navigateur à jour (Safari, Chrome…). Mets-le à jour, puis réessaie.";
+  }, 6000);
+</script>
+
+<script type="module">
+  window.__repasDemarre = true;
+
+  const SDK = "https://www.gstatic.com/firebasejs/10.12.2";
+  const CHEMIN = "repas/invites";
+  const SOURCES_JSQR = [
+    "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js",
+    "https://unpkg.com/jsqr@1/dist/jsQR.js",
+  ];
+  const DELAI_MEME_CODE = 2500;
+  const DUREE_OK = 3000;
+  const DUREE_KO = 2600;
+  const DUREE_COMPLET = 3400;
+  const INTERVALLE_LECTURE = 110;
+  const ICONE_COCHE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5L9.5 17L19 7.5"/></svg>';
+
+  const $ = (id) => document.getElementById(id);
+
+  let fb = null;
+  let db = null;
+  let repas = { titre: "Repas entre amis", invitesAttendus: 0 };
+  let invites = {};
+
+  let flux = null;
+  let lire = null;
+  let lecteurPret = null;
+  let session = 0;
+  let dernierPassage = 0;
+  let dernier = { code: null, vu: 0 };
+  let verdictOuvert = false;
+  let fermerApresVerdict = false;
+  let minuterieVerdict = null;
+  let audio = null;
+
+  // ---------- Outils ----------
+  const nettoyer = (t) => String(t ?? "").replace(/\s+/g, " ").trim();
+  const deux = (x) => String(x).padStart(2, "0");
+  const heureLisible = (h) => {
+    const [hh, mm] = String(h).split(":");
+    if (!mm) return String(h);
+    return mm === "00" ? `${Number(hh)} h` : `${Number(hh)} h ${mm}`;
+  };
+  const heureDe = (ms) => {
+    const d = new Date(ms);
+    return heureLisible(`${deux(d.getHours())}:${deux(d.getMinutes())}`);
+  };
+  const pluriel = (n, mot) => `${n} ${mot}${n > 1 ? "s" : ""}`;
+  const lienInscription = () => new URL("./", location.href).href;
+
+  function afficherErreur(message) {
+    $("erreur").textContent = message || "";
+    $("erreur").hidden = !message;
+  }
+
+  function montrer(nom) {
+    $("statut").hidden = nom !== "chargement";
+    $("ecran-tableau").hidden = nom !== "tableau";
+    $("barre").hidden = nom !== "tableau";
+  }
+
+  function panne(message) {
+    montrer("aucun");
+    $("statut").hidden = true;
+    afficherErreur(message);
+  }
+
+  const estRefus = (err) => /permission/i.test(String(err && (err.code || err.message)));
+
+  function messageEcriture(err) {
+    return estRefus(err)
+      ? "Modification refusée par la base. Vérifie les règles Firebase."
+      : "Modification impossible. Vérifie ta connexion, puis réessaie.";
+  }
+
+  function ecrire(promesse) {
+    promesse.catch((err) => {
+      const message = messageEcriture(err);
+      afficherErreur(message);
+      if (!$("scan").hidden) $("scan-etat").textContent = message;
+    });
+  }
+
+  async function copier(texte, bouton) {
+    const initial = bouton.textContent;
+    try {
+      await navigator.clipboard.writeText(texte);
+      bouton.textContent = "Copié";
+    } catch (e) {
+      bouton.textContent = "Copie impossible, sélectionne le texte";
+    }
+    setTimeout(() => { bouton.textContent = initial; }, 2000);
+  }
+
+  // ---------- Liste ----------
+  function listeTriee() {
+    return Object.entries(invites)
+      .filter(([, v]) => v && typeof v === "object" && v.prenom && v.jeton)
+      .map(([cle, v]) => ({ cle, ...v }))
+      .sort((a, b) => String(a.heure || "99:99").localeCompare(String(b.heure || "99:99"))
+        || String(a.prenom).localeCompare(String(b.prenom), "fr"));
+  }
+
+  const attendusPour = (liste) => Math.max(Number(repas.invitesAttendus) || 0, liste.length);
+
+  function element(balise, classe, texte) {
+    const el = document.createElement(balise);
+    if (classe) el.className = classe;
+    if (texte !== undefined) el.textContent = texte;
+    return el;
+  }
+
+  function ligneInvite(i, ouvert) {
+    const li = document.createElement("li");
+    const details = element("details", i.arrive ? "invite est-arrive" : "invite");
+    details.dataset.cle = i.cle;
+    details.open = ouvert;
+
+    const resume = document.createElement("summary");
+    const coche = element("span", "coche");
+    coche.setAttribute("aria-hidden", "true");
+    coche.innerHTML = ICONE_COCHE;
+    resume.append(
+      element("span", "invite-nom", i.prenom),
+      element("span", "invite-boisson", i.boisson || "Boisson non précisée"),
+      element("span", "invite-heure", i.heure ? heureLisible(i.heure) : "?"),
+      element("span", "invite-etat", i.arrive ? `là depuis ${heureDe(i.arrive)}` : "à venir"),
+      coche,
+    );
+
+    const actions = element("div", "invite-actions");
+    const arrivee = element("button", "action", i.arrive ? "Annuler son arrivée" : "Noter son arrivée");
+    arrivee.type = "button";
+    arrivee.dataset.action = "arrivee";
+    const supprimer = element("button", "action danger", "Supprimer l’inscription");
+    supprimer.type = "button";
+    supprimer.dataset.action = "supprimer";
+    actions.append(arrivee, supprimer);
+
+    details.append(resume, actions);
+    li.append(details);
+    return li;
+  }
+
+  function rendre() {
+    const liste = listeTriee();
+    const arrives = liste.filter((i) => i.arrive).length;
+    const attendus = Number(repas.invitesAttendus) || 0;
+
+    $("resume").textContent = `${pluriel(liste.length, "inscription")}${attendus ? ` sur ${attendus}` : ""}, ${pluriel(arrives, "arrivée")}.`;
+    $("scan-compteur").textContent = `${arrives}/${attendusPour(liste)}`;
+
+    const ouverts = new Set([...$("invites").querySelectorAll("details[open]")].map((d) => d.dataset.cle));
+    $("invites").replaceChildren(...liste.map((i) => ligneInvite(i, ouverts.has(i.cle))));
+    $("vide").hidden = liste.length > 0;
+
+    const compte = new Map();
+    for (const i of liste) {
+      const nom = nettoyer(i.boisson);
+      if (!nom) continue;
+      const cle = nom.toLowerCase();
+      const entree = compte.get(cle) || { nom, n: 0 };
+      entree.n++;
+      compte.set(cle, entree);
+    }
+    const boissons = [...compte.values()].sort((a, b) => b.n - a.n || a.nom.localeCompare(b.nom, "fr"));
+    $("boissons").replaceChildren(...boissons.map(({ nom, n }) => {
+      const li = element("li", "boisson");
+      li.append(element("span", "boisson-nom", nom), element("span", "boisson-nombre", String(n)));
+      return li;
+    }));
+    $("bloc-boissons").hidden = boissons.length === 0;
+  }
+
+  $("invites").addEventListener("click", (e) => {
+    const bouton = e.target.closest("button[data-action]");
+    if (!bouton) return;
+    const cle = bouton.closest("details").dataset.cle;
+    const inv = invites[cle];
+    if (!inv) return;
+    afficherErreur("");
+    const cible = fb.ref(db, `${CHEMIN}/${cle}`);
+
+    if (bouton.dataset.action === "arrivee") {
+      ecrire(fb.update(cible, { arrive: inv.arrive ? null : fb.serverTimestamp() }));
+      return;
+    }
+    if (!bouton.classList.contains("a-confirmer")) {
+      bouton.classList.add("a-confirmer");
+      bouton.textContent = "Touche encore pour supprimer";
+      setTimeout(() => {
+        if (!bouton.isConnected) return;
+        bouton.classList.remove("a-confirmer");
+        bouton.textContent = "Supprimer l’inscription";
+      }, 3000);
+      return;
+    }
+    ecrire(fb.remove(cible));
+  });
+
+  // ---------- Liste en direct ----------
+  $("copier-lien").addEventListener("click", (e) => copier(lienInscription(), e.currentTarget));
+
+  function ecouter() {
+    montrer("chargement");
+    fb.onValue(fb.ref(db, CHEMIN), (snap) => {
+      invites = snap.val() || {};
+      montrer("tableau");
+      rendre();
+    }, (err) => {
+      panne(estRefus(err)
+        ? "La base refuse l’accès. Vérifie que le bloc « repas » est bien dans tes règles Firebase, puis recharge la page."
+        : "La liste ne se charge pas. Vérifie ta connexion, puis recharge la page.");
+    });
+  }
+
+  // ---------- Lecteur de QR code ----------
+  function chargerScript(url) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = url;
+      script.async = true;
+      script.onload = () => resolve();
+      script.onerror = () => {
+        script.remove();
+        reject(new Error(`Chargement impossible : ${url}`));
+      };
+      document.head.append(script);
+    });
+  }
+
+  function fonctionJsQR() {
+    const lib = window.jsQR;
+    if (typeof lib === "function") return lib;
+    if (lib && typeof lib.default === "function") return lib.default;
+    return null;
+  }
+
+  async function creerLecteur() {
+    if ("BarcodeDetector" in window) {
+      try {
+        const formats = await window.BarcodeDetector.getSupportedFormats();
+        if (formats.includes("qr_code")) {
+          const detecteur = new window.BarcodeDetector({ formats: ["qr_code"] });
+          return async (video) => {
+            const codes = await detecteur.detect(video);
+            return codes.length ? codes[0].rawValue : null;
+          };
+        }
+      } catch (e) {
+        // on passe à jsQR
+      }
+    }
+    for (const url of SOURCES_JSQR) {
+      if (fonctionJsQR()) break;
+      try { await chargerScript(url); } catch (e) { /* source suivante */ }
+    }
+    const jsQR = fonctionJsQR();
+    if (!jsQR) {
+      const err = new Error("Lecteur QR indisponible");
+      err.name = "LecteurIndisponible";
+      throw err;
+    }
+    const toile = document.createElement("canvas");
+    const ctx = toile.getContext("2d", { willReadFrequently: true });
+    return async (video) => {
+      const w = video.videoWidth;
+      const h = video.videoHeight;
+      if (!w || !h) return null;
+      const echelle = Math.min(1, 800 / Math.max(w, h));
+      const lw = Math.round(w * echelle);
+      const lh = Math.round(h * echelle);
+      if (toile.width !== lw || toile.height !== lh) {
+        toile.width = lw;
+        toile.height = lh;
+      }
+      ctx.drawImage(video, 0, 0, lw, lh);
+      const image = ctx.getImageData(0, 0, lw, lh);
+      const resultat = jsQR(image.data, lw, lh, { inversionAttempts: "attemptBoth" });
+      return resultat ? resultat.data : null;
+    };
+  }
+
+  function preparerLecteur() {
+    if (!lecteurPret) {
+      lecteurPret = creerLecteur().catch((err) => {
+        lecteurPret = null;
+        throw err;
+      });
+    }
+    return lecteurPret;
+  }
+
+  function messageCamera(err) {
+    const nom = err && err.name;
+    if (nom === "LecteurIndisponible") {
+      return "Le lecteur de QR code n’a pas pu se charger. Vérifie la connexion internet, puis recharge la page.";
+    }
+    if (nom === "NotAllowedError" || nom === "SecurityError") {
+      return window.self !== window.top
+        ? "La caméra est bloquée dans cet aperçu. Ouvre le panel depuis son adresse en ligne pour scanner."
+        : "L’accès à la caméra est refusé. Autorise la caméra pour ce site dans les réglages du navigateur, puis réessaie.";
+    }
+    if (nom === "NotFoundError" || nom === "OverconstrainedError") return "Aucune caméra n’a été trouvée sur cet appareil.";
+    if (nom === "NotReadableError" || nom === "AbortError") return "La caméra est déjà utilisée par une autre app. Ferme-la, puis réessaie.";
+    return "La caméra n’a pas pu s’ouvrir. Recharge la page, puis réessaie.";
+  }
+
+  // ---------- Son et vibration ----------
+  function preparerSon() {
+    const Contexte = window.AudioContext || window.webkitAudioContext;
+    if (!Contexte) return;
+    try {
+      if (!audio) audio = new Contexte();
+      if (audio.state === "suspended") audio.resume().catch(() => {});
+    } catch (e) {
+      audio = null;
+    }
+  }
+
+  function bip(ok) {
+    if (!audio || audio.state !== "running") return;
+    const t0 = audio.currentTime;
+    const notes = ok ? [[880, 0, 0.09], [1320, 0.1, 0.16]] : [[196, 0, 0.34]];
+    for (const [frequence, debut, duree] of notes) {
+      const osc = audio.createOscillator();
+      const gain = audio.createGain();
+      osc.type = ok ? "sine" : "square";
+      osc.frequency.value = frequence;
+      gain.gain.setValueAtTime(0.0001, t0 + debut);
+      gain.gain.exponentialRampToValueAtTime(ok ? 0.25 : 0.08, t0 + debut + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + debut + duree);
+      osc.connect(gain);
+      gain.connect(audio.destination);
+      osc.start(t0 + debut);
+      osc.stop(t0 + debut + duree + 0.02);
+    }
+  }
+
+  function vibrer(ok) {
+    if (navigator.vibrate) navigator.vibrate(ok ? 90 : [120, 70, 120]);
+  }
+
+  // ---------- Caméra ----------
+  function arreterFlux(f) {
+    if (f) f.getTracks().forEach((piste) => piste.stop());
+  }
+
+  async function ouvrirScanner() {
+    afficherErreur("");
+    preparerSon();
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      afficherErreur(window.isSecureContext === false
+        ? "La caméra ne marche que sur une adresse en https://. Ouvre le panel depuis son lien https, puis réessaie."
+        : "Ce navigateur ne donne pas accès à la caméra. Ouvre le panel dans Safari ou Chrome.");
+      return;
+    }
+
+    const maSession = ++session;
+    $("bouton-scan").disabled = true;
+    $("scan-etat").textContent = "Ouverture de la caméra…";
+    $("scan").hidden = false;
+    document.body.classList.add("scan-ouvert");
+
+    try {
+      const nouveauFlux = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          facingMode: { ideal: "environment" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+      });
+      if (maSession !== session) {
+        arreterFlux(nouveauFlux);
+        return;
+      }
+      flux = nouveauFlux;
+      $("video").srcObject = flux;
+      try { await $("video").play(); } catch (e) { /* l'attribut autoplay prend le relais */ }
+      if (maSession !== session) return;
+
+      lire = await preparerLecteur();
+      if (maSession !== session) return;
+
+      dernier = { code: null, vu: 0 };
+      $("scan-etat").textContent = "Cadre le QR code de l’invitation";
+      boucle(maSession);
+    } catch (err) {
+      if (maSession !== session) return;
+      fermerScanner();
+      afficherErreur(messageCamera(err));
+    }
+  }
+
+  function fermerScanner() {
+    session++;
+    fermerApresVerdict = false;
+    cacherVerdict();
+    arreterFlux(flux);
+    flux = null;
+    $("video").srcObject = null;
+    $("scan").hidden = true;
+    document.body.classList.remove("scan-ouvert");
+    $("bouton-scan").disabled = false;
+  }
+
+  async function boucle(maSession) {
+    while (maSession === session) {
+      await new Promise((suite) => requestAnimationFrame(suite));
+      if (maSession !== session) return;
+      const t = performance.now();
+      if (t - dernierPassage < INTERVALLE_LECTURE || $("video").readyState < 2) continue;
+      dernierPassage = t;
+      let valeur = null;
+      try { valeur = await lire($("video")); } catch (e) { valeur = null; }
+      if (valeur && maSession === session) traiterLecture(valeur);
+    }
+  }
+
+  // ---------- Vérification ----------
+  function traiterLecture(brut) {
+    const code = nettoyer(brut).toUpperCase();
+    const maintenant = Date.now();
+    if (code === dernier.code) {
+      const recent = maintenant - dernier.vu < DELAI_MEME_CODE;
+      dernier.vu = maintenant;
+      if (recent) return;
+    }
+    if (verdictOuvert) return;
+    dernier = { code, vu: maintenant };
+
+    const jeton = /^REPAS-([A-Z0-9]{10})$/.exec(code);
+    const invite = jeton && listeTriee().find((i) => i.jeton === jeton[1]);
+    if (invite) accepter(invite);
+    else refuser();
+  }
+
+  function accepter(invite) {
+    const liste = listeTriee();
+    const deja = invite.arrive;
+    const arrivesApres = liste.filter((i) => i.arrive).length + (deja ? 0 : 1);
+    const complet = !deja && arrivesApres >= attendusPour(liste);
+    if (!deja) ecrire(fb.update(fb.ref(db, `${CHEMIN}/${invite.cle}`), { arrive: fb.serverTimestamp() }));
+
+    let detail = "";
+    if (deja) detail = `Déjà là depuis ${heureDe(deja)}`;
+    else if (complet) detail = "Tout le monde est là";
+    montrerVerdict({
+      ok: true,
+      nom: invite.prenom,
+      boisson: invite.boisson || "Non précisée",
+      heure: invite.heure ? heureLisible(invite.heure) : "Non précisée",
+      detail,
+      puisFermer: complet,
+    });
+  }
+
+  function refuser() {
+    montrerVerdict({ ok: false, nom: "Invitation inconnue", detail: "Ce QR code ne correspond à aucun inscrit." });
+  }
+
+  function ajusterMot() {
+    const mot = $("verdict-mot");
+    mot.style.fontSize = "";
+    let taille = parseFloat(getComputedStyle(mot).fontSize);
+    while (mot.scrollWidth > mot.clientWidth + 1 && taille > 36) {
+      taille -= 4;
+      mot.style.fontSize = `${taille}px`;
+    }
+  }
+
+  function montrerVerdict({ ok, nom, boisson, heure, detail, puisFermer = false }) {
+    verdictOuvert = true;
+    fermerApresVerdict = puisFermer;
+    const verdict = $("verdict");
+    verdict.classList.toggle("est-ok", ok);
+    verdict.classList.toggle("est-ko", !ok);
+    $("verdict-mot").textContent = ok ? "Approuvé" : "Refusé";
+    $("verdict-nom").textContent = nom;
+    $("verdict-infos").hidden = !ok;
+    $("verdict-boisson").textContent = boisson || "";
+    $("verdict-heure").textContent = heure || "";
+    $("verdict-detail").textContent = detail || "";
+    $("verdict-detail").hidden = !detail;
+
+    verdict.classList.remove("anime");
+    verdict.hidden = false;
+    ajusterMot();
+    void verdict.offsetWidth; // relance l'animation
+    verdict.classList.add("anime");
+
+    bip(ok);
+    vibrer(ok);
+    clearTimeout(minuterieVerdict);
+    minuterieVerdict = setTimeout(finVerdict, puisFermer ? DUREE_COMPLET : ok ? DUREE_OK : DUREE_KO);
+  }
+
+  function cacherVerdict() {
+    clearTimeout(minuterieVerdict);
+    $("verdict").hidden = true;
+    $("verdict").classList.remove("anime");
+    verdictOuvert = false;
+  }
+
+  function finVerdict() {
+    const fermer = fermerApresVerdict;
+    fermerApresVerdict = false;
+    cacherVerdict();
+    if (fermer) fermerScanner();
+  }
+
+  $("bouton-scan").addEventListener("click", ouvrirScanner);
+  $("fermer").addEventListener("click", fermerScanner);
+  $("verdict").addEventListener("click", finVerdict);
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (verdictOuvert) finVerdict();
+    else if (!$("scan").hidden) fermerScanner();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && !$("scan").hidden) fermerScanner();
+  });
+  window.addEventListener("pagehide", () => arreterFlux(flux));
+
+  // ---------- Démarrage ----------
+  const configRemplie = (c) => !!(c && c.apiKey && c.databaseURL && !/COLLE/i.test(`${c.apiKey}${c.databaseURL}`));
+
+  async function demarrer() {
+    let config;
+    try {
+      config = await import("./config.js");
+    } catch (e) {
+      panne("Le fichier config.js est introuvable. Il doit être dans le même dossier que cette page.");
+      return;
+    }
+    repas = { ...repas, ...(config.repas || {}) };
+    $("titre").textContent = repas.titre;
+    document.title = `Panel, ${repas.titre}`;
+    $("lien-inscription").textContent = lienInscription().replace(/^https?:\/\//, "");
+
+    if (!configRemplie(config.firebaseConfig)) {
+      panne("Colle la config Firebase de tes apps Velox dans config.js, puis recharge la page.");
+      return;
+    }
+    try {
+      const [app, base] = await Promise.all([
+        import(`${SDK}/firebase-app.js`),
+        import(`${SDK}/firebase-database.js`),
+      ]);
+      db = base.getDatabase(app.initializeApp(config.firebaseConfig));
+      fb = base;
+    } catch (e) {
+      panne("Le panel n’arrive pas à se charger. Vérifie ta connexion, puis recharge la page.");
+      return;
+    }
+    ecouter();
+    preparerLecteur().catch(() => { /* nouvel essai à l'ouverture du scanner */ });
+  }
+
+  demarrer();
+</script>
+</body>
+</html>

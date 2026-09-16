@@ -1,437 +1,1006 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Velox — la boîte à outils du restaurateur indépendant</title>
-<meta name="description" content="Menus digitaux, réservations sans commission, avis clients, coût matière, planning d'équipe et calculateurs de paie HCR. Des outils simples pour la restauration, développés par quelqu'un qui travaille en salle.">
-<meta property="og:title" content="Velox — la boîte à outils du restaurateur indépendant">
-<meta property="og:description" content="Une suite d'outils pensés pour la restauration, sans commission, sans usine à gaz.">
-<meta property="og:type" content="website">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F5F3">
+<title>Repas entre amis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
 <style>
-  :root{
-    --papier:#F7F4EC; --papier-2:#FBF9F3; --encre:#191713; --encre-2:#4A463D;
-    --bordeaux:#6E1F2E; --bordeaux-clair:#8A3242; --laiton:#B8863B; --laiton-pale:#EFE2C7;
-    --zinc:#6E6A5F; --trait:#E2DCCE; --vert:#2E6B45;
+  :root {
+    --papier: #F2F5F3;
+    --encre: #1F3A2E;
+    --gris: #5C6B63;
+    --trait: #D3DCD6;
+    --vert: #137A45;
+    --rouge: #C23B30;
+    --titre: "Barlow Condensed", "Arial Narrow", "sans-serif-condensed", system-ui, sans-serif;
+    --texte: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--papier);color:var(--encre);
-    font:400 1.02rem/1.6 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
-  a{color:var(--bordeaux)}
-  .mono{font-family:"Spline Sans Mono",ui-monospace,monospace}
 
-  /* --- Barre --- */
-  header.top{position:sticky;top:0;z-index:20;background:rgba(247,244,236,.86);
-    backdrop-filter:blur(10px);border-bottom:1px solid var(--trait)}
-  header.top .wrap{display:flex;align-items:center;gap:16px;height:64px}
-  .logo{font:900 1.25rem "Archivo",sans-serif;letter-spacing:-.02em;color:var(--bordeaux);text-decoration:none}
-  .logo::after{content:"·";color:var(--laiton);margin:0 2px}
-  .logo span{color:var(--encre)}
-  header.top nav{margin-left:auto;display:flex;gap:26px;align-items:center}
-  header.top nav a{color:var(--encre-2);text-decoration:none;font-weight:500;font-size:.92rem}
-  header.top nav a:hover{color:var(--bordeaux)}
-  .btn{display:inline-block;font:600 .95rem "Public Sans",sans-serif;text-decoration:none;
-    border-radius:9px;padding:11px 20px;cursor:pointer;border:0;transition:transform .12s,box-shadow .12s}
-  .btn.plein{background:var(--bordeaux);color:#fff}
-  .btn.plein:hover{transform:translateY(-1px);box-shadow:0 8px 20px -8px rgba(110,31,46,.6)}
-  .btn.ligne{border:1px solid var(--trait);color:var(--encre);background:var(--papier-2)}
-  .btn.ligne:hover{border-color:var(--bordeaux)}
-  @media(max-width:760px){header.top nav a.lien-nav{display:none}}
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
 
-  /* --- Hero --- */
-  .hero{padding:76px 0 40px;position:relative;overflow:hidden}
-  .hero .wrap{position:relative;z-index:2}
-  .kicker{display:inline-flex;align-items:center;gap:8px;font:600 .78rem "Spline Sans Mono",monospace;
-    letter-spacing:.06em;color:var(--bordeaux);background:var(--laiton-pale);
-    border:1px solid #E4D3AD;border-radius:99px;padding:6px 14px;margin-bottom:22px}
-  .kicker .pt{width:6px;height:6px;border-radius:50%;background:var(--vert)}
-  h1.titre{font:800 clamp(2.4rem,6vw,4.1rem)/1.02 "Archivo",sans-serif;letter-spacing:-.025em;
-    margin:0 0 20px;max-width:16ch}
-  h1.titre em{font-style:normal;color:var(--bordeaux);position:relative;white-space:nowrap}
-  h1.titre em::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.14em;
-    background:var(--laiton);opacity:.5;z-index:-1}
-  .accroche{font-size:1.2rem;color:var(--encre-2);max-width:54ch;margin:0 0 30px}
-  .hero .boutons{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-  .hero .preuve{margin-top:26px;font-size:.9rem;color:var(--zinc);display:flex;gap:20px;flex-wrap:wrap}
-  .hero .preuve b{color:var(--encre);font-weight:600}
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--papier);
+    color: var(--encre);
+    font: 400 17px/1.45 var(--texte);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body.grand-ouvert { overflow: hidden; }
+  button, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--vert); outline-offset: 3px; }
 
-  /* Signature : tampon "fait en salle" en filigrane */
-  .tampon{position:absolute;right:-60px;top:40px;width:340px;height:340px;z-index:1;
-    opacity:.07;transform:rotate(-8deg);pointer-events:none}
-  @media(max-width:900px){.tampon{display:none}}
+  .page {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: calc(34px + env(safe-area-inset-top)) 22px calc(40px + env(safe-area-inset-bottom));
+  }
+  h1 {
+    margin: 0;
+    font: 700 52px/0.95 var(--titre);
+    letter-spacing: -0.005em;
+  }
+  .infos {
+    margin: 12px 0 0;
+    color: var(--gris);
+    white-space: pre-line;
+  }
+  .chargement { margin: 36px 0 0; color: var(--gris); }
 
-  /* --- Bandeau atelier --- */
-  .atelier{border-top:1px solid var(--trait);border-bottom:1px solid var(--trait);background:var(--papier-2)}
-  .atelier .wrap{display:flex;flex-wrap:wrap;gap:8px 32px;padding:18px 24px;align-items:center;
-    font:500 .9rem "Public Sans",sans-serif;color:var(--encre-2)}
-  .atelier .lab{font:600 .74rem "Spline Sans Mono",monospace;letter-spacing:.08em;
-    text-transform:uppercase;color:var(--zinc)}
-  .atelier .pas{display:inline-flex;align-items:center;gap:8px}
-  .atelier .pas b{color:var(--bordeaux);font-family:"Spline Sans Mono",monospace;font-weight:600}
+  .ecran { margin-top: 36px; }
+  h2 {
+    margin: 0 0 22px;
+    font: 600 28px/1.1 var(--titre);
+    overflow-wrap: anywhere;
+  }
 
-  /* --- Grille produits --- */
-  section{padding:80px 0}
-  .titre-section{font:800 clamp(1.7rem,4vw,2.4rem)/1.1 "Archivo",sans-serif;letter-spacing:-.02em;margin:0 0 10px}
-  .sous-section{color:var(--zinc);max-width:58ch;margin:0 0 40px;font-size:1.05rem}
-  .grille{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
-  .tuile{grid-column:span 2;background:var(--papier-2);border:1px solid var(--trait);border-radius:16px;
-    padding:26px 24px;text-decoration:none;color:inherit;display:flex;flex-direction:column;
-    position:relative;overflow:hidden;transition:transform .16s,border-color .16s,box-shadow .16s}
-  .tuile:hover{transform:translateY(-3px);border-color:var(--bordeaux);box-shadow:0 18px 34px -22px rgba(25,23,19,.5)}
-  .tuile.large{grid-column:span 3}
-  @media(max-width:860px){.grille{grid-template-columns:repeat(2,1fr)}.tuile,.tuile.large{grid-column:span 1}}
-  @media(max-width:520px){.grille{grid-template-columns:1fr}.tuile,.tuile.large{grid-column:span 1}}
-  .tuile .ref{font:600 .72rem "Spline Sans Mono",monospace;color:var(--laiton);letter-spacing:.04em;margin-bottom:14px}
-  .tuile h3{font:700 1.28rem "Archivo",sans-serif;margin:0 0 8px;letter-spacing:-.01em}
-  .tuile p{margin:0 0 18px;font-size:.94rem;color:var(--encre-2);flex:1}
-  .tuile .pied{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.9rem;color:var(--bordeaux)}
-  .tuile .pied .fleche{transition:transform .16s}
-  .tuile:hover .pied .fleche{transform:translateX(4px)}
-  .tuile .prix{position:absolute;top:22px;right:22px;font:600 .74rem "Spline Sans Mono",monospace;
-    color:var(--zinc);background:var(--papier);border:1px solid var(--trait);border-radius:99px;padding:3px 10px}
-  .tuile .glyphe{font-size:1.7rem;margin-bottom:14px;line-height:1}
+  /* ---------- Formulaire ---------- */
+  .champ {
+    display: block;
+    min-width: 0;
+    margin: 0 0 22px;
+    padding: 0;
+    border: 0;
+  }
+  .etiquette {
+    display: block;
+    margin: 0 0 8px;
+    padding: 0;
+    font-weight: 600;
+  }
+  .saisie {
+    display: block;
+    width: 100%;
+    min-height: 56px;
+    padding: 0 16px;
+    border: 2px solid var(--trait);
+    border-radius: 12px;
+    background: #fff;
+    font-size: 19px;
+    font-weight: 500;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .saisie::placeholder { color: #8A968F; }
+  .saisie:focus { outline: none; border-color: var(--encre); }
+  .saisie[readonly] { background: transparent; color: var(--gris); }
+  .saisie::-webkit-date-and-time-value { text-align: left; }
 
-  /* --- Prestations --- */
-  .prestations{background:var(--encre);color:var(--papier)}
-  .prestations .titre-section{color:#fff}
-  .prestations .sous-section{color:#B9B3A5}
-  .duo{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
-  @media(max-width:820px){.duo{grid-template-columns:1fr;gap:28px}}
-  .prestations ul{list-style:none;padding:0;margin:0}
-  .prestations li{padding:14px 0;border-bottom:1px solid #2E2A22;display:flex;gap:14px;align-items:flex-start}
-  .prestations li:last-child{border-bottom:0}
-  .prestations li .n{font:600 .8rem "Spline Sans Mono",monospace;color:var(--laiton);flex-shrink:0;padding-top:2px}
-  .prestations li b{display:block;font:600 1.05rem "Archivo",sans-serif;margin-bottom:2px}
-  .prestations li span{color:#B9B3A5;font-size:.92rem}
-  .carte-devis{background:#221F19;border:1px solid #322E25;border-radius:18px;padding:30px}
-  .carte-devis .de{font:600 .78rem "Spline Sans Mono",monospace;color:var(--laiton);text-transform:uppercase;letter-spacing:.06em}
-  .carte-devis .montant{font:800 2.8rem "Archivo",sans-serif;margin:6px 0 2px;color:#fff}
-  .carte-devis .montant small{font:600 1rem "Public Sans",sans-serif;color:#B9B3A5}
-  .carte-devis p{color:#B9B3A5;font-size:.92rem;margin:12px 0 20px}
+  .puces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 12px;
+  }
+  .puce {
+    min-height: 42px;
+    padding: 0 15px;
+    border: 2px solid var(--trait);
+    border-radius: 999px;
+    background: #fff;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .puce[aria-pressed="true"] {
+    background: var(--encre);
+    border-color: var(--encre);
+    color: #fff;
+  }
 
-  /* --- Bundles --- */
-  .bundles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  @media(max-width:820px){.bundles{grid-template-columns:1fr}}
-  .plan{background:var(--papier-2);border:1px solid var(--trait);border-radius:16px;padding:28px}
-  .plan.vedette{border:2px solid var(--bordeaux);position:relative}
-  .plan.vedette .ruban{position:absolute;top:-13px;left:24px;background:var(--bordeaux);color:#fff;
-    font:700 .68rem "Spline Sans Mono",monospace;letter-spacing:.06em;text-transform:uppercase;
-    border-radius:99px;padding:4px 12px}
-  .plan h3{font:700 1.2rem "Archivo",sans-serif;margin:0 0 4px}
-  .plan .tarif{font:800 2.4rem "Archivo",sans-serif;margin:6px 0}
-  .plan .tarif small{font:600 .95rem "Public Sans",sans-serif;color:var(--zinc)}
-  .plan ul{list-style:none;padding:0;margin:14px 0 22px}
-  .plan li{padding:6px 0;font-size:.93rem;display:flex;gap:9px;color:var(--encre-2)}
-  .plan li::before{content:"→";color:var(--laiton);font-weight:700}
+  .erreur {
+    margin: 0 0 14px;
+    padding: 12px 14px;
+    border-left: 4px solid var(--rouge);
+    border-radius: 2px 10px 10px 2px;
+    background: #FBECEA;
+    color: #8A2A21;
+  }
+  .page > .erreur { margin-top: 36px; }
 
-  /* --- Manifeste --- */
-  .manifeste{background:var(--bordeaux);color:#fff}
-  .manifeste .wrap{max-width:820px;text-align:center}
-  .manifeste .g{font:600 .78rem "Spline Sans Mono",monospace;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--laiton-pale);opacity:.8}
-  .manifeste blockquote{font:600 clamp(1.4rem,3.2vw,2rem)/1.35 "Archivo",sans-serif;margin:18px 0 0;letter-spacing:-.01em}
-  .manifeste blockquote em{font-style:normal;border-bottom:2px solid var(--laiton);padding-bottom:2px}
+  .bouton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 58px;
+    margin-top: 12px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 16px;
+    background: var(--encre);
+    color: #fff;
+    font-size: 19px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform .12s ease;
+  }
+  .bouton:active { transform: scale(.98); }
+  .bouton:disabled { opacity: .55; cursor: default; transform: none; }
+  .bouton.secondaire {
+    border: 2px solid var(--encre);
+    background: transparent;
+    color: var(--encre);
+  }
+  .lien {
+    display: block;
+    margin: 14px auto 0;
+    padding: 8px;
+    border: 0;
+    background: none;
+    color: var(--gris);
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
 
-  /* --- Pied --- */
-  footer.fin{background:var(--encre);color:#9F9A8D;padding:56px 0 40px}
-  footer.fin .wrap{display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px}
-  @media(max-width:720px){footer.fin .wrap{grid-template-columns:1fr 1fr}}
-  footer.fin .logo{color:#fff}
-  footer.fin h4{font:700 .78rem "Spline Sans Mono",monospace;letter-spacing:.08em;text-transform:uppercase;
-    color:#6E6A5F;margin:0 0 14px}
-  footer.fin a{display:block;color:#C9C4B6;text-decoration:none;padding:5px 0;font-size:.92rem}
-  footer.fin a:hover{color:#fff}
-  footer.fin .bas{grid-column:1/-1;border-top:1px solid #2E2A22;margin-top:20px;padding-top:20px;
-    font-size:.82rem;color:#6E6A5F;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
-  .reveal.vu{opacity:1;transform:none}
-  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}
-    .btn,.tuile{transition:none}}
+  /* ---------- Invitation ---------- */
+  .affiche {
+    overflow: hidden;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 0 0 1px var(--trait);
+  }
+  .affiche img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .affiche-attente {
+    margin: 0;
+    padding: 96px 24px;
+    color: var(--gris);
+    text-align: center;
+  }
+  .consigne {
+    margin: 18px 0 6px;
+    text-align: center;
+    font-weight: 500;
+  }
+  .liens {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0 28px;
+    margin-top: 10px;
+  }
+  .liens .lien { margin: 0; }
+
+  /* ---------- QR code en grand ---------- */
+  .grand-qr {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));
+    background: #fff;
+    cursor: pointer;
+  }
+  .grand-qr svg {
+    display: block;
+    width: min(88vw, 62vh, 440px);
+    height: auto;
+  }
+  .grand-qr-nom {
+    margin: 14px 0 0;
+    font: 700 42px/1 var(--titre);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+  .grand-qr .bouton {
+    max-width: 320px;
+    margin-top: 28px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bouton { transition: none; }
+  }
 </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="wrap">
-    <a class="logo" href="#">Velox<span>Suite</span></a>
-    <nav>
-      <a class="lien-nav" href="#outils">Les outils</a>
-      <a class="lien-nav" href="#prestations">Installation</a>
-      <a class="lien-nav" href="#tarifs">Tarifs</a>
-      <a class="btn ligne" href="menu/admin.html">Espace pro</a>
-    </nav>
-  </div>
-</header>
+<main class="page">
+  <header>
+    <h1 id="titre">Repas entre amis</h1>
+    <p class="infos" id="infos" hidden></p>
+  </header>
 
-<!-- ===== HERO ===== -->
-<section class="hero">
-  <svg class="tampon" viewBox="0 0 200 200" aria-hidden="true">
-    <circle cx="100" cy="100" r="92" fill="none" stroke="var(--bordeaux)" stroke-width="3"/>
-    <circle cx="100" cy="100" r="78" fill="none" stroke="var(--bordeaux)" stroke-width="1"/>
-    <path id="cercle-haut" d="M100 30 a70 70 0 0 1 0 140" fill="none"/>
-    <path id="cercle-bas" d="M100 170 a70 70 0 0 1 0 -140" fill="none"/>
-    <text font-family="Spline Sans Mono, monospace" font-size="15" font-weight="600" fill="var(--bordeaux)" letter-spacing="4">
-      <textPath href="#cercle-haut" startOffset="6%">FAIT EN SALLE</textPath>
-    </text>
-    <text font-family="Spline Sans Mono, monospace" font-size="15" font-weight="600" fill="var(--bordeaux)" letter-spacing="4">
-      <textPath href="#cercle-bas" startOffset="10%">PAS EN RÉUNION</textPath>
-    </text>
-    <text x="100" y="112" text-anchor="middle" font-family="Archivo" font-size="52" font-weight="900" fill="var(--bordeaux)">V</text>
-  </svg>
-  <div class="wrap">
-    <span class="kicker"><span class="pt"></span>Outils pour la restauration indépendante</span>
-    <h1 class="titre">La boîte à outils du <em>restaurateur</em>, pas du groupe.</h1>
-    <p class="accroche">Menus digitaux, réservations sans commission, avis clients, coût matière,
-    planning d'équipe. Chaque outil règle une corvée précise de votre service — et rien de plus.</p>
-    <div class="boutons">
-      <a class="btn plein" href="#outils">Voir les outils</a>
-      <a class="btn ligne" href="#prestations">Je veux qu'on m'installe tout</a>
-    </div>
-    <div class="preuve">
-      <span><b>7</b> outils connectés</span>
-      <span><b>0</b> commission par couvert</span>
-      <span><b>1</b> seul compte pour tout</span>
-    </div>
-  </div>
-</section>
+  <p class="chargement" id="chargement">Chargement…</p>
 
-<!-- ===== BANDEAU ATELIER ===== -->
-<div class="atelier">
-  <div class="wrap">
-    <span class="lab">Le principe</span>
-    <span class="pas"><b>01</b> Vous créez votre restaurant une fois</span>
-    <span class="pas"><b>02</b> Vous activez les outils qui vous servent</span>
-    <span class="pas"><b>03</b> Tout partage le même compte et vos données</span>
-  </div>
+  <!-- 1. Inscription : prénom, boisson, heure d'arrivée -->
+  <form class="ecran" id="ecran-formulaire" novalidate hidden>
+    <h2 id="titre-formulaire">Inscris-toi</h2>
+    <label class="champ">
+      <span class="etiquette">Ton prénom</span>
+      <input class="saisie" id="prenom" type="text" maxlength="30" autocomplete="given-name" autocapitalize="words">
+    </label>
+    <fieldset class="champ">
+      <legend class="etiquette">Ta boisson</legend>
+      <div class="puces" id="puces"></div>
+      <input class="saisie" id="boisson" type="text" maxlength="40" autocomplete="off" placeholder="Ou écris la tienne" aria-label="Ta boisson">
+    </fieldset>
+    <label class="champ">
+      <span class="etiquette">Ton heure d’arrivée</span>
+      <input class="saisie" id="heure" type="time">
+    </label>
+    <p class="erreur" id="erreur-formulaire" role="alert" hidden></p>
+    <button class="bouton" type="submit" id="bouton-valider">Recevoir mon invitation</button>
+    <button class="lien" type="button" id="annuler" hidden>Annuler</button>
+  </form>
+
+  <!-- 2. L'affiche avec le QR code -->
+  <section class="ecran" id="ecran-invitation" hidden>
+    <h2 id="titre-invitation">Ton invitation</h2>
+    <div class="affiche">
+      <img id="affiche" alt="" hidden>
+      <p class="affiche-attente" id="affiche-attente">Préparation de ton invitation…</p>
+    </div>
+    <p class="consigne">Garde-la : son QR code sera scanné à ton arrivée.</p>
+    <button class="bouton" type="button" id="enregistrer" disabled>Enregistrer l’invitation</button>
+    <button class="bouton secondaire" type="button" id="agrandir">Agrandir le QR code</button>
+    <div class="liens">
+      <button class="lien" type="button" id="modifier">Modifier mes infos</button>
+      <button class="lien" type="button" id="pas-moi">Ce n’est pas moi</button>
+    </div>
+  </section>
+
+  <p class="erreur" id="erreur-globale" role="alert" hidden></p>
+</main>
+
+<div class="grand-qr" id="grand-qr" role="dialog" aria-modal="true" aria-label="QR code en grand" hidden>
+  <div id="grand-qr-code"></div>
+  <p class="grand-qr-nom" id="grand-qr-nom"></p>
+  <button class="bouton" type="button" id="fermer-grand">Fermer</button>
 </div>
 
-<!-- ===== OUTILS ===== -->
-<section id="outils">
-  <div class="wrap">
-    <h2 class="titre-section reveal">Sept outils, une seule maison</h2>
-    <p class="sous-section reveal">Prenez-en un, prenez-les tous. Ils fonctionnent seuls, mais parlent
-    la même langue quand vous les réunissez : le menu affiche le bouton de réservation, le planning
-    connaît vos heures sup, les avis remontent au bon endroit.</p>
-
-    <div class="grille">
-      <a class="tuile large reveal" href="menu/vente.html">
-        <span class="prix">gratuit · 9 €/mois</span>
-        <span class="glyphe">🍽️</span>
-        <span class="ref">VELOX · MENU</span>
-        <h3>Menu digital &amp; QR code</h3>
-        <p>Votre carte en ligne, le menu du jour changé en 30 secondes depuis le téléphone,
-        version anglaise et allergènes. Un QR à imprimer une seule fois.</p>
-        <span class="pied">Découvrir <span class="fleche">→</span></span>
-      </a>
-
-      <a class="tuile large reveal" href="resa/vente.html">
-        <span class="prix">inclus Pro</span>
-        <span class="glyphe">🗓️</span>
-        <span class="ref">VELOX · RÉSA</span>
-        <h3>Réservations sans commission</h3>
-        <p>Vos clients réservent depuis le menu, vous confirmez d'un tap. Capacité par service,
-        jamais 2 € prélevés par couvert comme sur les plateformes.</p>
-        <span class="pied">Découvrir <span class="fleche">→</span></span>
-      </a>
-
-      <a class="tuile reveal" href="avis/vente.html">
-        <span class="glyphe">⭐</span>
-        <span class="ref">VELOX · AVIS</span>
-        <h3>Avis clients</h3>
-        <p>Les contents filent sur Google, les déçus vous écrivent en privé. Vous répondez avant
-        que ça devienne un avis 1 étoile.</p>
-        <span class="pied">Découvrir <span class="fleche">→</span></span>
-      </a>
-
-      <a class="tuile reveal" href="food-cost/index.html">
-        <span class="prix">15 €/mois</span>
-        <span class="glyphe">📊</span>
-        <span class="ref">VELOX · FOOD COST</span>
-        <h3>Coût matière</h3>
-        <p>Fiches techniques, food cost en couleur, prix conseillé. Les plats qui vous font perdre
-        de l'argent passent au rouge.</p>
-        <span class="pied">Découvrir <span class="fleche">→</span></span>
-      </a>
-
-      <a class="tuile reveal" href="Planning/vente.html">
-        <span class="prix">9 €/mois</span>
-        <span class="glyphe">📋</span>
-        <span class="ref">VELOX · PLANNING</span>
-        <h3>Planning d'équipe</h3>
-        <p>La grille de la semaine, avec le calcul des heures sup en convention HCR
-        directement sur chaque ligne. Plus d'erreur de majoration.</p>
-        <span class="pied">Découvrir <span class="fleche">→</span></span>
-      </a>
-
-      <a class="tuile large reveal" href="Gestion/">
-        <span class="prix">l'historique</span>
-        <span class="glyphe">🍷</span>
-        <span class="ref">VELOX · GESTION</span>
-        <h3>Cave à vin</h3>
-        <p>Le premier outil Velox : gestion de cave, stock, ventes et rotations pour les
-        restaurants qui tiennent une vraie carte des vins.</p>
-        <span class="pied">Ouvrir <span class="fleche">→</span></span>
-      </a>
-
-      <a class="tuile large reveal" href="utils/index.html">
-        <span class="prix">gratuit</span>
-        <span class="glyphe">🧰</span>
-        <span class="ref">VELOX · UTILS</span>
-        <h3>Boîte à outils</h3>
-        <p>Factures de micro-entrepreneur, QR codes, compression d'images, conversions de cuisine.
-        Sans inscription, tout dans le navigateur.</p>
-        <span class="pied">Ouvrir <span class="fleche">→</span></span>
-      </a>
-    </div>
-
-    <p class="sous-section reveal" style="margin-top:34px;margin-bottom:0">
-      Déjà client ? Tout se pilote avec un seul compte depuis
-      <a href="menu/admin.html">votre espace pro</a>.</p>
-  </div>
-</section>
-
-<!-- ===== PRESTATIONS ===== -->
-<section class="prestations" id="prestations">
-  <div class="wrap">
-    <div class="duo">
-      <div>
-        <h2 class="titre-section reveal">Pas le temps ? Je m'occupe de tout.</h2>
-        <p class="sous-section reveal">Vous tenez un restaurant, pas une agence web. La mise en
-        place complète, c'est un forfait unique — et vous repartez avec un menu en ligne prêt le soir même.</p>
-        <ul class="reveal">
-          <li><span class="n">01</span><div><b>Saisie de votre carte</b><span>Je photographie votre menu et je saisis tous les plats, prix, descriptions et allergènes.</span></div></li>
-          <li><span class="n">02</span><div><b>QR codes imprimés</b><span>Vos chevalets de table prêts à poser, à votre nom, livrés en main propre.</span></div></li>
-          <li><span class="n">03</span><div><b>Formation de l'équipe</b><span>30 minutes pour que vous et votre personnel sachiez tout changer en autonomie.</span></div></li>
-        </ul>
-      </div>
-      <div class="carte-devis reveal">
-        <div class="de">Forfait installation</div>
-        <div class="montant">300 €<small> à 500 €</small></div>
-        <p>Une fois, sans engagement. Le tarif dépend de la taille de votre carte et de l'ajout
-        de la version anglaise. L'abonnement mensuel reste optionnel derrière.</p>
-        <a class="btn plein" href="#contact" style="width:100%;text-align:center">Demander un devis</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== TARIFS ===== -->
-<section id="tarifs">
-  <div class="wrap">
-    <h2 class="titre-section reveal">Des tarifs de restaurateur</h2>
-    <p class="sous-section reveal">Moins qu'un plat du jour par semaine. Tout est résiliable,
-    et le plan gratuit reste gratuit pour toujours.</p>
-    <div class="bundles">
-      <div class="plan reveal">
-        <h3>Découverte</h3>
-        <div class="tarif">0 €</div>
-        <ul>
-          <li>Menu digital, 15 plats</li>
-          <li>QR code inclus</li>
-          <li>Tous les outils gratuits</li>
-          <li>Calculateurs de paie</li>
-        </ul>
-        <a class="btn ligne" href="menu/admin.html" style="width:100%;text-align:center">Commencer</a>
-      </div>
-      <div class="plan vedette reveal">
-        <span class="ruban">le plus pris</span>
-        <h3>Resto Pro</h3>
-        <div class="tarif">19 €<small> /mois</small></div>
-        <ul>
-          <li>Menu illimité + version anglaise</li>
-          <li>Réservations sans commission</li>
-          <li>Avis clients</li>
-          <li>Coût matière complet</li>
-          <li>Planning &amp; heures sup HCR</li>
-        </ul>
-        <a class="btn plein" href="#contact" style="width:100%;text-align:center">Passer en Pro</a>
-      </div>
-      <div class="plan reveal">
-        <h3>À la carte</h3>
-        <div class="tarif">9-15 €<small> /mois</small></div>
-        <ul>
-          <li>Menu Pro seul — 9 €</li>
-          <li>Coût matière seul — 15 €</li>
-          <li>Planning seul — 9 €</li>
-          <li>On combine ce qu'il vous faut</li>
-        </ul>
-        <a class="btn ligne" href="#contact" style="width:100%;text-align:center">Composer</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== MANIFESTE ===== -->
-<section class="manifeste">
-  <div class="wrap">
-    <div class="g">Pourquoi Velox</div>
-    <blockquote>Les logiciels de restauration sont faits par des gens qui n'ont jamais fait un
-    service. Velox est né derrière un comptoir : chaque bouton existe parce qu'il <em>fait gagner
-    du temps un soir de rush</em>, pas parce qu'il remplit un tableau de fonctionnalités.</blockquote>
-  </div>
-</section>
-
-<!-- ===== CONTACT ===== -->
-<section id="contact">
-  <div class="wrap" style="text-align:center;max-width:640px">
-    <h2 class="titre-section reveal">On en parle ?</h2>
-    <p class="sous-section reveal" style="margin-left:auto;margin-right:auto">Une question, un devis
-    d'installation, l'envie de tester : écrivez-moi, je réponds vite — souvent entre deux services.</p>
-    <div class="reveal" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <a class="btn plein" href="mailto:contact@veloxgestion.fr">Écrire à Velox</a>
-      <a class="btn ligne" href="menu/admin.html">Créer mon menu gratuit</a>
-    </div>
-  </div>
-</section>
-
-<!-- ===== PIED ===== -->
-<footer class="fin">
-  <div class="wrap">
-    <div>
-      <a class="logo" href="#">Velox<span>Suite</span></a>
-      <p style="margin:14px 0 0;max-width:34ch;color:#9F9A8D;font-size:.92rem">
-        Des outils simples pour la restauration indépendante, développés par quelqu'un qui
-        travaille en salle.</p>
-    </div>
-    <div>
-      <h4>Espace pro — accès direct</h4>
-      <a href="menu/admin.html">Menu &amp; QR</a>
-      <a href="resa/admin.html">Réservations</a>
-      <a href="avis/admin.html">Avis clients</a>
-      <a href="food-cost/app.html">Coût matière</a>
-      <a href="Planning/app.html">Planning</a>
-      <a href="Gestion/">Cave à vin</a>
-    </div>
-    <div>
-      <h4>Sans compte</h4>
-      <a href="utils/index.html">Boîte à outils gratuite</a>
-      <a href="#prestations">Installation clé en main</a>
-      <a href="#tarifs">Tarifs</a>
-      <a href="#contact">Contact</a>
-    </div>
-    <div class="bas">
-      <span>© <span id="annee"></span> Velox — veloxgestion.fr</span>
-      <span class="mono">Fait en salle, pas en réunion.</span>
-    </div>
-  </div>
-</footer>
-
 <script>
-  document.getElementById('annee').textContent = new Date().getFullYear();
-  // Révélations au défilement (respecte prefers-reduced-motion via CSS)
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('vu'); io.unobserve(e.target); }
-    }, { threshold: 0.12 });
-    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
-  } else {
-    document.querySelectorAll('.reveal').forEach((el) => el.classList.add('vu'));
+  // Si le script principal ne démarre pas (navigateur trop ancien), on le dit.
+  setTimeout(function () {
+    if (window.__repasDemarre) return;
+    var p = document.getElementById("chargement");
+    if (p) p.textContent = "Cette page a besoin d’un navigateur à jour (Safari, Chrome…). Mets-le à jour, puis réessaie.";
+  }, 6000);
+</script>
+
+<script type="module">
+  window.__repasDemarre = true;
+
+  const SDK = "https://www.gstatic.com/firebasejs/10.12.2";
+  const $ = (id) => document.getElementById(id);
+
+  let fb = null;
+  let db = null;
+  let repas = { titre: "Repas entre amis", quand: "", ou: "", boissons: [] };
+  let reglagesAffiche = { image: "affiche.png", qr: { x: 50, y: 80, taille: 28 } };
+  let invite = null;   // { cle, prenom, boisson, heure, jeton }
+  let image = null;    // { blob, url, nom }
+  let enModification = false;
+  let rendu = 0;
+
+  // ---- QR-DEBUT : encodeur QR (mode alphanumérique, correction Q, versions 1 à 5) ----
+  const qrMatrice = (() => {
+    const ALNUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
+    const ECC = [0, 13, 22, 18, 26, 18];
+    const BLOCS = [0, 1, 1, 2, 2, 4];
+    const MASQUES = [
+      (x, y) => (x + y) % 2,
+      (x, y) => y % 2,
+      (x, y) => x % 3,
+      (x, y) => (x + y) % 3,
+      (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2,
+      (x, y) => (x * y) % 2 + (x * y) % 3,
+      (x, y) => ((x * y) % 2 + (x * y) % 3) % 2,
+      (x, y) => ((x + y) % 2 + (x * y) % 3) % 2,
+    ];
+    const bit = (v, i) => ((v >>> i) & 1) !== 0;
+    const bruts = (v) => {
+      let r = (16 * v + 128) * v + 64;
+      if (v >= 2) {
+        const k = Math.floor(v / 7) + 2;
+        r -= (25 * k - 10) * k - 55;
+      }
+      return r;
+    };
+    const octetsDonnees = (v) => Math.floor(bruts(v) / 8) - ECC[v] * BLOCS[v];
+    const gfMul = (x, y) => {
+      let z = 0;
+      for (let i = 7; i >= 0; i--) {
+        z = (z << 1) ^ ((z >>> 7) * 0x11d);
+        z ^= ((y >>> i) & 1) * x;
+      }
+      return z;
+    };
+    const diviseur = (deg) => {
+      const res = new Array(deg - 1).fill(0);
+      res.push(1);
+      let racine = 1;
+      for (let k = 0; k < deg; k++) {
+        for (let j = 0; j < deg; j++) {
+          res[j] = gfMul(res[j], racine);
+          if (j + 1 < deg) res[j] ^= res[j + 1];
+        }
+        racine = gfMul(racine, 2);
+      }
+      return res;
+    };
+    const reste = (data, div) => {
+      const res = new Array(div.length).fill(0);
+      for (const b of data) {
+        const f = b ^ res.shift();
+        res.push(0);
+        div.forEach((c, i) => { res[i] ^= gfMul(c, f); });
+      }
+      return res;
+    };
+
+    return (entree) => {
+      const texte = String(entree).toUpperCase();
+      if (![...texte].every((c) => ALNUM.includes(c))) throw new Error("Caractère non pris en charge");
+      const besoin = 13 + Math.floor(texte.length / 2) * 11 + (texte.length % 2 ? 6 : 0);
+      let v = 1;
+      while (v <= 5 && besoin > octetsDonnees(v) * 8) v++;
+      if (v > 5) throw new Error("Texte trop long");
+      const n = v * 4 + 17;
+      const mod = Array.from({ length: n }, () => new Array(n).fill(false));
+      const fixe = Array.from({ length: n }, () => new Array(n).fill(false));
+      const poser = (x, y, sombre) => { mod[y][x] = sombre; fixe[y][x] = true; };
+
+      // Bits de données
+      const bits = [];
+      const ajouter = (val, k) => { for (let i = k - 1; i >= 0; i--) bits.push((val >>> i) & 1); };
+      ajouter(2, 4);
+      ajouter(texte.length, 9);
+      for (let i = 0; i + 1 < texte.length; i += 2) {
+        ajouter(ALNUM.indexOf(texte[i]) * 45 + ALNUM.indexOf(texte[i + 1]), 11);
+      }
+      if (texte.length % 2) ajouter(ALNUM.indexOf(texte[texte.length - 1]), 6);
+      const capacite = octetsDonnees(v) * 8;
+      ajouter(0, Math.min(4, capacite - bits.length));
+      ajouter(0, (8 - (bits.length % 8)) % 8);
+      for (let pad = 0xec; bits.length < capacite; pad ^= 0xec ^ 0x11) ajouter(pad, 8);
+      const donnees = new Array(bits.length / 8).fill(0);
+      bits.forEach((b, i) => { donnees[i >>> 3] |= b << (7 - (i & 7)); });
+
+      // Motifs fixes
+      for (let i = 0; i < n; i++) {
+        poser(6, i, i % 2 === 0);
+        poser(i, 6, i % 2 === 0);
+      }
+      for (const [cx, cy] of [[3, 3], [n - 4, 3], [3, n - 4]]) {
+        for (let dy = -4; dy <= 4; dy++) {
+          for (let dx = -4; dx <= 4; dx++) {
+            const x = cx + dx;
+            const y = cy + dy;
+            if (x < 0 || x >= n || y < 0 || y >= n) continue;
+            const d = Math.max(Math.abs(dx), Math.abs(dy));
+            poser(x, y, d !== 2 && d !== 4);
+          }
+        }
+      }
+      if (v >= 2) {
+        const p = n - 7;
+        for (let dy = -2; dy <= 2; dy++) {
+          for (let dx = -2; dx <= 2; dx++) poser(p + dx, p + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);
+        }
+      }
+      const format = (masque) => {
+        const d = (3 << 3) | masque;
+        let r = d;
+        for (let i = 0; i < 10; i++) r = (r << 1) ^ ((r >>> 9) * 0x537);
+        const b = ((d << 10) | r) ^ 0x5412;
+        for (let i = 0; i < 6; i++) poser(8, i, bit(b, i));
+        poser(8, 7, bit(b, 6));
+        poser(8, 8, bit(b, 7));
+        poser(7, 8, bit(b, 8));
+        for (let i = 9; i < 15; i++) poser(14 - i, 8, bit(b, i));
+        for (let i = 0; i < 8; i++) poser(n - 1 - i, 8, bit(b, i));
+        for (let i = 8; i < 15; i++) poser(8, n - 15 + i, bit(b, i));
+        poser(8, n - 8, true);
+      };
+      format(0);
+
+      // Correction d'erreurs et entrelacement
+      const nb = BLOCS[v];
+      const lecc = ECC[v];
+      const total = Math.floor(bruts(v) / 8);
+      const courts = nb - (total % nb);
+      const lcourt = Math.floor(total / nb);
+      const div = diviseur(lecc);
+      const blocs = [];
+      for (let i = 0, k = 0; i < nb; i++) {
+        const bloc = donnees.slice(k, k + lcourt - lecc + (i < courts ? 0 : 1));
+        k += bloc.length;
+        const ecc = reste(bloc, div);
+        if (i < courts) bloc.push(0);
+        blocs.push(bloc.concat(ecc));
+      }
+      const mots = [];
+      for (let i = 0; i < blocs[0].length; i++) {
+        blocs.forEach((b, j) => { if (i !== lcourt - lecc || j >= courts) mots.push(b[i]); });
+      }
+
+      // Placement en zigzag
+      let i = 0;
+      for (let droite = n - 1; droite >= 1; droite -= 2) {
+        if (droite === 6) droite = 5;
+        const montant = ((droite + 1) & 2) === 0;
+        for (let vert = 0; vert < n; vert++) {
+          for (let j = 0; j < 2; j++) {
+            const x = droite - j;
+            const y = montant ? n - 1 - vert : vert;
+            if (!fixe[y][x] && i < mots.length * 8) {
+              mod[y][x] = bit(mots[i >>> 3], 7 - (i & 7));
+              i++;
+            }
+          }
+        }
+      }
+
+      // Choix du masque (pénalités de la norme)
+      const appliquer = (m) => {
+        const f = MASQUES[m];
+        for (let y = 0; y < n; y++) {
+          for (let x = 0; x < n; x++) if (!fixe[y][x] && f(x, y) === 0) mod[y][x] = !mod[y][x];
+        }
+      };
+      const penalite = () => {
+        let res = 0;
+        const histo = (run, h) => {
+          if (h[0] === 0) run += n;
+          h.unshift(run);
+          h.pop();
+        };
+        const motifs = (h) => {
+          const k = h[1];
+          const coeur = k > 0 && h[2] === k && h[4] === k && h[5] === k && h[3] === k * 3;
+          return (coeur && h[0] >= k * 4 && h[6] >= k ? 1 : 0) + (coeur && h[6] >= k * 4 && h[0] >= k ? 1 : 0);
+        };
+        const ligne = (lire) => {
+          let couleur = false;
+          let run = 0;
+          const h = [0, 0, 0, 0, 0, 0, 0];
+          for (let k = 0; k < n; k++) {
+            const c = lire(k);
+            if (c === couleur) {
+              run++;
+              if (run === 5) res += 3;
+              else if (run > 5) res++;
+            } else {
+              histo(run, h);
+              if (!couleur) res += motifs(h) * 40;
+              couleur = c;
+              run = 1;
+            }
+          }
+          if (couleur) {
+            histo(run, h);
+            run = 0;
+          }
+          histo(run + n, h);
+          res += motifs(h) * 40;
+        };
+        for (let y = 0; y < n; y++) ligne((x) => mod[y][x]);
+        for (let x = 0; x < n; x++) ligne((y) => mod[y][x]);
+        for (let y = 0; y < n - 1; y++) {
+          for (let x = 0; x < n - 1; x++) {
+            const c = mod[y][x];
+            if (c === mod[y][x + 1] && c === mod[y + 1][x] && c === mod[y + 1][x + 1]) res += 3;
+          }
+        }
+        let sombres = 0;
+        for (const r of mod) for (const c of r) if (c) sombres++;
+        const surface = n * n;
+        res += (Math.ceil(Math.abs(sombres * 20 - surface * 10) / surface) - 1) * 10;
+        return res;
+      };
+      let meilleur = 0;
+      let minimum = Infinity;
+      for (let m = 0; m < 8; m++) {
+        appliquer(m);
+        format(m);
+        const p = penalite();
+        if (p < minimum) {
+          minimum = p;
+          meilleur = m;
+        }
+        appliquer(m);
+      }
+      appliquer(meilleur);
+      format(meilleur);
+      return mod;
+    };
+  })();
+  // ---- QR-FIN ----
+
+  const MARGE_QR = 4;
+
+  function qrSvg(texte) {
+    const m = qrMatrice(texte);
+    const t = m.length + MARGE_QR * 2;
+    let d = "";
+    m.forEach((ligne, y) => ligne.forEach((sombre, x) => {
+      if (sombre) d += `M${x + MARGE_QR} ${y + MARGE_QR}h1v1h-1z`;
+    }));
+    return `<svg viewBox="0 0 ${t} ${t}" shape-rendering="crispEdges" role="img" aria-label="QR code de ton invitation">`
+      + `<rect width="${t}" height="${t}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
   }
+
+  // ---------- Outils ----------
+  const nettoyer = (t) => String(t ?? "").replace(/\s+/g, " ").trim();
+  const insecable = (t) => t.replace(/(\d) ?h ?(\d{2})\b/g, "$1\u00A0h\u00A0$2").replace(/(\d) h\b/g, "$1\u00A0h");
+  const chemin = (cle) => `repas/invites/${cle}`;
+  const heureLisible = (h) => {
+    const [hh, mm] = String(h).split(":");
+    if (!mm) return String(h);
+    return mm === "00" ? `${Number(hh)} h` : `${Number(hh)} h ${mm}`;
+  };
+
+  function cleDe(prenom) {
+    const base = prenom.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    if (base) return base.slice(0, 40);
+    return Array.from(prenom.toLowerCase(), (c) => c.codePointAt(0).toString(36)).join("-").slice(0, 40);
+  }
+
+  function genererJeton() {
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    return Array.from(crypto.getRandomValues(new Uint8Array(10)), (o) => alphabet[o & 31]).join("");
+  }
+
+  const estComplet = (d) => !!(d && d.prenom && d.jeton && d.boisson && d.heure);
+
+  function montrer(nom) {
+    $("chargement").hidden = true;
+    for (const e of ["formulaire", "invitation"]) $(`ecran-${e}`).hidden = e !== nom;
+    window.scrollTo(0, 0);
+  }
+
+  function afficherErreur(id, message) {
+    const p = $(id);
+    p.textContent = message || "";
+    p.hidden = !message;
+  }
+
+  function panne(message) {
+    $("chargement").hidden = true;
+    for (const e of ["formulaire", "invitation"]) $(`ecran-${e}`).hidden = true;
+    afficherErreur("erreur-globale", message);
+  }
+
+  function messageBase(err) {
+    const t = String((err && (err.code || err.message)) || "").toLowerCase();
+    if (t.includes("permission")) return "La base de données refuse l’inscription. Préviens l’organisateur du repas.";
+    return "Connexion impossible. Vérifie ton réseau, puis réessaie.";
+  }
+
+  function memoriserDansUrl(cle) {
+    try {
+      const url = new URL(location.href);
+      if (cle) url.searchParams.set("p", cle);
+      else url.searchParams.delete("p");
+      history.replaceState(null, "", url);
+    } catch (e) {
+      // aperçu sans historique : sans importance
+    }
+  }
+
+  // ---------- Formulaire ----------
+  function majPuces() {
+    const v = nettoyer($("boisson").value).toLowerCase();
+    for (const p of $("puces").children) p.setAttribute("aria-pressed", String(p.textContent.toLowerCase() === v));
+  }
+
+  $("puces").addEventListener("click", (e) => {
+    const puce = e.target.closest(".puce");
+    if (!puce) return;
+    $("boisson").value = puce.textContent;
+    majPuces();
+    afficherErreur("erreur-formulaire", "");
+  });
+  $("boisson").addEventListener("input", majPuces);
+  for (const id of ["prenom", "boisson", "heure"]) {
+    $(id).addEventListener("input", () => afficherErreur("erreur-formulaire", ""));
+  }
+
+  function ouvrirFormulaire(modification) {
+    enModification = modification;
+    $("titre-formulaire").textContent = modification ? "Modifie tes infos" : "Inscris-toi";
+    $("bouton-valider").textContent = modification ? "Enregistrer" : "Recevoir mon invitation";
+    $("annuler").hidden = !modification;
+    $("prenom").readOnly = modification;
+    if (modification) {
+      $("prenom").value = invite.prenom;
+      $("boisson").value = invite.boisson;
+      $("heure").value = invite.heure;
+    }
+    majPuces();
+    afficherErreur("erreur-formulaire", "");
+    montrer("formulaire");
+  }
+
+  $("annuler").addEventListener("click", () => afficherInvitation(false));
+
+  $("ecran-formulaire").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    afficherErreur("erreur-formulaire", "");
+    const prenom = enModification ? invite.prenom : nettoyer($("prenom").value);
+    const boisson = nettoyer($("boisson").value);
+    const heure = $("heure").value;
+    let probleme = null;
+    if (!prenom) probleme = ["prenom", "Écris ton prénom."];
+    else if (!boisson) probleme = ["boisson", "Choisis ou écris ta boisson."];
+    else if (!/^[0-2]\d:[0-5]\d$/.test(heure)) probleme = ["heure", "Indique ton heure d’arrivée."];
+    if (probleme) {
+      afficherErreur("erreur-formulaire", probleme[1]);
+      $(probleme[0]).focus();
+      return;
+    }
+
+    const bouton = $("bouton-valider");
+    const texte = bouton.textContent;
+    bouton.textContent = "Un instant…";
+    bouton.disabled = true;
+    try {
+      const cle = enModification ? invite.cle : cleDe(prenom);
+      let ancien = enModification ? invite : null;
+      if (!ancien) {
+        const snap = await fb.get(fb.ref(db, chemin(cle)));
+        ancien = snap.exists() ? snap.val() : null;
+      }
+      const fiche = {
+        prenom: (ancien && ancien.prenom) || prenom,
+        boisson,
+        heure,
+        jeton: (ancien && ancien.jeton) || genererJeton(),
+      };
+      await fb.update(fb.ref(db, chemin(cle)), fiche);
+      invite = { cle, ...fiche };
+      afficherInvitation(true);
+    } catch (err) {
+      afficherErreur("erreur-formulaire", messageBase(err));
+    } finally {
+      bouton.textContent = texte;
+      bouton.disabled = false;
+    }
+  });
+
+  // ---------- Invitation ----------
+  function afficherInvitation(nouveau) {
+    $("titre-invitation").textContent = nouveau
+      ? `C’est noté, ${invite.prenom}\u00A0!`
+      : `Ton invitation, ${invite.prenom}`;
+    memoriserDansUrl(invite.cle);
+    montrer("invitation");
+    preparerImage();
+  }
+
+  $("modifier").addEventListener("click", () => ouvrirFormulaire(true));
+
+  $("pas-moi").addEventListener("click", () => {
+    invite = null;
+    memoriserDansUrl(null);
+    for (const id of ["prenom", "boisson", "heure"]) $(id).value = "";
+    ouvrirFormulaire(false);
+    $("prenom").focus();
+  });
+
+  function chargerImage(src) {
+    return new Promise((ok, ko) => {
+      const img = new Image();
+      img.onload = () => ok(img);
+      img.onerror = () => ko(new Error(`Image introuvable : ${src}`));
+      img.src = src;
+    });
+  }
+
+  function versBlob(canvas, type) {
+    return new Promise((ok, ko) => {
+      canvas.toBlob((b) => (b ? ok(b) : ko(new Error("Image impossible"))), type, 0.92);
+    });
+  }
+
+  function rectangleArrondi(ctx, x, y, l, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + l, y, x + l, y + h, r);
+    ctx.arcTo(x + l, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + l, y, r);
+    ctx.closePath();
+  }
+
+  // L'affiche de l'organisateur, avec le QR code de l'invité posé dessus
+  async function dessinerAffiche(inv) {
+    const fichier = String(reglagesAffiche.image || "");
+    if (!fichier) throw new Error("Pas d’affiche");
+    const img = await chargerImage(new URL(fichier, location.href).href);
+    const echelle = Math.min(1, 2400 / Math.max(img.naturalWidth, img.naturalHeight));
+    const L = Math.round(img.naturalWidth * echelle);
+    const H = Math.round(img.naturalHeight * echelle);
+    const canvas = document.createElement("canvas");
+    canvas.width = L;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, L, H);
+
+    const { x = 50, y = 80, taille = 28 } = reglagesAffiche.qr || {};
+    const matrice = qrMatrice(`REPAS-${inv.jeton}`);
+    const modules = matrice.length + MARGE_QR * 2;
+    const pas = Math.max(2, Math.floor((L * taille) / 100 / modules));
+    const cote = pas * modules;
+    const x0 = Math.round((L * x) / 100 - cote / 2);
+    const y0 = Math.round((H * y) / 100 - cote / 2);
+    ctx.fillStyle = "#FFFFFF";
+    rectangleArrondi(ctx, x0, y0, cote, cote, pas * 1.5);
+    ctx.fill();
+    ctx.fillStyle = "#000000";
+    matrice.forEach((ligne, j) => ligne.forEach((sombre, i) => {
+      if (sombre) ctx.fillRect(x0 + (i + MARGE_QR) * pas, y0 + (j + MARGE_QR) * pas, pas, pas);
+    }));
+
+    const jpeg = /\.jpe?g$/i.test(fichier);
+    return { blob: await versBlob(canvas, jpeg ? "image/jpeg" : "image/png"), ext: jpeg ? "jpg" : "png" };
+  }
+
+  // Invitation simple, utilisée tant que l'affiche n'est pas dans le dossier
+  function ajusterPolice(ctx, texte, poids, famille, max, largeur) {
+    let taille = max;
+    do {
+      ctx.font = `${poids} ${taille}px ${famille}`;
+      if (ctx.measureText(texte).width <= largeur) break;
+      taille -= 2;
+    } while (taille > 24);
+    return taille;
+  }
+
+  async function dessinerInvitation(inv) {
+    try { await document.fonts.ready; } catch (e) { /* polices système */ }
+    const L = 1080;
+    const M = 80;
+    const TITRE = "'Barlow Condensed', 'Arial Narrow', sans-serif";
+    const TEXTE = "'Barlow', system-ui, sans-serif";
+    const infos = [repas.quand, repas.ou].map(nettoyer).filter(Boolean).map(insecable);
+    const matrice = qrMatrice(`REPAS-${inv.jeton}`);
+    const modules = matrice.length + MARGE_QR * 2;
+    const pas = Math.floor(640 / modules);
+    const cote = pas * modules;
+
+    const hTete = 72 + 92 + infos.length * 54 + 52;
+    const hQr = 40 + cote + 40;
+    const hCorps = 56 + 116 + 2 * 92 + 56;
+    const canvas = document.createElement("canvas");
+    canvas.width = L;
+    canvas.height = hTete + hQr + hCorps;
+    const ctx = canvas.getContext("2d");
+    ctx.textBaseline = "top";
+
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, L, canvas.height);
+
+    ctx.fillStyle = "#1F3A2E";
+    ctx.fillRect(0, 0, L, hTete);
+    ctx.fillStyle = "#FFFFFF";
+    ajusterPolice(ctx, repas.titre, 700, TITRE, 92, L - 2 * M);
+    ctx.fillText(repas.titre, M, 72);
+    ctx.fillStyle = "#CFE0D6";
+    infos.forEach((ligne, i) => {
+      ajusterPolice(ctx, ligne, 500, TEXTE, 40, L - 2 * M);
+      ctx.fillText(ligne, M, 72 + 92 + 18 + i * 54);
+    });
+
+    const x0 = Math.round((L - cote) / 2);
+    const y0 = hTete + 40;
+    ctx.fillStyle = "#000000";
+    matrice.forEach((ligne, y) => ligne.forEach((sombre, x) => {
+      if (sombre) ctx.fillRect(x0 + (x + MARGE_QR) * pas, y0 + (y + MARGE_QR) * pas, pas, pas);
+    }));
+
+    const yPerfo = hTete + hQr;
+    ctx.strokeStyle = "#D3DCD6";
+    ctx.lineWidth = 4;
+    ctx.setLineDash([18, 14]);
+    ctx.beginPath();
+    ctx.moveTo(M, yPerfo);
+    ctx.lineTo(L - M, yPerfo);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    let y = yPerfo + 56;
+    ctx.fillStyle = "#1F3A2E";
+    ajusterPolice(ctx, inv.prenom, 700, TITRE, 116, L - 2 * M);
+    ctx.fillText(inv.prenom, M, y);
+    y += 116;
+
+    for (const [etiquette, valeur] of [["Boisson", inv.boisson], ["Arrivée", heureLisible(inv.heure)]]) {
+      ctx.fillStyle = "#D3DCD6";
+      ctx.fillRect(M, y + 16, L - 2 * M, 2);
+      ctx.font = `400 38px ${TEXTE}`;
+      ctx.fillStyle = "#5C6B63";
+      ctx.fillText(etiquette, M, y + 40);
+      const largeurEtiquette = ctx.measureText(etiquette).width;
+      ajusterPolice(ctx, valeur, 600, TEXTE, 44, L - 2 * M - largeurEtiquette - 40);
+      ctx.fillStyle = "#1F3A2E";
+      ctx.textAlign = "right";
+      ctx.fillText(valeur, L - M, y + 36);
+      ctx.textAlign = "left";
+      y += 92;
+    }
+
+    return new Promise((ok, ko) => canvas.toBlob((b) => (b ? ok(b) : ko(new Error("Image impossible"))), "image/png"));
+  }
+  async function dessinerSecours(inv) {
+    return { blob: await dessinerInvitation(inv), ext: "png" };
+  }
+
+  async function preparerImage() {
+    const numero = ++rendu;
+    const pour = { ...invite };
+    const img = $("affiche");
+    const attente = $("affiche-attente");
+    $("enregistrer").disabled = true;
+    img.hidden = true;
+    attente.hidden = false;
+    attente.textContent = "Préparation de ton invitation…";
+    try {
+      let resultat;
+      try {
+        resultat = await dessinerAffiche(pour);
+      } catch (e) {
+        console.info(`Affiche indisponible (${e.message}) : invitation simple à la place.`);
+        resultat = await dessinerSecours(pour);
+      }
+      if (numero !== rendu) return;
+      if (image) URL.revokeObjectURL(image.url);
+      image = {
+        blob: resultat.blob,
+        url: URL.createObjectURL(resultat.blob),
+        nom: `invitation-${pour.cle}.${resultat.ext}`,
+      };
+      img.alt = `Invitation de ${pour.prenom}, avec son QR code`;
+      img.src = image.url;
+      img.hidden = false;
+      attente.hidden = true;
+      $("enregistrer").disabled = false;
+    } catch (e) {
+      if (numero === rendu) attente.textContent = "L’image n’a pas pu être créée. Utilise « Agrandir le QR code ».";
+    }
+  }
+
+  $("enregistrer").addEventListener("click", () => {
+    if (!image) return;
+    const fichier = new File([image.blob], image.nom, { type: image.blob.type });
+    if (navigator.canShare && navigator.canShare({ files: [fichier] })) {
+      navigator.share({ files: [fichier], title: repas.titre }).catch(() => {});
+      return;
+    }
+    const lien = document.createElement("a");
+    lien.href = image.url;
+    lien.download = image.nom;
+    document.body.append(lien);
+    lien.click();
+    lien.remove();
+  });
+
+  // ---------- QR code en grand ----------
+  function fermerGrand() {
+    if ($("grand-qr").hidden) return;
+    $("grand-qr").hidden = true;
+    document.body.classList.remove("grand-ouvert");
+    $("agrandir").focus();
+  }
+
+  $("agrandir").addEventListener("click", () => {
+    $("grand-qr-code").innerHTML = qrSvg(`REPAS-${invite.jeton}`);
+    $("grand-qr-nom").textContent = invite.prenom;
+    $("grand-qr").hidden = false;
+    document.body.classList.add("grand-ouvert");
+    $("fermer-grand").focus();
+  });
+  $("grand-qr").addEventListener("click", fermerGrand);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") fermerGrand(); });
+
+  // ---------- Démarrage ----------
+  function appliquerTextes() {
+    document.title = repas.titre;
+    $("titre").textContent = repas.titre;
+    const infos = [repas.quand, repas.ou].map(nettoyer).filter(Boolean).map(insecable).join("\n");
+    $("infos").textContent = infos;
+    $("infos").hidden = !infos;
+    const boissons = Array.isArray(repas.boissons) ? repas.boissons.map(nettoyer).filter(Boolean) : [];
+    $("puces").replaceChildren(...boissons.map((nom) => {
+      const puce = document.createElement("button");
+      puce.type = "button";
+      puce.className = "puce";
+      puce.textContent = nom;
+      puce.setAttribute("aria-pressed", "false");
+      return puce;
+    }));
+    $("puces").hidden = boissons.length === 0;
+  }
+
+  const configRemplie = (c) => !!(c && c.apiKey && c.databaseURL && !/COLLE/i.test(`${c.apiKey}${c.databaseURL}`));
+
+  async function demarrer() {
+    let config;
+    try {
+      config = await import("./config.js");
+    } catch (e) {
+      panne("Le fichier config.js est introuvable. Il doit être dans le même dossier que cette page.");
+      return;
+    }
+    repas = { ...repas, ...(config.repas || {}) };
+    reglagesAffiche = { ...reglagesAffiche, ...(config.affiche || {}) };
+    appliquerTextes();
+
+    if (!configRemplie(config.firebaseConfig)) {
+      panne("Le site n’est pas encore relié à sa base de données. Colle la config Firebase dans config.js.");
+      return;
+    }
+    try {
+      const [app, base] = await Promise.all([
+        import(`${SDK}/firebase-app.js`),
+        import(`${SDK}/firebase-database.js`),
+      ]);
+      fb = base;
+      db = base.getDatabase(app.initializeApp(config.firebaseConfig));
+    } catch (e) {
+      panne("Le site n’arrive pas à se charger. Vérifie ta connexion, puis recharge la page.");
+      return;
+    }
+
+    const cle = new URLSearchParams(location.search).get("p");
+    if (cle && /^[a-z0-9-]{1,60}$/.test(cle)) {
+      try {
+        const snap = await fb.get(fb.ref(db, chemin(cle)));
+        const d = snap.exists() ? snap.val() : null;
+        if (estComplet(d)) {
+          invite = { cle, prenom: d.prenom, boisson: d.boisson, heure: d.heure, jeton: d.jeton };
+          afficherInvitation(false);
+          return;
+        }
+      } catch (err) {
+        ouvrirFormulaire(false);
+        afficherErreur("erreur-formulaire", messageBase(err));
+        return;
+      }
+      memoriserDansUrl(null);
+    }
+    ouvrirFormulaire(false);
+  }
+
+  demarrer();
 </script>
 </body>
 </html>
