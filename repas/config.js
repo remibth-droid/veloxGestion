@@ -2,11 +2,11 @@
  
 // 1) Colle ici la config Firebase de tes apps Velox (projet cave-2004).
 export const firebaseConfig = {
-  apiKey: "COLLE_ICI",
+  apiKey: "AIzaSyC8OgrDoj-D5tpWDlIK7EmEiIM0_Bwuhig",
   authDomain: "cave-2004.firebaseapp.com",
-  databaseURL: "COLLE_ICI",
+  databaseURL: "https://cave-2004.firebaseapp.com",
   projectId: "cave-2004",
-  appId: "COLLE_ICI",
+  appId: "1:142269678134:web:48805cde3f78a65531ce97",
 };
  
 // 2) Ce qui s'affiche sur le site (laisse "" pour ne rien afficher).
