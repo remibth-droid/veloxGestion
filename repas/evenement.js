@@ -6,7 +6,7 @@ export const repas = {
   date: "Dimanche 20 septembre",
   heure: "à partir de 19 h 30",
   lieu: "2 place Champgil",
-  invitesAttendus: 4,
+  invitesAttendus: 10,
   boissons: ["Cocktail fraise", "Rosé", "Bière", "Vin rouge", "Champagne", "Soft", "Eau pétillante"],
 };
 
